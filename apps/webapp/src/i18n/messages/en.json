@@ -150,13 +150,6 @@
 				"afternoon": "Good afternoon",
 				"evening": "Good evening"
 			},
-			"weather": {
-				"summaryAriaLabel": "{description}, {temperature} degrees {unit}",
-				"units": {
-					"celsius": "Celsius",
-					"fahrenheit": "Fahrenheit"
-				}
-			},
 			"subtitle": "Here's a quick look at how things are going."
 		}
 	},

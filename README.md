@@ -29,20 +29,20 @@ This repo is a Bun workspaces + Turborepo monorepo centered around a Next.js 16 
 
 ## Package overview
 
-| Package     | Role                                                     |
-| ----------- | -------------------------------------------------------- |
-| `ai`        | AI models, prompts, AI SDK configuration                 |
-| `app-store` | OAuth and connectors (e.g. Gmail, Google Calendar)       |
-| `cache`     | Redis / KV and rate limits                               |
-| `db`        | Drizzle schema, migrations, DB access                    |
-| `email`     | React Email + Resend                                     |
-| `evals`     | Evalite evals for prompts and model behavior             |
-| `logger`    | Shared logging for client and server                     |
-| `pdf`       | React PDF templates and helpers                          |
-| `server`    | tRPC, auth, agents, integrations (Dub, AssemblyAI, etc.) |
-| `tsconfig`  | Shared TypeScript bases                                  |
-| `ui`        | Design system, Tailwind tokens, CVA, Base UI             |
-| `utils`     | Shared utilities (e.g. base URL helpers)                 |
+| Package     | Role                                               |
+| ----------- | -------------------------------------------------- |
+| `ai`        | AI models, prompts, AI SDK configuration           |
+| `app-store` | OAuth and connectors (e.g. Gmail, Google Calendar) |
+| `cache`     | Redis / KV and rate limits                         |
+| `db`        | Drizzle schema, migrations, DB access              |
+| `email`     | React Email + Resend                               |
+| `evals`     | Evalite evals for prompts and model behavior       |
+| `logger`    | Shared logging for client and server               |
+| `pdf`       | React PDF templates and helpers                    |
+| `server`    | tRPC, auth, agents, integrations (Dub, etc.)       |
+| `tsconfig`  | Shared TypeScript bases                            |
+| `ui`        | Design system, Tailwind tokens, CVA, Base UI       |
+| `utils`     | Shared utilities (e.g. base URL helpers)           |
 
 ## Local Development Notes
 

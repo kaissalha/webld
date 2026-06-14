@@ -16,7 +16,7 @@ export const getBaseURL = () => {
 		process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF === "main" ||
 		process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF === "master"
 	) {
-		return new URL("https://webld-webapp.vercel.app");
+		return new URL("https://webld.vercel.app");
 	}
 
 	// Fallback for branch deployments

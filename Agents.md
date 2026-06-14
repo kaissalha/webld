@@ -98,7 +98,7 @@
 - **packages/evals**: Evalite-based evaluation suite for prompts and AI behavior
 - **packages/logger**: Shared logging and observability helpers for client/server usage
 - **packages/pdf**: React PDF templates and document-generation helpers
-- **packages/server**: Server-side services and lib integrations (AI agents/tools, auth, payments, Resend, Dub, AssemblyAI, tRPC)
+- **packages/server**: Server-side services and lib integrations (AI agents/tools, auth, payments, Resend, Dub, tRPC)
 - **packages/tsconfig**: Shared TypeScript configs (base, web, node, react-lib, react-native)
 - **packages/ui**: Shared UI components, hooks, and global design tokens (Tailwind v4, CVA, Base UI/Radix)
 - **packages/utils**: Shared utility functions (get-base-url)
@@ -120,4 +120,3 @@
 - posthog: https://posthog.com/llms.txt
 - zod: https://zod.dev/llms.txt
 - upstash: https://upstash.com/docs/llms.txt
-- assemblyai: https://www.assemblyai.com/docs/llms.txt
