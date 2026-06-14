@@ -1,5 +1,3 @@
-import { cache } from "react";
-
 import { TRPCError } from "@trpc/server";
 import { and, eq, inArray, sql, type SQL } from "drizzle-orm";
 
@@ -24,13 +22,13 @@ type ContactFormInput = {
 	phoneNumber?: string | null;
 };
 
-export const getContact = cache(async ({ id, organizationId }: FindContactInput) => {
+export const getContact = async ({ id, organizationId }: FindContactInput) => {
 	return db.query.contacts.findFirst({
 		where: { id, organizationId },
 	});
-});
+};
 
-export const getContactByEmail = cache(async ({ email, organizationId }: { email: string; organizationId: string }) => {
+export const getContactByEmail = async ({ email, organizationId }: { email: string; organizationId: string }) => {
 	const normalizedEmail = email.trim().toLowerCase();
 	if (!normalizedEmail) {
 		return null;
@@ -43,27 +41,32 @@ export const getContactByEmail = cache(async ({ email, organizationId }: { email
 		.limit(1);
 
 	return contact ?? null;
-});
+};
 
-export const listContacts = cache(
-	async ({ cursor = null, order, organizationId, pageSize = 20, search, sort }: ListContactsInput) => {
-		const whereConditions: SQL[] = [eq(contacts.organizationId, organizationId)];
-		const query = db.select().from(contacts).$dynamic();
+export const listContacts = async ({
+	cursor = null,
+	order,
+	organizationId,
+	pageSize = 20,
+	search,
+	sort,
+}: ListContactsInput) => {
+	const whereConditions: SQL[] = [eq(contacts.organizationId, organizationId)];
+	const query = db.select().from(contacts).$dynamic();
 
-		if (sort) {
-			withOrderBy({ query, model: contacts, orderBy: sort, order, joinedColumns: {} });
-		}
-
-		if (search) {
-			addFullTextSearch({ whereConditions, model: contacts, searchTerm: search });
-		}
-
-		const whereCondition = and(...whereConditions) as SQL;
-		query.where(whereCondition);
-
-		return queryWithPagination({ query, model: contacts, pageSize, cursor, whereCondition });
+	if (sort) {
+		withOrderBy({ query, model: contacts, orderBy: sort, order, joinedColumns: {} });
 	}
-);
+
+	if (search) {
+		addFullTextSearch({ whereConditions, model: contacts, searchTerm: search });
+	}
+
+	const whereCondition = and(...whereConditions) as SQL;
+	query.where(whereCondition);
+
+	return queryWithPagination({ query, model: contacts, pageSize, cursor, whereCondition });
+};
 
 const mapContactInput = (input: ContactFormInput & { organizationId: string }) => ({
 	email: input.email,

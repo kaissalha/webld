@@ -1,5 +1,3 @@
-import { cache } from "react";
-
 import { TRPCError } from "@trpc/server";
 import { and, eq, inArray, type SQL } from "drizzle-orm";
 
@@ -28,7 +26,7 @@ type ListNotesInput = PaginationProps & {
 	resourceId?: string;
 };
 
-export const getNote = cache(async ({ id, organizationId }: { organizationId: string; id: string }) => {
+export const getNote = async ({ id, organizationId }: { organizationId: string; id: string }) => {
 	const note = await db.query.notes.findFirst({
 		where: { id, organizationId },
 		with: {
@@ -37,97 +35,95 @@ export const getNote = cache(async ({ id, organizationId }: { organizationId: st
 	});
 
 	return note;
-});
+};
 
-export const listNotes = cache(
-	async ({
-		pageSize = 20,
-		cursor = null,
-		sort = "createdAt",
-		order = "desc",
-		search,
-		organizationId,
-		resourceType,
-		resourceId,
-	}: ListNotesInput) => {
-		// If filtering by resource, first get the note IDs that mention this resource
-		let noteIdsWithResource: string[] | undefined;
+export const listNotes = async ({
+	pageSize = 20,
+	cursor = null,
+	sort = "createdAt",
+	order = "desc",
+	search,
+	organizationId,
+	resourceType,
+	resourceId,
+}: ListNotesInput) => {
+	// If filtering by resource, first get the note IDs that mention this resource
+	let noteIdsWithResource: string[] | undefined;
 
-		if (resourceType && resourceId) {
-			const mentionsForResource = await db
-				.select({ noteId: noteMentions.noteId })
-				.from(noteMentions)
-				.where(and(eq(noteMentions.resourceType, resourceType), eq(noteMentions.resourceId, resourceId)));
+	if (resourceType && resourceId) {
+		const mentionsForResource = await db
+			.select({ noteId: noteMentions.noteId })
+			.from(noteMentions)
+			.where(and(eq(noteMentions.resourceType, resourceType), eq(noteMentions.resourceId, resourceId)));
 
-			noteIdsWithResource = mentionsForResource.map((m) => m.noteId);
+		noteIdsWithResource = mentionsForResource.map((m) => m.noteId);
 
-			// If no notes mention this resource, return empty result
-			if (noteIdsWithResource.length === 0) {
-				return {
-					data: [],
-					meta: {
-						totalData: 0,
-						totalPages: 0,
-						cursor: null,
-					},
-				};
-			}
-		}
-
-		const whereConditions: SQL[] = [eq(notes.organizationId, organizationId)];
-
-		if (noteIdsWithResource) {
-			whereConditions.push(inArray(notes.id, noteIdsWithResource));
-		}
-
-		const query = db.select().from(notes).$dynamic();
-
-		if (sort) {
-			withOrderBy({ query, model: notes, orderBy: sort, order, joinedColumns: {} });
-		}
-
-		if (search) {
-			addFullTextSearch({ whereConditions, model: notes, searchTerm: search });
-		}
-
-		const whereCondition = and(...whereConditions) as SQL;
-		query.where(whereCondition);
-
-		const result = await queryWithPagination({ query, model: notes, pageSize, cursor, whereCondition });
-
-		// Fetch mentions for all notes
-		if (result.data.length > 0) {
-			const noteIds = result.data.map((n) => n.id);
-			const allMentions = await db.select().from(noteMentions).where(inArray(noteMentions.noteId, noteIds));
-
-			const mentionsByNoteId = allMentions.reduce(
-				(acc, mention) => {
-					if (!acc[mention.noteId]) {
-						acc[mention.noteId] = [];
-					}
-					acc[mention.noteId].push(mention);
-					return acc;
-				},
-				{} as Record<string, NoteMention[]>
-			);
-
-			const notesWithMentions = result.data.map((note) => ({
-				...note,
-				mentions: mentionsByNoteId[note.id] || [],
-			}));
-
+		// If no notes mention this resource, return empty result
+		if (noteIdsWithResource.length === 0) {
 			return {
-				...result,
-				data: notesWithMentions,
+				data: [],
+				meta: {
+					totalData: 0,
+					totalPages: 0,
+					cursor: null,
+				},
 			};
 		}
+	}
+
+	const whereConditions: SQL[] = [eq(notes.organizationId, organizationId)];
+
+	if (noteIdsWithResource) {
+		whereConditions.push(inArray(notes.id, noteIdsWithResource));
+	}
+
+	const query = db.select().from(notes).$dynamic();
+
+	if (sort) {
+		withOrderBy({ query, model: notes, orderBy: sort, order, joinedColumns: {} });
+	}
+
+	if (search) {
+		addFullTextSearch({ whereConditions, model: notes, searchTerm: search });
+	}
+
+	const whereCondition = and(...whereConditions) as SQL;
+	query.where(whereCondition);
+
+	const result = await queryWithPagination({ query, model: notes, pageSize, cursor, whereCondition });
+
+	// Fetch mentions for all notes
+	if (result.data.length > 0) {
+		const noteIds = result.data.map((n) => n.id);
+		const allMentions = await db.select().from(noteMentions).where(inArray(noteMentions.noteId, noteIds));
+
+		const mentionsByNoteId = allMentions.reduce(
+			(acc, mention) => {
+				if (!acc[mention.noteId]) {
+					acc[mention.noteId] = [];
+				}
+				acc[mention.noteId].push(mention);
+				return acc;
+			},
+			{} as Record<string, NoteMention[]>
+		);
+
+		const notesWithMentions = result.data.map((note) => ({
+			...note,
+			mentions: mentionsByNoteId[note.id] || [],
+		}));
 
 		return {
 			...result,
-			data: result.data.map((note) => ({ ...note, mentions: [] as NoteMention[] })),
+			data: notesWithMentions,
 		};
 	}
-);
+
+	return {
+		...result,
+		data: result.data.map((note) => ({ ...note, mentions: [] as NoteMention[] })),
+	};
+};
 
 export const createNote = async (input: { organizationId: string; body: string; mentions?: MentionInput[] }) => {
 	const { mentions = [], ...noteData } = input;

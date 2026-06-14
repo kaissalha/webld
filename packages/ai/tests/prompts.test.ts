@@ -8,14 +8,9 @@ import {
 	mailSearchRewriteSchema,
 	mailThreadClassificationSchema,
 	ragAnswerSystemPrompt,
-	removeImageBackgroundPrompt,
 } from "../src/prompts";
 
 describe("prompts", () => {
-	it("keeps the image background removal prompt in the AI package", () => {
-		expect(removeImageBackgroundPrompt).toContain("remove the background");
-	});
-
 	it("adds a trimmed current user section when user details are provided", () => {
 		const prompt = dashboardChatSystemPrompt({
 			currentUser: {

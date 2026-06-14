@@ -1,5 +1,3 @@
-import { cache } from "react";
-
 import { headers } from "next/headers";
 import { after, type NextRequest, NextResponse } from "next/server";
 
@@ -24,21 +22,19 @@ export const streamContext = createResumableStreamContext({
 	subscriber: createTCPRedisClient(process.env.REDIS_URL),
 });
 
-export const convertDbMessagesForUI = cache(
-	<TMessage extends BaseChatUIMessage>(messages: DbChatMessage[]): TMessage[] => {
-		return messages.map<TMessage>(
-			(message) =>
-				({
-					id: message.id,
-					role: message.role as TMessage["role"],
-					parts: message.parts as TMessage["parts"],
-					metadata: {
-						createdAt: formatISO(message.createdAt),
-					},
-				}) as TMessage
-		);
-	}
-);
+export const convertDbMessagesForUI = <TMessage extends BaseChatUIMessage>(messages: DbChatMessage[]): TMessage[] => {
+	return messages.map<TMessage>(
+		(message) =>
+			({
+				id: message.id,
+				role: message.role as TMessage["role"],
+				parts: message.parts as TMessage["parts"],
+				metadata: {
+					createdAt: formatISO(message.createdAt),
+				},
+			}) as TMessage
+	);
+};
 
 /**
  * Shared handler for resuming chat streams.

@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-export const removeImageBackgroundPrompt = "do not change anything, we only want to remove the background";
-
 type CurrentUser = {
 	email?: string;
 	name?: string;

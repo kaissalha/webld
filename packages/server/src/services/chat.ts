@@ -1,5 +1,3 @@
-import { cache } from "react";
-
 import { TRPCError } from "@trpc/server";
 import { asc, eq } from "drizzle-orm";
 
@@ -58,7 +56,7 @@ export const saveOrUpdateChatMessage = async (chatId: string, message: BaseChatU
 	}
 };
 
-export const getChat = cache(async (id: string, organizationId: string) => {
+export const getChat = async (id: string, organizationId: string) => {
 	try {
 		const chat = await db.query.aiChats.findFirst({
 			where: {
@@ -71,9 +69,9 @@ export const getChat = cache(async (id: string, organizationId: string) => {
 	} catch (error) {
 		throw new Error("Failed to get chat", { cause: error });
 	}
-});
+};
 
-export const getChats = cache(async (organizationId: string) => {
+export const getChats = async (organizationId: string) => {
 	try {
 		const chats = await db.query.aiChats.findMany({
 			where: { organizationId },
@@ -86,9 +84,9 @@ export const getChats = cache(async (organizationId: string) => {
 	} catch (error) {
 		throw new Error("Failed to get chats", { cause: error });
 	}
-});
+};
 
-const getChatMessagesFromDbQuery = async ({ chatId, organizationId }: { chatId: string; organizationId: string }) => {
+export const getChatMessagesFromDb = async ({ chatId, organizationId }: { chatId: string; organizationId: string }) => {
 	try {
 		const chat = await db.query.aiChats.findFirst({
 			where: {
@@ -111,9 +109,6 @@ const getChatMessagesFromDbQuery = async ({ chatId, organizationId }: { chatId: 
 		throw new Error("Failed to get chat messages", { cause: error });
 	}
 };
-
-export const getChatMessagesFromDb = cache(getChatMessagesFromDbQuery);
-export const getChatMessagesFromDbUncached = getChatMessagesFromDbQuery;
 
 export const deleteChat = async (chatId: string, organizationId: string) => {
 	const chat = await getChat(chatId, organizationId);
