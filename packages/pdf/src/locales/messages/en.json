@@ -1,0 +1,23 @@
+{
+	"components": {
+		"footer": {
+			"copyright": "© {year} {companyName}. All rights reserved.",
+			"page": "Page {pageNumber} of {totalPages}"
+		}
+	},
+	"invoice": {
+		"title": "INVOICE",
+		"from": "From",
+		"billTo": "Bill To",
+		"issueDate": "Issue Date",
+		"dueDate": "Due Date",
+		"description": "Description",
+		"quantity": "Qty",
+		"unitPrice": "Unit Price",
+		"total": "Total",
+		"subtotal": "Subtotal",
+		"tax": "Tax ({rate}%)",
+		"grandTotal": "Total",
+		"notes": "Notes"
+	}
+}

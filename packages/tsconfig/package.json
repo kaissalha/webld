@@ -1,0 +1,17 @@
+{
+	"name": "@starter/tsconfig",
+	"version": "0.0.0",
+	"private": true,
+	"license": "MIT",
+	"type": "module",
+	"exports": {
+		"./base.json": "./base.json",
+		"./react-lib.json": "./react-lib.json",
+		"./web.json": "./web.json",
+		"./node.json": "./node.json",
+		"./react-native.json": "./react-native.json"
+	},
+	"devDependencies": {
+		"@typescript/native-preview": "^7.0.0-dev.20260614.1"
+	}
+}

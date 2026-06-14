@@ -1,0 +1,41 @@
+name: Production
+env:
+    AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
+    VERCEL_ACCESS_TOKEN: ${{ secrets.VERCEL_ACCESS_TOKEN }}
+    VERCEL_TEAM_ID: ${{ vars.VERCEL_TEAM_ID }}
+    VERCEL_ORG_ID: ${{ vars.VERCEL_TEAM_ID }}
+    VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+    TURBO_TOKEN: ${{ secrets.VERCEL_ACCESS_TOKEN }}
+    TURBO_TEAM: ${{ vars.VERCEL_TEAM_ID }}
+    NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+    NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
+
+on:
+    push:
+        branches:
+            - master
+
+jobs:
+    main:
+        name: Production
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup
+              uses: ./.github/actions/setup
+
+            - name: 🔦 Check Lint
+              run: bun check
+
+            - name: 🪐 Check Typecheck
+              run: bun typecheck
+
+            - name: 📤 Pull Vercel Environment Information
+              run: bunx vercel pull --yes --environment=production --token=${{ secrets.VERCEL_ACCESS_TOKEN }}
+              working-directory: apps/webapp
+
+            - name: 🗃️ Run Migrations
+              run: bunx dotenv-cli -e ./apps/webapp/.vercel/.env.production.local -- bun --filter @starter/db migrate

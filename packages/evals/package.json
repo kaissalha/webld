@@ -1,0 +1,26 @@
+{
+	"name": "@starter/evals",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"eval:ci": "evalite",
+		"eval:dev": "evalite watch",
+		"eval:export": "evalite export --output=./.evalite/ui",
+		"typecheck": "tsgo --noEmit --skipLibCheck"
+	},
+	"dependencies": {
+		"@starter/ai": "workspace:*",
+		"@starter/server": "workspace:*",
+		"ai": "^6.0.205",
+		"zod": "^4.4.3"
+	},
+	"devDependencies": {
+		"@starter/tsconfig": "workspace:*",
+		"@types/node": "^25.9.3",
+		"@typescript/native-preview": "^7.0.0-dev.20260614.1",
+		"better-sqlite3": "^12.10.1",
+		"evalite": "beta",
+		"vitest": "^4.1.8"
+	}
+}

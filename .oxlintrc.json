@@ -1,0 +1,146 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"ignorePatterns": [
+		"AGENTS.md",
+		".agents",
+		".agents/**",
+		".github/skills",
+		".github/skills/**",
+		"**/node_modules",
+		"**/.next",
+		"**/build",
+		"**/dist",
+		"**/.dist",
+		"**/.react-email",
+		"**/.turbo",
+		"**/.vercel",
+		"**/.workflow-data",
+		"**/.well-known/workflow",
+		"**/.vscode",
+		"**/packages/db/src/db",
+		"**/lint-staged.config.js",
+		"**/.cursorrules",
+		"**/expo-env.d.ts",
+		"**/ios",
+		"**/android",
+		"**/.expo",
+		"**/.expo-shared",
+		"**/metro-cache",
+		"**/coverage",
+		"**/.cache",
+		"**/storybook-static",
+		"**/.husky",
+		"**/.trigger",
+		"**/*.min.js",
+		"**/*.d.ts",
+		"**/next-env.d.ts",
+		"**/postcss.config.*",
+		"**/bun.lockb",
+		"**/*.lock",
+		"skills-lock.json",
+		"**/.git",
+		"**/tmp",
+		"**/.docker",
+		"**/containers"
+	],
+	"env": {
+		"browser": true,
+		"node": true,
+		"es6": true
+	},
+	"globals": {
+		"__DEV__": "readonly",
+		"jest": "readonly"
+	},
+	"plugins": ["eslint", "oxc", "typescript", "react", "import", "vitest"],
+	"settings": {
+		"next": {
+			"rootDir": "apps/webapp"
+		},
+		"react": {
+			"version": "19.2.0"
+		}
+	},
+	"rules": {
+		"typescript/no-explicit-any": "warn",
+		"no-unused-expressions": "off",
+		"func-style": ["error", "expression", { "allowArrowFunctions": true }],
+		"no-unused-vars": [
+			"error",
+			{
+				"argsIgnorePattern": "^_",
+				"varsIgnorePattern": "^_",
+				"caughtErrorsIgnorePattern": "^_"
+			}
+		],
+		"typescript/consistent-type-definitions": ["error", "type"],
+		"react/rules-of-hooks": "error",
+		"react/exhaustive-deps": "error",
+		"react/no-unescaped-entities": "error",
+		"react/display-name": "warn",
+		"import/no-default-export": "error",
+		"react/jsx-key": "error",
+		"react/self-closing-comp": "error"
+	},
+	"overrides": [
+		{
+			"files": [
+				"tailwind.config.ts",
+				"next.config.ts",
+				"**/vitest.config.*",
+				"**/page.{js,jsx,ts,tsx}",
+				"**/layout.{js,jsx,ts,tsx}",
+				"**/not-found.{js,jsx,ts,tsx}",
+				"**/error.{js,jsx,ts,tsx}",
+				"**/global-error.{js,jsx,ts,tsx}",
+				"**/loading.{js,jsx,ts,tsx}",
+				"**/robots.{js,jsx,ts,tsx}",
+				"**/sitemap.{js,jsx,ts,tsx}",
+				"**/middleware.{js,jsx,ts,tsx}",
+				"**/proxy.{js,jsx,ts,tsx}",
+				"**/i18n/request.ts",
+				"**/eslint**",
+				"**/drizzle.config.ts"
+			],
+			"rules": {
+				"import/no-default-export": "off"
+			}
+		},
+		{
+			"files": ["apps/mobile/src/uniwind-types.d.ts"],
+			"rules": {
+				"typescript/consistent-type-definitions": "off"
+			}
+		},
+		{
+			"files": ["**/*.test.{js,jsx,ts,tsx}", "**/*.spec.{js,jsx,ts,tsx}", "**/tests/**/*.{js,jsx,ts,tsx}"],
+			"rules": {
+				"vitest/require-mock-type-parameters": "off"
+			}
+		},
+		{
+			"files": ["apps/mobile/src/app/**/*.{js,jsx,ts,tsx}"],
+			"rules": {
+				"import/no-default-export": "off"
+			}
+		},
+		{
+			"files": ["packages/email/src/emails/**/*.{js,jsx,ts,tsx}"],
+			"rules": {
+				"import/no-default-export": "off"
+			}
+		},
+		{
+			"files": ["apps/webapp/**/*.{js,jsx,ts,tsx}"],
+			"plugins": ["eslint", "oxc", "typescript", "react", "import", "vitest", "nextjs"],
+			"rules": {
+				"nextjs/no-title-in-document-head": "error",
+				"nextjs/no-img-element": "error",
+				"nextjs/no-html-link-for-pages": "error",
+				"nextjs/no-sync-scripts": "error",
+				"nextjs/no-duplicate-head": "error",
+				"nextjs/google-font-display": "error"
+			}
+		}
+	]
+}

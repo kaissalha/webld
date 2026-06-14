@@ -1,0 +1,50 @@
+name: Prompt Evals
+
+on:
+    pull_request:
+        types:
+            - opened
+            - synchronize
+            - reopened
+            - ready_for_review
+
+permissions:
+    contents: read
+
+jobs:
+    evals:
+        name: Evalite
+        if: github.event.pull_request.draft == false
+        runs-on: ubuntu-latest
+        timeout-minutes: 25
+        env:
+            AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup
+              uses: ./.github/actions/setup
+
+            - name: Verify eval credentials
+              run: test -n "$AI_GATEWAY_API_KEY"
+
+            - name: Run Evalite
+              id: run-evals
+              continue-on-error: true
+              env:
+                  AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
+              run: bun run eval:ci
+
+            - name: Export Evalite UI
+              if: always()
+              run: bun run eval:export
+
+            - name: Upload Evalite UI artifact
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: evalite-ui-${{ github.run_id }}
+                  path: packages/evals/.evalite/ui
+                  if-no-files-found: warn

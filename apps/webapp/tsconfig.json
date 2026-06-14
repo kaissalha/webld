@@ -1,0 +1,17 @@
+{
+	"extends": "@starter/tsconfig/web.json",
+	"compilerOptions": {
+		"plugins": [
+			{
+				"name": "next"
+			}
+		],
+		"paths": {
+			"@/*": ["./src/*"],
+			// sharp 0.35.0 ships an "exports" map without a "types" condition, hiding its bundled types
+			"sharp": ["./node_modules/sharp/lib/index.d.ts"]
+		}
+	},
+	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "next.config.ts"],
+	"exclude": ["node_modules", ".trigger", ".vercel"]
+}

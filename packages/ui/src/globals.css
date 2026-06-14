@@ -1,0 +1,442 @@
+@import "tailwindcss";
+@source "../../../apps/**/src/**/*.{ts,tsx}";
+@source "../../**/src/**/*.{ts,tsx}";
+@source "./**/*.{ts,tsx}";
+
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+	--color-olive-50: oklch(98.8% 0.003 106.5);
+	--color-olive-100: oklch(96.6% 0.005 106.5);
+	--color-olive-200: oklch(93% 0.007 106.5);
+	--color-olive-300: oklch(88% 0.011 106.6);
+	--color-olive-400: oklch(73.7% 0.021 106.9);
+	--color-olive-500: oklch(58% 0.031 107.3);
+	--color-olive-600: oklch(46.6% 0.025 107.3);
+	--color-olive-700: oklch(39.4% 0.023 107.4);
+	--color-olive-800: oklch(28.6% 0.016 107.4);
+	--color-olive-900: oklch(22.8% 0.013 107.4);
+	--color-olive-950: oklch(15.3% 0.006 107.1);
+
+	--background: oklch(1 0.00005 2.06);
+	--foreground: oklch(0.027 0 2.06);
+	--card: oklch(0.9881 0 0);
+	--card-foreground: oklch(0.027 0 2.06);
+	--popover: oklch(1 0.00005 2.06);
+	--popover-foreground: oklch(0.027 0 2.06);
+	--primary: oklch(0.077 0.00001 2.06);
+	--primary-foreground: oklch(0.982 0.00005 2.06);
+	--secondary: var(--color-olive-100);
+	--secondary-foreground: oklch(0.077 0.00001 2.06);
+	--muted: var(--color-olive-100);
+	--muted-foreground: oklch(0.484 0.00003 2.06);
+	--accent: var(--color-olive-100);
+	--accent-foreground: oklch(0.077 0.00001 2.06);
+	--destructive: oklch(0.637 0.237 25.331);
+	--destructive-foreground: oklch(0.982 0.00005 2.06);
+	--border: hsl(238, 5%, 90%);
+	--input: oklch(0.909 0.00005 2.06);
+	--ring: oklch(0.027 0 2.06);
+	--chart-1: oklch(0.606 0.592 0.715);
+	--chart-2: oklch(0.586 0.345 3.202);
+	--chart-3: oklch(0.283 0.138 4.108);
+	--chart-4: oklch(0.806 0.504 1.531);
+	--chart-5: oklch(0.739 0.515 1.099);
+	--radius: 0.625rem;
+	--sidebar: oklch(1 0.00005 2.06); /* background */
+	--sidebar-foreground: oklch(0.027 0 2.06); /* foreground */
+	--sidebar-primary: oklch(0.077 0.00001 2.06); /* primary */
+	--sidebar-primary-foreground: oklch(0.982 0.00005 2.06); /* primary-foreground */
+	--sidebar-accent: var(--color-olive-100);
+	--sidebar-accent-foreground: oklch(0.077 0.00001 2.06); /* accent-foreground */
+	--sidebar-border: oklch(0.909 0.00005 2.06); /* border */
+	--sidebar-ring: oklch(0.027 0 2.06); /* ring */
+	--info: oklch(0.623 0.214 259.815);
+	--info-foreground: oklch(0.488 0.243 264.376);
+	--success: oklch(0.696 0.17 162.48);
+	--success-foreground: oklch(0.508 0.118 165.612);
+	--warning: oklch(0.769 0.188 70.08);
+	--warning-foreground: oklch(0.555 0.163 48.998);
+}
+
+.dark {
+	--background: oklch(0.145 0 0);
+	--foreground: oklch(0.985 0 0);
+	--card: oklch(0.145 0 0);
+	--card-foreground: oklch(0.985 0 0);
+	--popover: oklch(0.145 0 0);
+	--popover-foreground: oklch(0.985 0 0);
+	--primary: oklch(0.985 0 0);
+	--primary-foreground: oklch(0.205 0 0);
+	--secondary: oklch(0.269 0 0);
+	--secondary-foreground: oklch(0.985 0 0);
+	--muted: oklch(0.269 0 0);
+	--muted-foreground: oklch(0.708 0 0);
+	--accent: oklch(0.269 0 0);
+	--accent-foreground: oklch(0.985 0 0);
+	--destructive: oklch(0.396 0.141 25.723);
+	--destructive-foreground: oklch(0.637 0.237 25.331);
+	--border: oklch(0.269 0 0);
+	--input: oklch(0.269 0 0);
+	--ring: oklch(0.556 0 0);
+	--chart-1: oklch(0.488 0.243 264.376);
+	--chart-2: oklch(0.696 0.17 162.48);
+	--chart-3: oklch(0.769 0.188 70.08);
+	--chart-4: oklch(0.627 0.265 303.9);
+	--chart-5: oklch(0.645 0.246 16.439);
+	--sidebar: oklch(0.205 0 0);
+	--sidebar-foreground: oklch(0.985 0 0);
+	--sidebar-primary: oklch(0.488 0.243 264.376);
+	--sidebar-primary-foreground: oklch(0.985 0 0);
+	--sidebar-accent: oklch(0.269 0 0);
+	--sidebar-accent-foreground: oklch(0.985 0 0);
+	--sidebar-border: oklch(0.269 0 0);
+	--sidebar-ring: oklch(0.439 0 0);
+	--info: oklch(0.623 0.214 259.815);
+	--info-foreground: oklch(0.707 0.165 254.624);
+	--success: oklch(0.696 0.17 162.48);
+	--success-foreground: oklch(0.765 0.177 163.223);
+	--warning: oklch(0.769 0.188 70.08);
+	--warning-foreground: oklch(0.828 0.189 84.429);
+}
+
+@theme inline {
+	--font-display: var(--font-display);
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+	--color-chart-5: var(--chart-5);
+	--color-olive-50: var(--color-olive-50);
+	--color-olive-100: var(--color-olive-100);
+	--color-olive-200: var(--color-olive-200);
+	--color-olive-300: var(--color-olive-300);
+	--color-olive-400: var(--color-olive-400);
+	--color-olive-500: var(--color-olive-500);
+	--color-olive-600: var(--color-olive-600);
+	--color-olive-700: var(--color-olive-700);
+	--color-olive-800: var(--color-olive-800);
+	--color-olive-900: var(--color-olive-900);
+	--color-olive-950: var(--color-olive-950);
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+	--radius-2xl: calc(var(--radius) + 8px);
+	--radius-3xl: calc(var(--radius) + 12px);
+	--radius-4xl: calc(var(--radius) + 16px);
+	--radius-5xl: calc(var(--radius) + 20px);
+	--shadow-input: 0px 2px 8px 0px rgba(0, 0, 0, 0.05) inset;
+	--shadow-button:
+		0px 4px 4px 0px rgba(0, 0, 0, 0.05), inset 0px -4px 3px 0px rgba(0, 0, 0, 0.02),
+		0px 0px 0px 1px rgba(0, 0, 0, 0.1), inset 0px 1px 0px 0px rgba(255, 255, 255, 0.75);
+	--shadow-button-hover:
+		0 4px 4px 0 rgba(0, 0, 0, 0.05), inset 0 -4px 3px 0 rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(0, 0, 0, 0.3),
+		inset 0 1px 0 0 rgba(255, 255, 255, 0.75);
+	--shadow-button-dark:
+		0px 4px 4px 0px rgba(0, 0, 0, 0.05), inset 0px -4px 3px 0px rgba(0, 0, 0, 0.02),
+		inset 0px 1px 0px 0px rgba(255, 255, 255, 0.2);
+	--color-sidebar: var(--sidebar);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-ring: var(--sidebar-ring);
+	--animate-accordion-down: accordion-down 0.2s ease-out;
+	--animate-accordion-up: accordion-up 0.2s ease-out;
+	--animate-fade-in-up: fade-in-up 400ms cubic-bezier(0.23, 1, 0.32, 1) both;
+
+	--ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+
+	@keyframes fade-in-up {
+		from {
+			opacity: 0;
+			transform: translateY(6px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+	--color-warning-foreground: var(--warning-foreground);
+	--color-warning: var(--warning);
+	--color-success-foreground: var(--success-foreground);
+	--color-success: var(--success);
+	--color-info-foreground: var(--info-foreground);
+	--color-info: var(--info);
+
+	@keyframes accordion-down {
+		from {
+			height: 0;
+		}
+		to {
+			height: var(--radix-accordion-content-height);
+		}
+	}
+
+	@keyframes accordion-up {
+		from {
+			height: var(--radix-accordion-content-height);
+		}
+		to {
+			height: 0;
+		}
+	}
+}
+
+@layer utilities {
+	.step {
+		counter-increment: step;
+	}
+
+	.step:before {
+		@apply border-background bg-muted absolute inline-flex h-9 w-9 items-center justify-center rounded-full border-4 text-center -indent-px font-mono text-base font-medium;
+		@apply -ms-12.5 -mt-1;
+		content: counter(step);
+	}
+
+	.chunk-container {
+		@apply shadow-none;
+	}
+
+	.chunk-container::after {
+		content: "";
+		@apply absolute -inset-4 rounded-xl border shadow-xl;
+	}
+
+	/* Hide scrollbar for Chrome, Safari and Opera */
+	.no-scrollbar::-webkit-scrollbar {
+		display: none;
+	}
+	/* Hide scrollbar for IE, Edge and Firefox */
+	.no-scrollbar {
+		-ms-overflow-style: none; /* IE and Edge */
+		scrollbar-width: none; /* Firefox */
+	}
+
+	.border-grid {
+		@apply border-border/30 dark:border-border;
+	}
+
+	.container-wrapper {
+		@apply border-border/30 dark:border-border mx-auto w-full min-[1800px]:max-w-screen-2xl min-[1800px]:border-x;
+	}
+
+	.container {
+		@apply mx-auto max-w-screen-2xl px-4 xl:px-6 2xl:px-4;
+	}
+}
+
+@layer base {
+	*::-webkit-scrollbar {
+		background-color: transparent;
+		width: 5px;
+	}
+
+	*::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	*::-webkit-scrollbar-thumb {
+		border-radius: 5px;
+		background: hsl(var(--border));
+	}
+
+	* {
+		@apply border-border outline-ring/50;
+		scrollbar-width: thin;
+		scrollbar-color: hsl(var(--border)) transparent;
+	}
+
+	body {
+		@apply bg-background text-foreground;
+	}
+
+	*,
+	html,
+	body {
+		-webkit-font-smoothing: antialiased;
+		scrollbar-gutter: stable;
+	}
+
+	button:not(:disabled),
+	[role="button"]:not(:disabled) {
+		cursor: pointer;
+	}
+}
+
+/* Google Maps Places Autocomplete styling */
+.pac-container {
+	@apply mt-1 rounded-2xl border bg-popover p-1 font-sans shadow-md;
+	z-index: 9999 !important;
+
+	&::after {
+		display: none !important;
+	}
+
+	.pac-item {
+		@apply cursor-pointer rounded-xl border-none px-3 py-2 text-sm font-medium text-muted-foreground transition-colors;
+
+		.pac-item-query {
+			@apply text-foreground;
+		}
+
+		.pac-matched {
+			@apply font-semibold text-foreground;
+		}
+
+		.pac-secondary-text {
+			@apply text-xs text-muted-foreground;
+		}
+
+		.pac-icon {
+			@apply hidden;
+		}
+	}
+
+	.pac-item:hover,
+	.pac-item-selected {
+		@apply bg-accent text-foreground;
+	}
+}
+
+@layer utilities {
+	.no-scrollbar::-webkit-scrollbar {
+		display: none;
+		height: 0;
+		width: 0;
+	}
+	.no-scrollbar {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+
+	.font-ss01 {
+		font-feature-settings: "ss01" 1;
+	}
+	.font-ss03 {
+		font-feature-settings: "ss03" 1;
+	}
+	.font-ss05 {
+		font-feature-settings: "ss05" 1;
+	}
+	.font-ss07 {
+		font-feature-settings: "ss07" 1;
+	}
+	.font-ss08 {
+		font-feature-settings: "ss08" 1;
+	}
+	.font-ss12 {
+		font-feature-settings: "ss12" 1;
+	}
+	.font-kern {
+		font-feature-settings: "kern" 1;
+	}
+
+	/* Or a combo class that matches your example */
+	.font-stylistic {
+		font-feature-settings:
+			"ss01" 1,
+			"ss03" 1,
+			"ss05" 1,
+			"ss07" 1,
+			"ss08" 1,
+			"ss12" 1,
+			"kern" 1;
+	}
+}
+
+.react-grid-item > .react-resizable-handle {
+	z-index: 10;
+	inline-size: 1.5rem;
+	block-size: 1.5rem;
+	padding: 0;
+	background-image: none;
+}
+
+.react-grid-item > .react-resizable-handle-se::after,
+.react-grid-item > .react-resizable-handle-sw::after,
+.react-grid-item > .react-resizable-handle-ne::after,
+.react-grid-item > .react-resizable-handle-nw::after {
+	content: "";
+	position: absolute;
+	inline-size: 0.75rem;
+	block-size: 0.75rem;
+	opacity: 0.42;
+}
+
+.react-grid-item > .react-resizable-handle-se::after {
+	inset-inline-end: 0.25rem;
+	inset-block-end: 0.25rem;
+	border-inline-end: 2px solid var(--muted-foreground);
+	border-block-end: 2px solid var(--muted-foreground);
+}
+
+.react-grid-item > .react-resizable-handle-sw::after {
+	inset-inline-start: 0.25rem;
+	inset-block-end: 0.25rem;
+	border-inline-start: 2px solid var(--muted-foreground);
+	border-block-end: 2px solid var(--muted-foreground);
+}
+
+.react-grid-item > .react-resizable-handle-ne::after {
+	inset-inline-end: 0.25rem;
+	inset-block-start: 0.25rem;
+	border-inline-end: 2px solid var(--muted-foreground);
+	border-block-start: 2px solid var(--muted-foreground);
+}
+
+.react-grid-item > .react-resizable-handle-nw::after {
+	inset-inline-start: 0.25rem;
+	inset-block-start: 0.25rem;
+	border-inline-start: 2px solid var(--muted-foreground);
+	border-block-start: 2px solid var(--muted-foreground);
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.react-grid-item:hover > .react-resizable-handle-se::after,
+	.react-grid-item:hover > .react-resizable-handle-sw::after,
+	.react-grid-item:hover > .react-resizable-handle-ne::after,
+	.react-grid-item:hover > .react-resizable-handle-nw::after {
+		opacity: 0.72;
+		border-color: var(--color-border);
+	}
+}
+
+button {
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}

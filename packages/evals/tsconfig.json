@@ -1,0 +1,11 @@
+{
+	"extends": "@starter/tsconfig/node.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"composite": true,
+		"declaration": true,
+		"declarationMap": true,
+		"incremental": true
+	},
+	"exclude": ["dist"]
+}

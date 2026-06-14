@@ -1,0 +1,47 @@
+{
+	"name": "starter",
+	"version": "1.0.0",
+	"private": true,
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
+	"type": "module",
+	"scripts": {
+		"build": "turbo run build",
+		"dev": "turbo run dev dev:ai dev:stripe dev:blob",
+		"eval:ci": "turbo run eval:ci --filter=@starter/evals",
+		"eval:dev": "turbo run eval:dev --filter=@starter/evals",
+		"eval:export": "turbo run eval:export --filter=@starter/evals",
+		"test": "vitest run",
+		"lint": "oxlint . --quiet && oxfmt --check .",
+		"lint:fix": "oxlint --fix . && oxfmt .",
+		"check": "bun lint",
+		"typecheck": "turbo run typecheck",
+		"react-doctor": "bunx -y react-doctor@latest . --verbose --diff --yes",
+		"prepare": "husky"
+	},
+	"devDependencies": {
+		"@starter/db": "workspace:*",
+		"@testcontainers/postgresql": "^12.0.2",
+		"@testcontainers/redis": "^12.0.2",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@testing-library/react": "^16.3.2",
+		"@types/pg": "^8.20.0",
+		"@typescript/native-preview": "^7.0.0-dev.20260614.1",
+		"@vitejs/plugin-react": "^6.0.2",
+		"@vitest/coverage-istanbul": "^4.1.8",
+		"@vitest/coverage-v8": "^4.1.8",
+		"@vitest/ui": "^4.1.8",
+		"drizzle-orm": "^1.0.0-rc.4",
+		"happy-dom": "^20.10.3",
+		"husky": "^9.1.7",
+		"oxfmt": "^0.54.0",
+		"oxlint": "^1.69.0",
+		"pg": "^8.21.0",
+		"testcontainers": "^12.0.2",
+		"turbo": "^2.9.18",
+		"vitest": "^4.1.8"
+	},
+	"packageManager": "bun@1.3.14"
+}

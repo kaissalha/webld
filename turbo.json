@@ -1,0 +1,80 @@
+{
+	"$schema": "https://turbo.build/schema.json",
+	"ui": "tui",
+	"tasks": {
+		"dev": {
+			"cache": false,
+			"persistent": true
+		},
+		"dev:ai": {
+			"cache": false,
+			"persistent": true
+		},
+		"eval:ci": {
+			"cache": false
+		},
+		"eval:dev": {
+			"cache": false,
+			"persistent": true
+		},
+		"eval:export": {
+			"cache": false,
+			"outputs": ["packages/evals/.evalite/ui/**"]
+		},
+		"dev:stripe": {
+			"cache": false,
+			"persistent": true
+		},
+		"dev:blob": {
+			"cache": false,
+			"persistent": true
+		},
+		"build": {
+			"outputs": ["dist/**", ".next/**", "!.next/cache/**", ".react-email/**"],
+			"cache": true
+		},
+		"webapp#build": {
+			"inputs": ["$TURBO_DEFAULT$", "apps/webapp/package.json"],
+			"outputs": [".next/**", "!.next/cache/**"],
+			"cache": true,
+			"passThroughEnv": ["VERCEL_OIDC_TOKEN"],
+			"env": [
+				"AI_GATEWAY_API_KEY",
+				"BETTER_AUTH_SECRET",
+				"BLOB_READ_WRITE_TOKEN",
+				"DATABASE_URL",
+				"FLAGS_SECRET",
+				"GOOGLE_CLIENT_ID",
+				"GOOGLE_CLIENT_SECRET",
+				"GOOGLE_MAPS_BACKEND_KEY",
+				"NEXT_PUBLIC_ENABLE_QUERY_DEVTOOLS",
+				"NEXT_PUBLIC_POSTHOG_KEY",
+				"NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
+				"POSTHOG_PERSONAL_API_KEY",
+				"POSTHOG_PROJECT_ID",
+				"REACT_SCAN",
+				"REDIS_URL",
+				"RESEND_KEY",
+				"UPSTASH_TOKEN",
+				"UPSTASH_URL",
+				"VERCEL_BLOB_CALLBACK_URL",
+				"DUB_API_KEY",
+				"DUB_WEBHOOK_SECRET",
+				"ASSEMBLYAI_API_KEY",
+				"STRIPE_SECRET_KEY",
+				"STRIPE_WEBHOOK_SECRET",
+				"STRIPE_STARTER_PRICE_ID",
+				"STRIPE_PRO_PRICE_ID"
+			]
+		},
+		"lint": {
+			"cache": true
+		},
+		"lint:fix": {
+			"cache": true
+		},
+		"typecheck": {
+			"cache": true
+		}
+	}
+}

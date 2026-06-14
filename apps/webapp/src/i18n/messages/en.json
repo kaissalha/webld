@@ -1,0 +1,689 @@
+{
+	"lang": {
+		"en": "English",
+		"es": "Español",
+		"fr": "Français",
+		"pt": "Português",
+		"ja": "日本語",
+		"switch_to": "Switch to {lang}"
+	},
+	"common": {
+		"loading": "Loading...",
+		"cancel": "Cancel",
+		"save": "Save",
+		"edit": "Edit",
+		"delete": "Delete",
+		"add": "Add",
+		"view": "View",
+		"search": "Search",
+		"close": "Close",
+		"next": "Next",
+		"previous": "Previous",
+		"ok": "OK",
+		"yes": "Yes",
+		"no": "No",
+		"done": "Done",
+		"actions": {
+			"back": "Back",
+			"creating": "Creating...",
+			"cancel": "Cancel"
+		},
+		"validation": {
+			"required": "This field is required",
+			"invalidEmail": "Please enter a valid email address"
+		},
+		"errors": {
+			"somethingWentWrong": "Something went wrong. Please try again."
+		},
+		"fields": {
+			"name": "Name",
+			"firstName": "First name",
+			"lastName": "Last name",
+			"email": "Email",
+			"phoneNumber": "Phone",
+			"additionalContext": "Additional context",
+			"dateAdded": "Date added",
+			"date": "Date",
+			"author": "Author",
+			"latestMessage": "Latest message",
+			"contact": "Contact",
+			"startedAt": "Started"
+		},
+		"today": "Today",
+		"yesterday": "Yesterday",
+		"deleted": "Deleted",
+		"deleteFailed": "Failed to delete",
+		"failed": "Failed",
+		"saved": "Saved",
+		"saving": "Saving...",
+		"saveError": "Didn't save!",
+		"sent": "Sent!",
+		"sending": "Sending...",
+		"sentFailed": "Didn't send",
+		"retry": "Retry",
+		"upgrade": "Upgrade",
+		"download": "Download",
+		"downloaded": "Downloaded",
+		"downloadFailed": "Download failed",
+		"beta": "Beta",
+		"prompt": "Prompt",
+		"select": "Select",
+		"back": "Back",
+		"copyToClipboard": "Copy to clipboard",
+		"copiedToClipboard": "Copied to clipboard"
+	},
+	"breadcrumbs": {
+		"home": "Home",
+		"settings": "Settings",
+		"chat": "Chat"
+	},
+	"chats": {
+		"general": "General",
+		"marketing": "Marketing",
+		"finance": "Finance",
+		"sales": "Sales",
+		"customerService": "Customer service",
+		"research": "Research",
+		"global": "General",
+		"studio": "Studio",
+		"newChat": "New chat",
+		"startConversation": "Start a conversation",
+		"askAnything": "Ask me anything about your business and I'll help you out.",
+		"suggestions": {
+			"mail": {
+				"summarize": "Summarize inbox",
+				"draft": "Draft a reply"
+			},
+			"dashboard": {
+				"today": "What's on today?",
+				"overview": "CRM overview"
+			}
+		},
+		"generalDescription": "Start a conversation with your AI assistant about general topics related to your business.",
+		"marketingDescription": "Get help with marketing strategies, campaigns, and promotional content for your business.",
+		"financeDescription": "Discuss financial planning, budgeting, and money management for your business.",
+		"salesDescription": "Get assistance with sales strategies, customer acquisition, and revenue growth.",
+		"customerServiceDescription": "Improve your customer service approach and handle customer inquiries effectively.",
+		"customerDescription": "Improve your customer service approach and handle customer inquiries effectively.",
+		"researchDescription": "Conduct research, analyze market trends, and gather insights for your business decisions.",
+		"globalDescription": "Start a conversation with your AI assistant about general topics related to your business.",
+		"studioDescription": "Generate images for your business.",
+		"placeholder": "How can Starter help you?",
+		"collectBusinessInfoTool": {
+			"message": "To give you answers relevant to your business, can you describe your business and any products or services you offer?",
+			"inputPlaceholder": "Collect business info",
+			"success": "You can update your business details anytime in Settings.",
+			"openSettings": "Open settings",
+			"getAnswer": "Get answer",
+			"descriptionExists": "Your business information has been updated. Click below to continue with your personalized answer."
+		},
+		"error": "Looks like there was an error",
+		"rateLimit": {
+			"title": "You’ve hit your limit for messages sent.",
+			"description": "Please try again tomorrow at {date}"
+		},
+		"emailVerification": {
+			"title": "You need to verify your email",
+			"description": "Before using more of Starter, you need to verify your email address",
+			"cta": "Verify email",
+			"sent": {
+				"title": "Verification email sent!",
+				"description": "Check your email for a verification link"
+			}
+		},
+		"viewReasoning": "View reasoning",
+		"businessDescriptionInput": {
+			"title": "To create better visuals for your business, can you <strong>describe your business</strong> and any products or services do you offer?",
+			"placeholder": "What’s your business about? What products or services do you offer?"
+		}
+	},
+	"notFound": {
+		"title": "Not Found"
+	},
+	"ai": {
+		"tools": {}
+	},
+	"dashboard": {
+		"home": {
+			"greeting": {
+				"morning": "Good morning",
+				"afternoon": "Good afternoon",
+				"evening": "Good evening"
+			},
+			"weather": {
+				"summaryAriaLabel": "{description}, {temperature} degrees {unit}",
+				"units": {
+					"celsius": "Celsius",
+					"fahrenheit": "Fahrenheit"
+				}
+			},
+			"subtitle": "Here's a quick look at how things are going."
+		}
+	},
+	"account": {
+		"settings": "Settings",
+		"logout": "Logout",
+		"billing": "Billing",
+		"notifications": "Notifications",
+		"login": {
+			"pageTitle": "Sign in | Starter",
+			"title": "Continue to Starter",
+			"description": "Log in or register with the options below",
+			"heroTitle": "Welcome to Starter",
+			"heroSubtitle": "Sign in or create an account",
+			"emailCta": "Continue with Email",
+			"backFromEmailStep": "Back",
+			"orDivider": "or",
+			"moreOptionsShow": "Show other options",
+			"moreOptionsHide": "Hide other options",
+			"emailContinue": "Continue",
+			"titleOtp": "Check your email",
+			"otpDescription": "Enter the verification code we sent to your email",
+			"otpRequestedRelative": "Code requested {relativeTime}",
+			"withEmail": "Sign in with email",
+			"withGoogle": "Continue with Google",
+			"signingIn": "Signing in...",
+			"verifying": "Verifying...",
+			"verify": "Verify",
+			"orContinueWith": "Or continue with",
+			"noAccount": "Don't have an account? Sign up",
+			"backToEmail": "Back to email",
+			"otpSent": "Verification code sent to your email",
+			"loginSuccess": "Successfully logged in",
+			"legal": {
+				"prefix": "By signing in you agree to our",
+				"acknowledge": "By continuing, you acknowledge that you understand and agree to the",
+				"betweenClauses": " and ",
+				"ending": ".",
+				"terms": "Terms of service",
+				"termsPath": "Terms & Conditions",
+				"privacy": "Privacy policy",
+				"privacyPath": "Privacy Policy"
+			},
+			"testimonials": {
+				"slide0": {
+					"lead": "We finally have one place for workspaceal notes, billing, and follow-ups,",
+					"punct": " ",
+					"highlight": "and the team onboards new staff in a day instead of a week\"",
+					"name": "Jordan Lee",
+					"role": "Workspace lead • United States"
+				},
+				"slide1": {
+					"lead": "The biggest win is knowing nothing slips through the cracks",
+					"punct": ",",
+					"highlight": " from intake to the next visit.\"",
+					"name": "Samira Khan",
+					"role": "Operations • United Kingdom"
+				},
+				"slide2": {
+					"lead": "We replaced three tools with a single workflow",
+					"punct": " ",
+					"highlight": "and contacts get clearer, faster answers.\"",
+					"name": "Elena Rossi",
+					"role": "Independent workspace • Italy"
+				},
+				"slide3": {
+					"lead": "I needed software that my whole team would actually use",
+					"punct": ",",
+					"highlight": " not another clunky back office app.\"",
+					"name": "Alex Nguyen",
+					"role": "Allied health • Canada"
+				}
+			},
+			"errors": {
+				"invalidCredentials": "Invalid email or password",
+				"invalidOtp": "Invalid verification code. Please try again."
+			},
+			"fields": {
+				"email": {
+					"placeholder": "Email address",
+					"placeholderAlt": "Enter email address",
+					"label": "Email address",
+					"errors": {
+						"required": "Email is required",
+						"invalid": "Invalid email address"
+					}
+				},
+				"password": {
+					"placeholder": "Password",
+					"label": "Password",
+					"errors": {
+						"required": "Password is required"
+					}
+				},
+				"otp": {
+					"label": "Enter verification code"
+				}
+			}
+		},
+		"signup": {
+			"title": "Create your account",
+			"withEmail": "Sign up with email",
+			"withGoogle": "Continue with Google",
+			"creatingAccount": "Creating account...",
+			"orContinueWith": "Or continue with",
+			"haveAccount": "Already have an account? Sign in",
+			"errors": {
+				"failedToCreate": "Failed to create account. Please try again."
+			},
+			"fields": {
+				"name": {
+					"placeholder": "Full name",
+					"label": "Full name",
+					"errors": {
+						"required": "Full name is required",
+						"tooShort": "Full name must be at least 2 characters"
+					}
+				},
+				"business": {
+					"placeholder": "Business name",
+					"label": "Business name",
+					"errors": {
+						"required": "Business name is required",
+						"tooShort": "Business name must be at least 2 characters"
+					}
+				},
+				"email": {
+					"placeholder": "Email address",
+					"label": "Email address",
+					"errors": {
+						"required": "Email is required",
+						"invalid": "Please enter a valid email address"
+					}
+				},
+				"password": {
+					"placeholder": "Password",
+					"label": "Password",
+					"errors": {
+						"required": "Password is required",
+						"tooShort": "Password must be at least 8 characters"
+					}
+				}
+			}
+		}
+	},
+	"organization": {
+		"organizations": "MyOlv",
+		"addOrganization": "Add workspace",
+		"switchOrganization": "Switch workspace",
+		"createOrganization": "Create workspace",
+		"errors": {
+			"failedToSwitch": "Failed to switch workspace",
+			"failedToCreate": "Failed to create workspace"
+		}
+	},
+	"onboarding": {
+		"eyebrow": "Workspace setup",
+		"title": "Set up your workspace",
+		"description": "Accept an invite or create a workspace to continue.",
+		"restoringTitle": "Restoring your workspace",
+		"restoringDescription": "We found an existing workspace and are reconnecting your session now.",
+		"restoreErrorTitle": "We couldn't restore your workspace",
+		"restoreErrorDescription": "Try again to continue into your existing workspace.",
+		"restoreAction": "Try again",
+		"loadingInvitations": "Checking for pending invitations...",
+		"inviteTitle": "Join your team",
+		"inviteDescription": "We found invitations for {email}. Accept one to continue.",
+		"inviteEmpty": "No invitation found for this account.",
+		"inviteAction": "Accept invitation",
+		"inviteActionPending": "Joining...",
+		"inviteExpires": "Expires {date}",
+		"createTitle": "Create your workspace",
+		"createDescription": "No invitation is associated with {email}, so let's create your workspace first.",
+		"createHelper": "You can invite your team and finish setup once you're inside.",
+		"createAction": "Create workspace",
+		"createActionPending": "Creating workspace...",
+		"sideTitle": "What happens next",
+		"sideDescription": "We’ll take you straight into your workspace once this step is done.",
+		"sideItems": {
+			"invite": {
+				"title": "Join with one tap",
+				"description": "Pending invites appear automatically here so people land in the right workspace."
+			},
+			"create": {
+				"title": "Start with a clean workspace",
+				"description": "If there’s no invite, you can create a workspace without leaving onboarding."
+			},
+			"team": {
+				"title": "Add the rest later",
+				"description": "Workspace creation stays lightweight so you can invite teammates after setup."
+			}
+		},
+		"errors": {
+			"loadInvitations": "We couldn't load your invitations.",
+			"acceptInvitation": "We couldn't accept that invitation.",
+			"createOrganization": "We couldn't create your workspace.",
+			"restoreOrganization": "We couldn't restore your workspace.",
+			"uploadLogo": "We created your workspace, but couldn't upload the logo. You can add it from settings.",
+			"invalidOrganizationName": "Enter a workspace name to continue."
+		},
+		"fields": {
+			"organizationName": {
+				"label": "Workspace name",
+				"placeholder": "Acme Workspace"
+			}
+		}
+	},
+	"organizationLogo": {
+		"fieldLabel": "Logo",
+		"optional": "optional",
+		"altFallback": "Workspace logo",
+		"actions": {
+			"upload": "Upload logo",
+			"replace": "Replace logo",
+			"remove": "Remove"
+		},
+		"errors": {
+			"upload": "We couldn't upload that image. Please try again.",
+			"tooLarge": "Image is too large. Maximum size is {size}MB."
+		}
+	},
+	"acceptInvitation": {
+		"eyebrow": "Team invitation",
+		"title": "You're invited",
+		"titleWithOrganization": "Join {organizationName}",
+		"description": "You've been invited to join this workspace as a {role}. This invitation was sent to {email}.",
+		"descriptionFallback": "Accept this invitation to join the workspace.",
+		"defaultRole": "Member",
+		"accept": "Accept invitation",
+		"decline": "Decline",
+		"signInAsOther": "Sign in with a different account",
+		"success": "Welcome aboard!",
+		"rejected": "Invitation declined",
+		"signedInAs": "Signed in as {email}",
+		"mismatch": {
+			"title": "This invitation was sent to a different email",
+			"description": "The invitation is for {invitationEmail}, but you're signed in as {userEmail}. Sign out and sign back in with the invited email to accept."
+		},
+		"errors": {
+			"accept": "We couldn't accept that invitation.",
+			"reject": "We couldn't decline that invitation."
+		}
+	},
+	"globalError": {
+		"globalTitle": "Oops! Something went wrong.",
+		"globalDescription": "We apologize for the inconvenience. An unexpected error has occurred.",
+		"tryAgain": "Try again"
+	},
+	"subscription": {
+		"dialog": {
+			"title": "Choose your plan",
+			"description": "Select a plan to unlock all features and take your business to the next level.",
+			"perMonth": "month",
+			"getStarted": "Get Started",
+			"selectPlan": "Select Plan",
+			"footer": "All plans include a 14-day free trial. Cancel anytime.",
+			"badges": {
+				"popular": "Most Popular"
+			},
+			"plans": {
+				"starter": {
+					"description": "Perfect for small teams getting started"
+				},
+				"pro": {
+					"description": "For growing teams that need more power"
+				}
+			},
+			"features": {
+				"upTo5Users": "Up to 5 team members",
+				"basicAnalytics": "Basic analytics",
+				"emailSupport": "Email support",
+				"5gbStorage": "5 GB storage",
+				"unlimitedUsers": "Unlimited team members",
+				"advancedAnalytics": "Advanced analytics & reports",
+				"prioritySupport": "Priority support",
+				"unlimitedStorage": "Unlimited storage",
+				"apiAccess": "API access",
+				"customIntegrations": "Custom integrations"
+			}
+		},
+		"upgrade": {
+			"title": "Upgrade your plan",
+			"description": "Choose a plan that best fits your needs and unlock more features."
+		}
+	},
+	"components": {
+		"chat": {
+			"input": {
+				"stop": "Stop",
+				"send": "Send",
+				"attachFiles": "Attach files",
+				"chooseFiles": "Choose files",
+				"dropzone": "Chat file dropzone",
+				"dropActive": "Drop files to attach",
+				"fileReadFailed": "Could not read one of those files. Try again.",
+				"fileTooLarge": "Files must be {size} or smaller.",
+				"fileUploadFailed": "Could not upload one of those files.",
+				"removeFile": "Remove {filename}",
+				"tooManyFiles": "You can attach up to {count} files.",
+				"unsupportedFileType": "Only text-like files can be uploaded to knowledge right now.",
+				"uploaded": "Uploaded",
+				"uploadFailed": "Upload failed",
+				"uploading": "Uploading...",
+				"processing": "Indexing..."
+			},
+			"message": {
+				"copyToClipboard": "Copy to clipboard",
+				"copiedToClipboard": "Copied to clipboard",
+				"tool": {
+					"inputStreaming": "Preparing...",
+					"processing": "Processing...",
+					"completed": "completed",
+					"noResults": "No results found",
+					"error": "An error occurred",
+					"emailDraft": {
+						"to": "To",
+						"subject": "Subject",
+						"message": "Message",
+						"addressPlaceholder": "name@example.com",
+						"subjectPlaceholder": "Add a subject",
+						"contentPlaceholder": "Write your message",
+						"copyMessage": "Copy message",
+						"copiedMessage": "Message copied",
+						"openInMailApp": "Open in mail app"
+					}
+				},
+				"file": {
+					"file": "File",
+					"attachment": "Attachment"
+				},
+				"linkPreview": {
+					"faviconAlt": "{siteName} favicon"
+				}
+			}
+		}
+	},
+	"errorPage": {
+		"title": "Something went wrong",
+		"description": "It looks like there was an error, try reloading the page",
+		"reload": "Reload page"
+	},
+	"mail": {
+		"send": "Send",
+		"sent": "Message sent"
+	},
+	"settings": {
+		"tabs": {
+			"profile": "General",
+			"organization": "Workspace",
+			"team": "Team",
+			"subscription": "Subscription",
+			"security": "Security"
+		},
+		"profile": {
+			"title": "Profile",
+			"description": "Manage your personal information and account details.",
+			"avatar": {
+				"title": "Avatar",
+				"description": "This is your avatar. Click on the avatar to upload a custom one from your files.",
+				"hint": "An avatar is optional but strongly recommended."
+			},
+			"displayName": {
+				"title": "Display Name",
+				"description": "Please enter your full name, or a display name you are comfortable with.",
+				"hint": "Please use 32 characters at maximum."
+			},
+			"email": {
+				"title": "Email",
+				"description": "Change your email address.",
+				"hint": "This is your primary email address for notifications and more."
+			},
+			"fields": {
+				"name": "Name",
+				"namePlaceholder": "Enter your full name",
+				"email": "Email",
+				"emailHint": "Email cannot be changed. Contact support if you need to update it."
+			}
+		},
+		"organization": {
+			"name": {
+				"title": "Workspace name",
+				"description": "The name shown for your workspace in the app and in shared contexts.",
+				"hint": "Use the name contacts and teammates recognize.",
+				"placeholder": "Acme Physiotherapy"
+			},
+			"logo": {
+				"title": "Logo",
+				"description": "Upload an image that represents your workspace.",
+				"hint": "PNG, JPG, WEBP or SVG up to 4MB. A square image works best."
+			},
+			"empty": "No active workspace is selected. Switch or create a workspace to edit these settings.",
+			"readOnly": "Only workspace owners and admins can edit workspace details.",
+			"errors": {
+				"forbidden": "You do not have permission to update this workspace."
+			}
+		},
+		"team": {
+			"title": "Team",
+			"description": "Invite teammates and manage who has access to this workspace.",
+			"empty": {
+				"noOrganization": "No active workspace is selected. Switch or create a workspace to manage your team.",
+				"noMembers": "No teammates yet. Invite someone to get started."
+			},
+			"labels": {
+				"you": "(you)"
+			},
+			"roles": {
+				"owner": "Owner",
+				"admin": "Admin",
+				"member": "Member"
+			},
+			"status": {
+				"pending": "Invited"
+			},
+			"actions": {
+				"more": "More actions",
+				"resend": "Resend invitation",
+				"cancelInvitation": "Cancel invitation",
+				"remove": "Remove from team"
+			},
+			"invite": {
+				"cta": "Invite member",
+				"success": "Invitation sent to {email}",
+				"title": "Invite a teammate",
+				"description": "They'll receive an email with a link to join this workspace.",
+				"submit": "Send invitation",
+				"fields": {
+					"email": {
+						"label": "Email address",
+						"placeholder": "teammate@example.com"
+					},
+					"role": {
+						"label": "Role",
+						"placeholder": "Select a role",
+						"options": {
+							"member": "Member",
+							"admin": "Admin"
+						}
+					}
+				},
+				"errors": {
+					"required": "Email is required",
+					"invalidEmail": "Enter a valid email address"
+				}
+			},
+			"errors": {
+				"invite": "We couldn't send that invitation.",
+				"cancelInvitation": "We couldn't cancel that invitation.",
+				"resend": "We couldn't resend that invitation.",
+				"remove": "We couldn't remove that member."
+			},
+			"manage": {
+				"invitation": {
+					"title": "Manage invitation",
+					"description": "Resend or cancel the invitation sent to {email}.",
+					"resend": "Resend",
+					"cancel": "Cancel invitation",
+					"success": "Invitation canceled",
+					"resent": "Invitation resent to {email}"
+				},
+				"member": {
+					"title": "Remove teammate",
+					"description": "Are you sure you want to remove {name} from this team? They will immediately lose access.",
+					"remove": "Remove",
+					"success": "{name} has been removed"
+				}
+			}
+		},
+		"subscription": {
+			"currentPlan": "Current Plan",
+			"description": "Manage your subscription and billing settings.",
+			"freePlan": "Free Plan",
+			"freePlanDescription": "You're currently on the free plan. Upgrade to unlock more features.",
+			"manageBilling": "Manage Billing",
+			"upgradeComingSoon": "Upgrade options coming soon!",
+			"renewsOn": "Renews on {date}",
+			"status": {
+				"active": "Active",
+				"canceled": "Canceled",
+				"trialing": "Trial"
+			},
+			"features": {
+				"title": "Plan Features",
+				"description": "What's included in your current plan.",
+				"feature1": "Unlimited contacts",
+				"feature2": "AI-powered insights",
+				"feature3": "Email integrations",
+				"feature4": "Priority support"
+			}
+		},
+		"security": {
+			"mfa": {
+				"title": "Multi-factor authentication",
+				"description": "Add an additional layer of security to your account by requiring more than just a password to sign in.",
+				"addDevice": "Add new device",
+				"remove": "Remove",
+				"socialAccountNotice": "Two-factor authentication is not available for social login accounts.",
+				"addedOn": "Added on {date}",
+				"verified": "Verified",
+				"unverified": "Unverified",
+				"errors": {
+					"enableFailed": "Failed to enable two-factor authentication",
+					"disableFailed": "Failed to disable two-factor authentication",
+					"invalidCode": "Invalid verification code. Please try again."
+				},
+				"success": {
+					"enabled": "Two-factor authentication enabled successfully",
+					"disabled": "Two-factor authentication disabled"
+				},
+				"setup": {
+					"passwordTitle": "Verify your identity",
+					"passwordDescription": "Enter your password to enable two-factor authentication.",
+					"passwordLabel": "Password",
+					"passwordPlaceholder": "Enter your password",
+					"scanTitle": "Scan QR code",
+					"scanDescription": "Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)",
+					"backupCodesTitle": "Backup codes",
+					"backupCodesDescription": "Save these backup codes in a secure place. You can use them to access your account if you lose your device.",
+					"verifyTitle": "Verify setup",
+					"verifyDescription": "Enter the 6-digit code from your authenticator app to complete setup.",
+					"verify": "Verify"
+				},
+				"disable": {
+					"title": "Remove two-factor authentication",
+					"description": "Enter your password to remove two-factor authentication from your account."
+				}
+			}
+		}
+	}
+}

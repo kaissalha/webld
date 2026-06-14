@@ -1,0 +1,115 @@
+name: "Stripe Webhook Setup"
+description: "Creates a Stripe webhook for preview deployments"
+inputs:
+    pr_number:
+        description: "Pull request number"
+        required: true
+    preview_url:
+        description: "Preview deployment URL"
+        required: true
+    stripe_api_key:
+        description: "Stripe API key"
+        required: true
+    vercel_protection_bypass:
+        description: "Vercel protection bypass token"
+        required: true
+outputs:
+    webhook_id:
+        description: "ID of the created Stripe webhook"
+        value: ${{ steps.setup-webhook.outputs.webhook_id }}
+    webhook_url:
+        description: "URL of the created Stripe webhook"
+        value: ${{ steps.setup-webhook.outputs.webhook_url }}
+runs:
+    using: "composite"
+    steps:
+        - name: Setup Stripe Webhook
+          id: setup-webhook
+          shell: bash
+          run: |
+              # Use the provided preview URL from input
+              PREVIEW_URL="${{ inputs.preview_url }}"
+              PR_NUMBER="${{ inputs.pr_number }}"
+
+              # Validate preview URL is not empty
+              if [ -z "$PREVIEW_URL" ] || [ "$PREVIEW_URL" = "null" ]; then
+                echo "Error: Preview URL is empty or null"
+                exit 1
+              fi
+
+              # Construct the webhook endpoint URL
+              WEBHOOK_ENDPOINT="${PREVIEW_URL}/api/subscriptions/stripe-webhook?x-vercel-protection-bypass=${{ inputs.vercel_protection_bypass }}"
+
+              echo "Setting up Stripe webhook for PR #${PR_NUMBER}"
+              echo "Preview URL: $PREVIEW_URL"
+              echo "Webhook Endpoint: $WEBHOOK_ENDPOINT"
+
+              # Check if webhook with this URL already exists
+              EXISTING_WEBHOOKS=$(curl -s -X GET "https://api.stripe.com/v1/webhook_endpoints" \
+                -H "Authorization: Bearer ${{ inputs.stripe_api_key }}")
+
+              # Extract existing webhook ID if URL matches
+              EXISTING_WEBHOOK_ID=$(echo "$EXISTING_WEBHOOKS" | jq -r ".data[] | select(.url == \"${WEBHOOK_ENDPOINT}\") | .id")
+
+              if [ -n "$EXISTING_WEBHOOK_ID" ]; then
+                echo "✅ Webhook already exists with ID: $EXISTING_WEBHOOK_ID"
+                WEBHOOK_ID=$EXISTING_WEBHOOK_ID
+                WEBHOOK_URL="${WEBHOOK_ENDPOINT}"
+              else
+                echo "Creating new webhook endpoint..."
+                # Create Stripe webhook for the preview URL
+                WEBHOOK_RESPONSE=$(curl -s -X POST "https://api.stripe.com/v1/webhook_endpoints" \
+                  -H "Authorization: Bearer ${{ inputs.stripe_api_key }}" \
+                  -H "Content-Type: application/x-www-form-urlencoded" \
+                  -d "url=${WEBHOOK_ENDPOINT}" \
+                  -d "enabled_events[]=checkout.session.completed" \
+                  -d "enabled_events[]=customer.subscription.deleted" \
+                  -d "enabled_events[]=customer.subscription.updated" \
+                  -d "enabled_events[]=account.updated" \
+                  -d "enabled_events[]=account.external_account.created" \
+                  -d "enabled_events[]=account.external_account.updated" \
+                  -d "enabled_events[]=account.external_account.deleted" \
+                  -d "enabled_events[]=account.application.deauthorized" \
+                  -d "enabled_events[]=payment_intent.succeeded" \
+                  -d "enabled_events[]=payment_intent.processing" \
+                  -d "enabled_events[]=payment_intent.requires_action" \
+                  -d "enabled_events[]=payment_intent.canceled" \
+                  -d "enabled_events[]=payment_intent.payment_failed" \
+                  -d "enabled_events[]=charge.succeeded" \
+                  -d "enabled_events[]=charge.refunded" \
+                  -d "enabled_events[]=charge.dispute.created" \
+                  -d "enabled_events[]=charge.dispute.updated" \
+                  -d "enabled_events[]=charge.dispute.closed" \
+                  -d "connect=true" \
+                  -d "description=PR #${PR_NUMBER} webhook sandbox")
+
+                # Check for errors in the response
+                if echo "$WEBHOOK_RESPONSE" | jq -e '.error' > /dev/null; then
+                  ERROR_MSG=$(echo "$WEBHOOK_RESPONSE" | jq -r '.error.message')
+                  echo "❌ Failed to create webhook: $ERROR_MSG"
+                  exit 1
+                fi
+
+                WEBHOOK_ID=$(echo "$WEBHOOK_RESPONSE" | jq -r '.id')
+                WEBHOOK_URL="${WEBHOOK_ENDPOINT}"
+
+                if [ -z "$WEBHOOK_ID" ] || [ "$WEBHOOK_ID" = "null" ]; then
+                  echo "❌ Failed to create webhook. Response: $WEBHOOK_RESPONSE"
+                  exit 1
+                fi
+
+                echo "✅ Webhook created successfully with ID: $WEBHOOK_ID"
+              fi
+
+              # Validate outputs before setting them
+              if [ -z "$WEBHOOK_URL" ] || [ "$WEBHOOK_URL" = "null" ]; then
+                echo "❌ Error: WEBHOOK_URL is empty or null"
+                exit 1
+              fi
+
+              echo "📤 Setting outputs:"
+              echo "  - webhook_id: $WEBHOOK_ID"
+              echo "  - webhook_url: $WEBHOOK_URL"
+
+              echo "webhook_id=$WEBHOOK_ID" >> $GITHUB_OUTPUT
+              echo "webhook_url=$WEBHOOK_URL" >> $GITHUB_OUTPUT
