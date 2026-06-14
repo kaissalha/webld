@@ -4,8 +4,8 @@ services:
         volumes:
             - app_db_data:/var/lib/postgresql/data
         environment:
-            POSTGRES_DB: starter
-            POSTGRES_USER: starter
+            POSTGRES_DB: webld
+            POSTGRES_USER: webld
             POSTGRES_PASSWORD: kais12345
             POSTGRES_HOST_AUTH_METHOD: trust
         ports:

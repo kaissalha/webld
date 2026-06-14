@@ -16,7 +16,7 @@ import type { Locale } from "@/i18n/routing";
 import { PostHogClientEffects } from "@/lib/posthog";
 import { TRPCProvider } from "@/lib/trpc";
 import { getDirection } from "@/utils/get-direction";
-import { Toaster } from "@starter/ui/components/sonner";
+import { Toaster } from "@webld/ui/components/sonner";
 
 import "server-only";
 

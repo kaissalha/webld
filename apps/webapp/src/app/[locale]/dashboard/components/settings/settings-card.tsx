@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 type SettingsCardProps = {
 	title: string;

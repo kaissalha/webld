@@ -5,7 +5,7 @@ import { useCallback } from "react";
 import { useTranslations } from "next-intl";
 
 import { useChatSession } from "@/components/chat/stores/chat-session-store";
-import { Button } from "@starter/ui/components/button";
+import { Button } from "@webld/ui/components/button";
 
 type DashboardChatEmptyStateProps = {
 	onNewChat: () => void;

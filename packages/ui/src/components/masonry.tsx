@@ -2,7 +2,7 @@
 
 import { Children, cloneElement, isValidElement, memo, useCallback, useLayoutEffect, useRef } from "react";
 
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 type MasonryProps = {
 	children: React.ReactNode;

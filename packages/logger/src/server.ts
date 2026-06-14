@@ -22,7 +22,7 @@ export const createServerLogger = () => {
 			const posthog = await getPostHog();
 			const context = posthog.getContext();
 
-			logs.getLogger("@starter/logger").emit({
+			logs.getLogger("@webld/logger").emit({
 				body: message,
 				severityNumber: getSeverityNumber({ level }),
 				severityText: level.toUpperCase(),

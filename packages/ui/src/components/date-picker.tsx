@@ -6,10 +6,10 @@ import type { DateRange } from "@daypicker/react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 
-import { Button } from "@starter/ui/components/button";
-import { Calendar } from "@starter/ui/components/calendar";
-import { Popover, PopoverPopup, PopoverTrigger } from "@starter/ui/components/popover";
-import { cn } from "@starter/ui/lib/utils";
+import { Button } from "@webld/ui/components/button";
+import { Calendar } from "@webld/ui/components/calendar";
+import { Popover, PopoverPopup, PopoverTrigger } from "@webld/ui/components/popover";
+import { cn } from "@webld/ui/lib/utils";
 
 type DatePickerProps = {
 	value?: Date;

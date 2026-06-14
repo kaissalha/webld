@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { useLogger } from "@starter/logger/client";
+import { useLogger } from "@webld/logger/client";
 
 export const useCopyToClipboard = ({ timeout = 2000, onCopy }: { timeout?: number; onCopy?: () => void } = {}) => {
 	const [isCopied, setIsCopied] = React.useState(false);

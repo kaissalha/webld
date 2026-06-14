@@ -8,7 +8,7 @@ import type { MediaAccess } from "@/constants/upload";
 import { processAndStoreAutoAdjustedOrganizationLogo } from "@/lib/server/auto-adjust-organization-logo";
 import { findStorageByUrl } from "@/services/storage";
 import { withErrorHandler } from "@/utils/with-error-handler";
-import { auth } from "@starter/server/auth";
+import { auth } from "@webld/server/auth";
 
 const bodySchema = z.object({
 	organizationId: z.string().min(1),

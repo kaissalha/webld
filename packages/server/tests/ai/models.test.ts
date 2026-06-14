@@ -26,7 +26,7 @@ describe("ai models", () => {
 		process.env.NODE_ENV = "development";
 		vi.resetModules();
 
-		await import("@starter/ai/models");
+		await import("@webld/ai/models");
 
 		expect(devToolsMiddleware).toHaveBeenCalled();
 		expect(wrapLanguageModel).toHaveBeenCalled();
@@ -39,7 +39,7 @@ describe("ai models", () => {
 		process.env.NODE_ENV = "production";
 		vi.resetModules();
 
-		await import("@starter/ai/models");
+		await import("@webld/ai/models");
 
 		const firstCall = wrapLanguageModel.mock.calls[0]?.[0];
 		expect(firstCall.middleware).toEqual([]);

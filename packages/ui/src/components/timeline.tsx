@@ -2,7 +2,7 @@ import type * as React from "react";
 
 import { CheckIcon, ChevronDownIcon, ChevronRightIcon, LoaderIcon } from "lucide-react";
 
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 const Timeline = ({ className, ...props }: React.ComponentProps<"div">) => {
 	return <div data-slot='timeline' className={cn("relative w-full", className)} {...props} />;

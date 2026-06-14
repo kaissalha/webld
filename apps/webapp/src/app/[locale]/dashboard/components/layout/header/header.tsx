@@ -6,8 +6,8 @@ import type { LucideIcon } from "lucide-react";
 import type { AppConfig } from "next-intl";
 import { useTranslations } from "next-intl";
 
-import { SidebarTrigger } from "@starter/ui/components/sidebar";
-import { cn } from "@starter/ui/lib/utils";
+import { SidebarTrigger } from "@webld/ui/components/sidebar";
+import { cn } from "@webld/ui/lib/utils";
 
 export type BreadcrumbItemProp =
 	| {

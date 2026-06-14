@@ -7,8 +7,8 @@ import { useTranslations } from "next-intl";
 import { Header } from "@/app/[locale]/dashboard/components/layout/header/header";
 import { ChatSessionProvider } from "@/components/chat/stores/chat-session-store";
 import { useRouter } from "@/i18n/navigation";
-import type { DashboardChatUIMessage } from "@starter/server";
-import { Button } from "@starter/ui/components/button";
+import type { DashboardChatUIMessage } from "@webld/server";
+import { Button } from "@webld/ui/components/button";
 
 import { ChatInterface } from "./chat-interface";
 import { ChatRuntimeSync } from "./chat-runtime-sync";

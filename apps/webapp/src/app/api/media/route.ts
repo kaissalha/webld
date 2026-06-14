@@ -10,8 +10,8 @@ import { getBlob, handleClientUpload } from "@/lib/server/storage";
 import { createStorageRecord, findStorageByUrl } from "@/services/storage";
 import { parseJsonPayload } from "@/utils/parse-json-payload";
 import { withErrorHandler } from "@/utils/with-error-handler";
-import { db, members } from "@starter/db";
-import { auth } from "@starter/server/auth";
+import { db, members } from "@webld/db";
+import { auth } from "@webld/server/auth";
 
 const uploadClientPayloadSchema = z.object({
 	organizationId: z.string().min(1),

@@ -4,9 +4,9 @@ import {
 	isOAuthTokenRevokedError,
 	oauthProvidersWithAccessTokenRefresh,
 	refreshOAuthProviderAccessToken,
-} from "@starter/app-store";
-import { db, type OAuthConnection, oauthConnections } from "@starter/db";
-import { logger } from "@starter/logger/server";
+} from "@webld/app-store";
+import { db, type OAuthConnection, oauthConnections } from "@webld/db";
+import { logger } from "@webld/logger/server";
 
 export const refreshStoredOAuthAccessToken = async (connection: OAuthConnection) => {
 	const now = new Date();

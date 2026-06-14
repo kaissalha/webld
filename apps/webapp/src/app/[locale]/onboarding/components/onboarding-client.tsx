@@ -4,8 +4,8 @@ import { useTranslations } from "next-intl";
 
 import { Logo } from "@/components/logo";
 import { Link } from "@/i18n/navigation";
-import { Badge } from "@starter/ui/components/badge";
-import { Card, CardHeader, CardTitle } from "@starter/ui/components/card";
+import { Badge } from "@webld/ui/components/badge";
+import { Card, CardHeader, CardTitle } from "@webld/ui/components/card";
 
 import { OnboardingContent } from "./onboarding-content";
 import { useOnboardingController } from "./use-onboarding-controller";

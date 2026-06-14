@@ -6,16 +6,16 @@ import { getMessages } from "next-intl/server";
 
 import { BaseLayout } from "@/components/layout/base-layout";
 import { generateLocalizedStaticParams, routing } from "@/i18n/routing";
-import "@starter/ui/globals.css";
+import "@webld/ui/globals.css";
 
 export const generateStaticParams = generateLocalizedStaticParams;
 
 export const metadata: Metadata = {
 	title: {
-		default: "Starter",
-		template: "%s | Starter",
+		default: "webld",
+		template: "%s | webld",
 	},
-	description: "Starter is a platform",
+	description: "webld is a platform",
 };
 
 type LocaleLayoutProps = {

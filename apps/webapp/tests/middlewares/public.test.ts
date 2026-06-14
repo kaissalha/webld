@@ -9,7 +9,7 @@ const { getSession } = vi.hoisted(() => ({
 	getSession: vi.fn(),
 }));
 
-vi.mock("@starter/server/auth", () => ({
+vi.mock("@webld/server/auth", () => ({
 	auth: {
 		api: {
 			getSession,

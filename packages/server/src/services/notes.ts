@@ -12,7 +12,7 @@ import {
 	notes,
 	queryWithPagination,
 	withOrderBy,
-} from "@starter/db";
+} from "@webld/db";
 
 import type { PaginationProps } from "../types/pagination";
 

@@ -8,7 +8,7 @@ import { Navbar } from "@/app/[locale]/(site)/components/sections/navbar";
 import { BaseLayout } from "@/components/layout/base-layout";
 import messages from "@/i18n/messages/en.json";
 import { routing } from "@/i18n/routing";
-import "@starter/ui/globals.css";
+import "@webld/ui/globals.css";
 
 export default function NotFound() {
 	return (

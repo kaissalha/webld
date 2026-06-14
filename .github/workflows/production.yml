@@ -38,4 +38,4 @@ jobs:
               working-directory: apps/webapp
 
             - name: 🗃️ Run Migrations
-              run: bunx dotenv-cli -e ./apps/webapp/.vercel/.env.production.local -- bun --filter @starter/db migrate
+              run: bunx dotenv-cli -e ./apps/webapp/.vercel/.env.production.local -- bun --filter @webld/db migrate

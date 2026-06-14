@@ -4,7 +4,7 @@ import { Loader2Icon, PaperclipIcon, XIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 import type { ChatFileAttachment } from "@/components/chat/chat-attachments";
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 type ChatAttachmentPreviewProps = {
 	attachments: ChatFileAttachment[];

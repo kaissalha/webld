@@ -3,7 +3,7 @@ import { cache } from "react";
 import { TRPCError } from "@trpc/server";
 import { asc, eq } from "drizzle-orm";
 
-import { aiChatMessages, aiChatStreams, aiChats, type DbChatNewMessage, db } from "@starter/db";
+import { aiChatMessages, aiChatStreams, aiChats, type DbChatNewMessage, db } from "@webld/db";
 
 import type { BaseChatUIMessage } from "../ai/types";
 

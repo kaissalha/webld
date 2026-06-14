@@ -5,8 +5,8 @@ import type * as React from "react";
 import { DayPicker } from "@daypicker/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { buttonVariants } from "@starter/ui/components/button";
-import { cn } from "@starter/ui/lib/utils";
+import { buttonVariants } from "@webld/ui/components/button";
+import { cn } from "@webld/ui/lib/utils";
 
 const IconLeft = ({ className }: React.ComponentPropsWithoutRef<"button">) => (
 	<ChevronLeft className={cn("size-4", className)} />

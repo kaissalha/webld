@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { authClient } from "@/lib/auth-client";
-import { Button } from "@starter/ui/components/button";
+import { Button } from "@webld/ui/components/button";
 
 import { GoogleColoredMark } from "./google-colored-mark";
 

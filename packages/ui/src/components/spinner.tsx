@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 
 import { Loader2Icon } from "lucide-react";
 
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 const Spinner = ({ className, ...props }: ComponentProps<typeof Loader2Icon>) => {
 	return (

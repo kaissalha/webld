@@ -1,5 +1,5 @@
 {
-	"extends": "@starter/tsconfig/react-lib.json",
+	"extends": "@webld/tsconfig/react-lib.json",
 	"compilerOptions": {
 		"types": ["node"],
 		"paths": {

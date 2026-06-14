@@ -7,16 +7,16 @@
 			"contact": "mail@example.com +123456789"
 		},
 		"logo": {
-			"alt": "starter"
+			"alt": "webld"
 		}
 	},
 	"notifications": {
 		"match": "We matched the transaction \"{transactionName}\" against \"{fileName}\""
 	},
 	"welcome": {
-		"title": "Welcome to Starter",
+		"title": "Welcome to webld",
 		"greeting": "Hi {firstName}",
-		"intro": "Welcome to Starter! I'm Kais, one of the founders. It's really important to us that you have a great experience ramping up.",
+		"intro": "Welcome to webld! I'm Kais, one of the founders. It's really important to us that you have a great experience ramping up.",
 		"description": "We're excited to help you build and grow your business. Our platform is designed to make running your business easier and more efficient.",
 		"support": "If you have any questions or need assistance, don't hesitate to reach out to our support team.",
 		"signature": "Best regards,<br/>Kais"
@@ -29,7 +29,7 @@
 		"code_label": "Your verification code:",
 		"expires": "This code will expire in 10 minutes.",
 		"not_requested": "If you didn't request this code, you can safely ignore this email.",
-		"signature": "Best regards,<br/>The Starter Team"
+		"signature": "Best regards,<br/>The webld Team"
 	},
 	"invitation": {
 		"preview": "You're invited to join {organizationName}",
@@ -40,7 +40,7 @@
 		"cta": "Accept invitation",
 		"fallback": "Or copy and paste this link into your browser:",
 		"not_you": "If you didn't expect this invitation, you can safely ignore this email.",
-		"signature": "Best regards,<br/>The Starter Team"
+		"signature": "Best regards,<br/>The webld Team"
 	},
 	"test": {
 		"markup": "Hello <strong>World</strong>"

@@ -1,5 +1,5 @@
 {
-	"name": "starter",
+	"name": "webld",
 	"version": "1.0.0",
 	"private": true,
 	"workspaces": [
@@ -10,9 +10,9 @@
 	"scripts": {
 		"build": "turbo run build",
 		"dev": "turbo run dev dev:ai dev:stripe dev:blob",
-		"eval:ci": "turbo run eval:ci --filter=@starter/evals",
-		"eval:dev": "turbo run eval:dev --filter=@starter/evals",
-		"eval:export": "turbo run eval:export --filter=@starter/evals",
+		"eval:ci": "turbo run eval:ci --filter=@webld/evals",
+		"eval:dev": "turbo run eval:dev --filter=@webld/evals",
+		"eval:export": "turbo run eval:export --filter=@webld/evals",
 		"test": "vitest run",
 		"lint": "oxlint . --quiet && oxfmt --check .",
 		"lint:fix": "oxlint --fix . && oxfmt .",
@@ -22,7 +22,6 @@
 		"prepare": "husky"
 	},
 	"devDependencies": {
-		"@starter/db": "workspace:*",
 		"@testcontainers/postgresql": "^12.0.2",
 		"@testcontainers/redis": "^12.0.2",
 		"@testing-library/jest-dom": "^6.9.1",
@@ -33,6 +32,7 @@
 		"@vitest/coverage-istanbul": "^4.1.8",
 		"@vitest/coverage-v8": "^4.1.8",
 		"@vitest/ui": "^4.1.8",
+		"@webld/db": "workspace:*",
 		"drizzle-orm": "^1.0.0-rc.4",
 		"happy-dom": "^20.10.3",
 		"husky": "^9.1.7",

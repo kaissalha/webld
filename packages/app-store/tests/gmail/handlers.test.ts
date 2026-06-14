@@ -14,7 +14,7 @@ const mockUpdate = vi.fn();
 const mockSet = vi.fn();
 const mockUpdateWhere = vi.fn();
 
-vi.mock("@starter/db", () => {
+vi.mock("@webld/db", () => {
 	return {
 		db: {
 			select: mockSelect,

@@ -5,8 +5,8 @@ import { useState } from "react";
 import { BrainIcon, ChevronDownIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@starter/ui/components/collapsible";
-import { cn } from "@starter/ui/lib/utils";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@webld/ui/components/collapsible";
+import { cn } from "@webld/ui/lib/utils";
 
 export type ReasoningPartProps = {
 	text: string;

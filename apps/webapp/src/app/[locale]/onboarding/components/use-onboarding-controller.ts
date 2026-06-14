@@ -9,7 +9,7 @@ import { useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
 import { requireAuthClientData, resolveAuthClientResult } from "@/lib/auth-client-request";
 import { uploadFromClient } from "@/lib/storage";
-import { toast } from "@starter/ui/components/sonner";
+import { toast } from "@webld/ui/components/sonner";
 
 import { buildOrganizationSlug } from "./onboarding-utils";
 

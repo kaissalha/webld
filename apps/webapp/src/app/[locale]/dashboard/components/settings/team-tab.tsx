@@ -3,8 +3,8 @@
 import { PlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Button } from "@starter/ui/components/button";
-import { Skeleton } from "@starter/ui/components/skeleton";
+import { Button } from "@webld/ui/components/button";
+import { Skeleton } from "@webld/ui/components/skeleton";
 
 import { InviteMemberDialog } from "./team/invite-member-dialog";
 import { ManageMemberDialog } from "./team/manage-member-dialog";

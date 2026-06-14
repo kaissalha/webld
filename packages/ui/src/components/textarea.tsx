@@ -1,6 +1,6 @@
 import type * as React from "react";
 
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 export type TextareaProps = React.ComponentProps<"textarea"> & {
 	size?: "sm" | "default" | "lg" | number;

@@ -9,9 +9,9 @@ import { z } from "zod";
 
 import { useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
-import { Button } from "@starter/ui/components/button";
-import { Form } from "@starter/ui/components/form";
-import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@starter/ui/components/input-otp";
+import { Button } from "@webld/ui/components/button";
+import { Form } from "@webld/ui/components/form";
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@webld/ui/components/input-otp";
 
 const otpFormSchema = (invalidMessage: string) =>
 	z.object({

@@ -1,8 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { withErrorHandler } from "@/utils/with-error-handler";
-import { handleGoogleCalendarCallback } from "@starter/app-store";
-import { getBaseURL } from "@starter/utils";
+import { handleGoogleCalendarCallback } from "@webld/app-store";
+import { getBaseURL } from "@webld/utils";
 
 export const GET = withErrorHandler(async (request: NextRequest) => {
 	const { searchParams } = request.nextUrl;

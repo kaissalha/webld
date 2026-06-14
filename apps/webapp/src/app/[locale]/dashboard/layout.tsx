@@ -8,7 +8,7 @@ import {
 	SidebarHeader,
 	SidebarInset,
 	SidebarProvider,
-} from "@starter/ui/components/sidebar";
+} from "@webld/ui/components/sidebar";
 
 import { AppSidebar } from "./components/layout/sidebar/app-sidebar";
 import { SettingsModal } from "./components/settings/settings-modal";

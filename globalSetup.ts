@@ -5,7 +5,7 @@ import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Pool } from "pg";
 import { GenericContainer, Network, type StartedNetwork, type StartedTestContainer } from "testcontainers";
 
-import { type Database, relations } from "@starter/db";
+import { type Database, relations } from "@webld/db";
 
 console.log("Setting up global test environment");
 
@@ -23,7 +23,7 @@ export const setup = async () => {
 
 		// Create PostgreSQL container
 		postgresContainer = await new PostgreSqlContainer("pgvector/pgvector:pg17")
-			.withDatabase("startertest")
+			.withDatabase("webldtest")
 			.withUsername("test")
 			.withPassword("test")
 			.start();

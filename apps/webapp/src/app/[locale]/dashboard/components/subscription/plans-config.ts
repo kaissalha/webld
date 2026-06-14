@@ -1,4 +1,4 @@
-export type PlanId = "starter" | "pro";
+export type PlanId = "webld" | "pro";
 
 export type Plan = {
 	id: PlanId;
@@ -21,7 +21,7 @@ export type FeatureKey =
 	| "apiAccess"
 	| "customIntegrations";
 
-const STARTER_FEATURES = ["upTo5Users", "basicAnalytics", "emailSupport", "5gbStorage"] as const;
+const webld_FEATURES = ["upTo5Users", "basicAnalytics", "emailSupport", "5gbStorage"] as const;
 const PRO_FEATURES = [
 	"unlimitedUsers",
 	"advancedAnalytics",
@@ -33,10 +33,10 @@ const PRO_FEATURES = [
 
 export const PLANS: Plan[] = [
 	{
-		id: "starter",
-		name: "Starter",
+		id: "webld",
+		name: "webld",
 		price: 12,
-		features: STARTER_FEATURES,
+		features: webld_FEATURES,
 	},
 	{
 		id: "pro",

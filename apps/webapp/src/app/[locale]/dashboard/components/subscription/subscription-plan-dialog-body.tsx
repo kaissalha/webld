@@ -5,9 +5,9 @@ import type { ReactNode } from "react";
 import { CheckIcon, ZapIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Badge } from "@starter/ui/components/badge";
-import { Button } from "@starter/ui/components/button";
-import { cn } from "@starter/ui/lib/utils";
+import { Badge } from "@webld/ui/components/badge";
+import { Button } from "@webld/ui/components/button";
+import { cn } from "@webld/ui/lib/utils";
 
 import { type FeatureKey, PLANS, type PlanId } from "./plans-config";
 
@@ -39,7 +39,7 @@ export const SubscriptionPlanDialogBody = ({
 		customIntegrations: t("dialog.features.customIntegrations"),
 	};
 	const planDescriptions: Record<PlanId, string> = {
-		starter: t("dialog.plans.starter.description"),
+		webld: t("dialog.plans.webld.description"),
 		pro: t("dialog.plans.pro.description"),
 	};
 

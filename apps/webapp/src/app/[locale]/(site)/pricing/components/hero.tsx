@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
 
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 export const PricingHero = ({ className, ...props }: ComponentProps<"section">) => {
 	return (

@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { ErrorPageView } from "@/components/layout/error-page-view";
 import { routing } from "@/i18n/routing";
 import { getDirection } from "@/utils/get-direction";
-import "@starter/ui/globals.css";
+import "@webld/ui/globals.css";
 
 type GlobalErrorProps = {
 	error: Error & { digest?: string };

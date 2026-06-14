@@ -12,7 +12,7 @@ vi.mock("ai", () => ({
 	generateText,
 }));
 
-vi.mock("@starter/ai/models", () => ({
+vi.mock("@webld/ai/models", () => ({
 	models: {
 		mailClassification: {
 			model: "mail-classification-model",
@@ -24,7 +24,7 @@ vi.mock("@vercel/functions", () => ({
 	waitUntil,
 }));
 
-import { MAIL_CLASSIFICATION_LABELS } from "@starter/app-store";
+import { MAIL_CLASSIFICATION_LABELS } from "@webld/app-store";
 
 import {
 	applyMailClassificationLabels,

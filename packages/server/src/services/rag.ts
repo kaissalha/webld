@@ -2,8 +2,8 @@ import { embed, embedMany } from "ai";
 import { and, cosineDistance, desc, eq, sql } from "drizzle-orm";
 import { createHash } from "node:crypto";
 
-import { embeddingModels } from "@starter/ai/models";
-import { db, ragDocumentChunks, ragDocuments } from "@starter/db";
+import { embeddingModels } from "@webld/ai/models";
+import { db, ragDocumentChunks, ragDocuments } from "@webld/db";
 
 const RAG_DOCUMENT_WAIT_INTERVAL_MS = 1500;
 const RAG_DOCUMENT_WAIT_TIMEOUT_MS = 4.5 * 60 * 1000;

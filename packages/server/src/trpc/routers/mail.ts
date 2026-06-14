@@ -15,7 +15,7 @@ import {
 	trashMail,
 	unstarMail,
 } from "../../services/mail";
-import type { StarterRouterFactoryOptions } from "../shared";
+import type { WebldRouterFactoryOptions } from "../shared";
 
 const RecipientSchema = z.object({
 	name: z.string().optional(),
@@ -27,7 +27,7 @@ const ThreadIdsSchema = z.object({
 	threadIds: z.array(z.string()).min(1),
 });
 
-export const createMailRouter = ({ createTRPCRouter, organizationProcedure }: StarterRouterFactoryOptions) =>
+export const createMailRouter = ({ createTRPCRouter, organizationProcedure }: WebldRouterFactoryOptions) =>
 	createTRPCRouter({
 		listConnections: organizationProcedure.query(async ({ ctx }) =>
 			listMailConnections({ organizationId: ctx.activeOrganizationId })

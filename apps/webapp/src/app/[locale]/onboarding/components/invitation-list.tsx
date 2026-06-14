@@ -3,9 +3,9 @@
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 
-import { Badge } from "@starter/ui/components/badge";
-import { Button } from "@starter/ui/components/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@starter/ui/components/card";
+import { Badge } from "@webld/ui/components/badge";
+import { Button } from "@webld/ui/components/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@webld/ui/components/card";
 
 import type { OnboardingInvitation } from "./use-onboarding-controller";
 

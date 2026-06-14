@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 import { consumeDashboardChatHandoff } from "@/components/chat/dashboard-chat-handoff";
 import { useChatSession } from "@/components/chat/stores/chat-session-store";
-import type { BaseChatUIMessage } from "@starter/server";
+import type { BaseChatUIMessage } from "@webld/server";
 
 type DashboardChatHandoffEffectProps = {
 	chatId: string;

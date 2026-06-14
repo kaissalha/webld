@@ -8,7 +8,7 @@ import { PostHog } from "posthog-node";
 import { v7 as uuidv7 } from "uuid";
 
 import type { Request } from "@/instrumentation";
-import { logger } from "@starter/logger/server";
+import { logger } from "@webld/logger/server";
 
 const posthogApiKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 

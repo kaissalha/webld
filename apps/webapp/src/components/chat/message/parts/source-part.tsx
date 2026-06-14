@@ -2,7 +2,7 @@
 
 import { ExternalLinkIcon, LinkIcon } from "lucide-react";
 
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 export type SourcePartProps = {
 	url: string;

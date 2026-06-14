@@ -6,7 +6,7 @@ import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
 
 import { ChatMessage, ChatMessageById } from "@/components/chat/message/chat-message";
 import { useChatSession, useMessageIds, useStreamingMessageId } from "@/components/chat/stores/chat-session-store";
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 type ChatMessageListProps = {
 	className?: string;

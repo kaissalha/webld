@@ -12,9 +12,9 @@ import {
 	useMessageRenderDataById,
 	useMessageRoleById,
 } from "@/components/chat/stores/chat-session-store";
-import type { BaseChatUIMessage } from "@starter/server";
-import { Button } from "@starter/ui/components/button";
-import { cn } from "@starter/ui/lib/utils";
+import type { BaseChatUIMessage } from "@webld/server";
+import { Button } from "@webld/ui/components/button";
+import { cn } from "@webld/ui/lib/utils";
 
 import { MessagePartsById, StaticMessageParts } from "./chat-message-parts";
 

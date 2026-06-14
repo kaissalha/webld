@@ -10,8 +10,8 @@ import { Menu, X } from "lucide-react";
 
 import { Logo } from "@/components/logo";
 import { authClient } from "@/lib/auth-client";
-import { Button } from "@starter/ui/components/button";
-import { cn } from "@starter/ui/lib/utils";
+import { Button } from "@webld/ui/components/button";
+import { cn } from "@webld/ui/lib/utils";
 
 const NavbarLink = ({
 	children,

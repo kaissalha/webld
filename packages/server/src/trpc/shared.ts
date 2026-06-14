@@ -1,7 +1,7 @@
 import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 
-export type StarterSession = {
+export type webldSession = {
 	session: {
 		activeOrganizationId?: string | null;
 	};
@@ -12,11 +12,11 @@ export type StarterSession = {
 	};
 } | null;
 
-type StarterTRPCContext = {
-	session: StarterSession;
+type webldTRPCContext = {
+	session: webldSession;
 };
 
-const t = initTRPC.context<StarterTRPCContext>().create({
+const t = initTRPC.context<webldTRPCContext>().create({
 	transformer: superjson,
 });
 
@@ -48,16 +48,16 @@ const organizationProcedure = protectedProcedure.use(({ ctx, next }) => {
 	});
 });
 
-export type CreateStarterTRPCOptions = {
-	getSession: () => Promise<StarterSession>;
+export type CreateWebldTRPCOptions = {
+	getSession: () => Promise<webldSession>;
 };
 
-export type StarterTRPCRouterFactory = typeof t.router;
-export type StarterProtectedProcedure = typeof protectedProcedure;
-export type StarterOrganizationProcedure = typeof organizationProcedure;
+export type webldTRPCRouterFactory = typeof t.router;
+export type webldProtectedProcedure = typeof protectedProcedure;
+export type webldOrganizationProcedure = typeof organizationProcedure;
 
-export type StarterRouterFactoryOptions = {
-	createTRPCRouter: StarterTRPCRouterFactory;
-	organizationProcedure: StarterOrganizationProcedure;
-	protectedProcedure: StarterProtectedProcedure;
+export type WebldRouterFactoryOptions = {
+	createTRPCRouter: webldTRPCRouterFactory;
+	organizationProcedure: webldOrganizationProcedure;
+	protectedProcedure: webldProtectedProcedure;
 };

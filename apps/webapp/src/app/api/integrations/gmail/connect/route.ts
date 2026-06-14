@@ -2,8 +2,8 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { withErrorHandler } from "@/utils/with-error-handler";
-import { createGmailAuthUrl } from "@starter/app-store";
-import { auth } from "@starter/server/auth";
+import { createGmailAuthUrl } from "@webld/app-store";
+import { auth } from "@webld/server/auth";
 
 export const GET = withErrorHandler(async () => {
 	const session = await auth.api.getSession({ headers: await headers() });

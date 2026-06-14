@@ -4,7 +4,7 @@ import { memo } from "react";
 
 import type { ChatMessagePartType } from "@/components/chat/stores/chat-session-projections";
 import { useMessagePartByPartIdx } from "@/components/chat/stores/chat-session-store";
-import type { BaseChatUIMessage } from "@starter/server";
+import type { BaseChatUIMessage } from "@webld/server";
 
 import { ErrorPart } from "./parts/error-part";
 import { FilePart } from "./parts/file-part";

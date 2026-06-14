@@ -8,7 +8,7 @@ import { LogoPicker } from "@/components/organization/logo-picker";
 import { authClient } from "@/lib/auth-client";
 import { resolveAuthClientResult } from "@/lib/auth-client-request";
 import { uploadFromClient } from "@/lib/storage";
-import { toast } from "@starter/ui/components/sonner";
+import { toast } from "@webld/ui/components/sonner";
 
 type OrganizationLogoUploadProps = {
 	canEdit: boolean;

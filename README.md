@@ -1,6 +1,6 @@
-# starter
+# webld
 
-This repo is a Bun workspaces + Turborepo monorepo centered around a Next.js 16 web app and shared packages for AI, auth, data, email, PDFs, logging, third-party API clients (e.g. Spoonacular), and platform integrations.
+This repo is a Bun workspaces + Turborepo monorepo centered around a Next.js 16 web app and shared packages for AI, auth, data, email, PDFs, logging, third-party API clients, and platform integrations.
 
 ## Repo Layout
 
@@ -18,7 +18,6 @@ This repo is a Bun workspaces + Turborepo monorepo centered around a Next.js 16 
 |   |-- logger/              # Shared client/server logging utilities
 |   |-- pdf/                 # React PDF templates and helpers
 |   |-- server/              # Shared server-side services, auth, AI tools, and tRPC helpers
-|   |-- spoonacular/         # Vendored OpenAPI client for the Spoonacular food and nutrition API
 |   |-- tsconfig/            # Shared TypeScript configs
 |   |-- ui/                  # Shared UI primitives, hooks, and design tokens
 |   `-- utils/               # Shared utilities
@@ -30,21 +29,20 @@ This repo is a Bun workspaces + Turborepo monorepo centered around a Next.js 16 
 
 ## Package overview
 
-| Package       | Role                                                     |
-| ------------- | -------------------------------------------------------- |
-| `ai`          | AI models, prompts, AI SDK configuration                 |
-| `app-store`   | OAuth and connectors (e.g. Gmail, Google Calendar)       |
-| `cache`       | Redis / KV and rate limits                               |
-| `db`          | Drizzle schema, migrations, DB access                    |
-| `email`       | React Email + Resend                                     |
-| `evals`       | Evalite evals for prompts and model behavior             |
-| `logger`      | Shared logging for client and server                     |
-| `pdf`         | React PDF templates and helpers                          |
-| `server`      | tRPC, auth, agents, integrations (Dub, AssemblyAI, etc.) |
-| `spoonacular` | Vendored OpenAPI client for the Spoonacular API          |
-| `tsconfig`    | Shared TypeScript bases                                  |
-| `ui`          | Design system, Tailwind tokens, CVA, Base UI             |
-| `utils`       | Shared utilities (e.g. base URL helpers)                 |
+| Package     | Role                                                     |
+| ----------- | -------------------------------------------------------- |
+| `ai`        | AI models, prompts, AI SDK configuration                 |
+| `app-store` | OAuth and connectors (e.g. Gmail, Google Calendar)       |
+| `cache`     | Redis / KV and rate limits                               |
+| `db`        | Drizzle schema, migrations, DB access                    |
+| `email`     | React Email + Resend                                     |
+| `evals`     | Evalite evals for prompts and model behavior             |
+| `logger`    | Shared logging for client and server                     |
+| `pdf`       | React PDF templates and helpers                          |
+| `server`    | tRPC, auth, agents, integrations (Dub, AssemblyAI, etc.) |
+| `tsconfig`  | Shared TypeScript bases                                  |
+| `ui`        | Design system, Tailwind tokens, CVA, Base UI             |
+| `utils`     | Shared utilities (e.g. base URL helpers)                 |
 
 ## Local Development Notes
 

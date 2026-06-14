@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { TRPCError } from "@trpc/server";
 import { getHTTPStatusCodeFromError } from "@trpc/server/http";
 
-import { logger } from "@starter/logger/server";
+import { logger } from "@webld/logger/server";
 
 /**
  * Wraps API route handlers to catch TRPCErrors and other errors.

@@ -4,7 +4,7 @@ import * as React from "react";
 
 import { Slider as SliderPrimitive } from "@base-ui/react/slider";
 
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 const Slider = ({
 	className,

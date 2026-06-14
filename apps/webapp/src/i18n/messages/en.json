@@ -108,7 +108,7 @@
 		"researchDescription": "Conduct research, analyze market trends, and gather insights for your business decisions.",
 		"globalDescription": "Start a conversation with your AI assistant about general topics related to your business.",
 		"studioDescription": "Generate images for your business.",
-		"placeholder": "How can Starter help you?",
+		"placeholder": "How can webld help you?",
 		"collectBusinessInfoTool": {
 			"message": "To give you answers relevant to your business, can you describe your business and any products or services you offer?",
 			"inputPlaceholder": "Collect business info",
@@ -124,7 +124,7 @@
 		},
 		"emailVerification": {
 			"title": "You need to verify your email",
-			"description": "Before using more of Starter, you need to verify your email address",
+			"description": "Before using more of webld, you need to verify your email address",
 			"cta": "Verify email",
 			"sent": {
 				"title": "Verification email sent!",
@@ -166,10 +166,10 @@
 		"billing": "Billing",
 		"notifications": "Notifications",
 		"login": {
-			"pageTitle": "Sign in | Starter",
-			"title": "Continue to Starter",
+			"pageTitle": "Sign in | webld",
+			"title": "Continue to webld",
 			"description": "Log in or register with the options below",
-			"heroTitle": "Welcome to Starter",
+			"heroTitle": "Welcome to webld",
 			"heroSubtitle": "Sign in or create an account",
 			"emailCta": "Continue with Email",
 			"backFromEmailStep": "Back",
@@ -417,7 +417,7 @@
 				"popular": "Most Popular"
 			},
 			"plans": {
-				"starter": {
+				"webld": {
 					"description": "Perfect for small teams getting started"
 				},
 				"pro": {

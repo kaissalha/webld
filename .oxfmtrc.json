@@ -24,7 +24,7 @@
 			},
 			{
 				"groupName": "workspace-internal",
-				"elementNamePattern": ["@starter", "@starter/**", "@/**"]
+				"elementNamePattern": ["@webld", "@webld/**", "@/**"]
 			}
 		],
 		"groups": [

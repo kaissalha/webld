@@ -3,7 +3,7 @@ import { cache } from "react";
 import { TRPCError } from "@trpc/server";
 import { and, eq, inArray, sql, type SQL } from "drizzle-orm";
 
-import { addFullTextSearch, type Contact, contacts, db, queryWithPagination, withOrderBy } from "@starter/db";
+import { addFullTextSearch, type Contact, contacts, db, queryWithPagination, withOrderBy } from "@webld/db";
 
 import type { PaginationProps } from "../types/pagination";
 

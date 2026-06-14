@@ -9,7 +9,7 @@ import {
 	updateContact,
 } from "../../services/contacts";
 import { PaginationSchema } from "../../types/pagination";
-import type { StarterRouterFactoryOptions } from "../shared";
+import type { WebldRouterFactoryOptions } from "../shared";
 
 const ContactInputSchema = z.object({
 	email: z.email(),
@@ -18,7 +18,7 @@ const ContactInputSchema = z.object({
 	phoneNumber: z.string().nullable().optional(),
 });
 
-export const createContactsRouter = ({ createTRPCRouter, organizationProcedure }: StarterRouterFactoryOptions) =>
+export const createContactsRouter = ({ createTRPCRouter, organizationProcedure }: WebldRouterFactoryOptions) =>
 	createTRPCRouter({
 		create: organizationProcedure
 			.input(ContactInputSchema)

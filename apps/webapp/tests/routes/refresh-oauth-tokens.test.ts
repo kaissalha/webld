@@ -10,13 +10,13 @@ const { loggerError, runOAuthTokenRefreshJob } = vi.hoisted(() => ({
 	runOAuthTokenRefreshJob: vi.fn(),
 }));
 
-vi.mock("@starter/logger/server", () => ({
+vi.mock("@webld/logger/server", () => ({
 	logger: {
 		error: loggerError,
 	},
 }));
 
-vi.mock("@starter/server/oauth-token-refresh", () => ({
+vi.mock("@webld/server/oauth-token-refresh", () => ({
 	runOAuthTokenRefreshJob,
 }));
 

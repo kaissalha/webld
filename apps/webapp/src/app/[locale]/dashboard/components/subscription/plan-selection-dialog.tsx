@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 
-import { Dialog, DialogDescription, DialogPopup, DialogTitle } from "@starter/ui/components/dialog";
+import { Dialog, DialogDescription, DialogPopup, DialogTitle } from "@webld/ui/components/dialog";
 
 import { SubscriptionPlanDialogBody } from "./subscription-plan-dialog-body";
 import { useSubscription } from "./use-subscription";

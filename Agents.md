@@ -23,7 +23,7 @@
 - Prefer stable ids for React keys. Do not use array indexes when a stable value like `id`, `email`, or `code` exists.
 - Prefer string constants over tiny helper functions that only return a storage key or other static string.
 - Avoid defensive helper wrappers like `isRecord` unless they are truly necessary at a boundary. Prefer direct shape checks and simpler assumptions in app code.
-- Keep all AI prompts, output schemas used directly by prompts, and prompt tests in `packages/ai`; application and server code should import them from `@starter/ai/prompts` instead of defining prompt strings inline.
+- Keep all AI prompts, output schemas used directly by prompts, and prompt tests in `packages/ai`; application and server code should import them from `@webld/ai/prompts` instead of defining prompt strings inline.
 - Keep prompt and model behavior evals in `packages/evals`; add or update a relevant eval whenever a production prompt is introduced or materially changed.
 - Do not create generic nullable predicate helpers like `isDefined`, `isPresent`, or `isNonNull`. Use explicit local control flow, `flatMap`, or a narrow inline type predicate at the boundary that needs it.
 - Do not create one-line named helpers that only wrap property access, a simple condition, a static string, or a single `map`/`filter` expression. Inline that code unless the helper has multiple real consumers and a domain name that improves readability.
@@ -99,7 +99,6 @@
 - **packages/logger**: Shared logging and observability helpers for client/server usage
 - **packages/pdf**: React PDF templates and document-generation helpers
 - **packages/server**: Server-side services and lib integrations (AI agents/tools, auth, payments, Resend, Dub, AssemblyAI, tRPC)
-- **packages/spoonacular**: Vendored OpenAPI client for the Spoonacular food and nutrition API (`@starter/spoonacular`)
 - **packages/tsconfig**: Shared TypeScript configs (base, web, node, react-lib, react-native)
 - **packages/ui**: Shared UI components, hooks, and global design tokens (Tailwind v4, CVA, Base UI/Radix)
 - **packages/utils**: Shared utility functions (get-base-url)

@@ -7,9 +7,9 @@ import { PDFParse } from "pdf-parse";
 import { z } from "zod";
 
 import { withErrorHandler } from "@/utils/with-error-handler";
-import { logger } from "@starter/logger/server";
-import { createPendingRagDocument, markRagDocumentFailed, upsertRagTextDocument } from "@starter/server";
-import { auth } from "@starter/server/auth";
+import { logger } from "@webld/logger/server";
+import { createPendingRagDocument, markRagDocumentFailed, upsertRagTextDocument } from "@webld/server";
+import { auth } from "@webld/server/auth";
 
 const ragDocumentRequestSchema = z.object({
 	chunkSize: z.number().min(100).max(10_000).optional(),

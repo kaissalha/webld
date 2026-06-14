@@ -2,7 +2,7 @@
 
 import { useCallback, useRef } from "react";
 
-import type { BaseChatUIMessage } from "@starter/server";
+import type { BaseChatUIMessage } from "@webld/server";
 
 const areStreamingSnapshotValuesEqual = (left: unknown, right: unknown): boolean => {
 	if (Object.is(left, right)) {

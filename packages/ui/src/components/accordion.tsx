@@ -3,7 +3,7 @@
 import { Accordion as AccordionPrimitive } from "@base-ui/react/accordion";
 import { MinusIcon, PlusIcon } from "lucide-react";
 
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 const Accordion = (props: AccordionPrimitive.Root.Props) => {
 	return <AccordionPrimitive.Root data-slot='accordion' {...props} />;

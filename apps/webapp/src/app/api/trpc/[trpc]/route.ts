@@ -2,7 +2,7 @@ import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { getHTTPStatusCodeFromError } from "@trpc/server/http";
 
 import { appRouter, createTRPCContext } from "@/server/trpc";
-import { logger } from "@starter/logger/server";
+import { logger } from "@webld/logger/server";
 
 const handler = (req: Request) =>
 	fetchRequestHandler({

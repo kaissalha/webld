@@ -8,8 +8,8 @@ import { atom, useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { MenuIcon, SidebarIcon } from "lucide-react";
 
-import { useIsMobile } from "@starter/ui/hooks/use-mobile";
-import { cn } from "@starter/ui/lib/utils";
+import { useIsMobile } from "@webld/ui/hooks/use-mobile";
+import { cn } from "@webld/ui/lib/utils";
 
 import { useHydrated } from "../hooks/use-hydrated";
 import { Button } from "./button";

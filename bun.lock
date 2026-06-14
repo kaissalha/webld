@@ -5,7 +5,6 @@
     "": {
       "name": "starter",
       "devDependencies": {
-        "@starter/db": "workspace:*",
         "@testcontainers/postgresql": "^12.0.2",
         "@testcontainers/redis": "^12.0.2",
         "@testing-library/jest-dom": "^6.9.1",
@@ -16,6 +15,7 @@
         "@vitest/coverage-istanbul": "^4.1.8",
         "@vitest/coverage-v8": "^4.1.8",
         "@vitest/ui": "^4.1.8",
+        "@webld/db": "workspace:*",
         "drizzle-orm": "^1.0.0-rc.4",
         "happy-dom": "^20.10.3",
         "husky": "^9.1.7",
@@ -52,15 +52,6 @@
         "@posthog/next": "^0.4.95",
         "@posthog/nextjs-config": "^1.9.66",
         "@radix-ui/react-direction": "^1.1.2",
-        "@starter/ai": "workspace:*",
-        "@starter/app-store": "workspace:*",
-        "@starter/cache": "workspace:*",
-        "@starter/db": "workspace:*",
-        "@starter/email": "workspace:*",
-        "@starter/logger": "workspace:*",
-        "@starter/server": "workspace:*",
-        "@starter/ui": "workspace:*",
-        "@starter/utils": "workspace:*",
         "@tanstack/react-query": "^5.101.0",
         "@tanstack/react-query-devtools": "^5.101.0",
         "@trpc/client": "^11.17.0",
@@ -71,6 +62,15 @@
         "@vercel/blob": "^2.4.0",
         "@vercel/speed-insights": "^2.0.0",
         "@vercel/toolbar": "^0.2.6",
+        "@webld/ai": "workspace:*",
+        "@webld/app-store": "workspace:*",
+        "@webld/cache": "workspace:*",
+        "@webld/db": "workspace:*",
+        "@webld/email": "workspace:*",
+        "@webld/logger": "workspace:*",
+        "@webld/server": "workspace:*",
+        "@webld/ui": "workspace:*",
+        "@webld/utils": "workspace:*",
         "@workflow/ai": "5.0.0",
         "@wrksz/themes": "^0.9.3",
         "accept-md-runtime": "^5.0.2",
@@ -117,7 +117,6 @@
         "zustand": "^5.0.14",
       },
       "devDependencies": {
-        "@starter/tsconfig": "workspace:*",
         "@tailwindcss/postcss": "^4.3.1",
         "@testing-library/jest-dom": "^6.9.1",
         "@testing-library/react": "^16.3.2",
@@ -129,6 +128,7 @@
         "@types/validator": "^13.15.10",
         "@typescript/native-preview": "^7.0.0-dev.20260614.1",
         "@vitejs/plugin-react": "^6.0.2",
+        "@webld/tsconfig": "workspace:*",
         "accept-md": "^5.0.2",
         "baseline-browser-mapping": "^2.10.37",
         "cookies-next": "^6.1.1",
@@ -141,7 +141,7 @@
       },
     },
     "packages/ai": {
-      "name": "@starter/ai",
+      "name": "@webld/ai",
       "version": "1.0.0",
       "dependencies": {
         "@ai-sdk/devtools": "^0.0.19",
@@ -149,32 +149,32 @@
         "zod": "^4.4.3",
       },
       "devDependencies": {
-        "@starter/tsconfig": "workspace:*",
         "@types/node": "^25.9.3",
         "@typescript/native-preview": "^7.0.0-dev.20260614.1",
+        "@webld/tsconfig": "workspace:*",
       },
     },
     "packages/app-store": {
-      "name": "@starter/app-store",
+      "name": "@webld/app-store",
       "version": "1.0.0",
       "dependencies": {
         "@better-fetch/fetch": "^1.3.0",
         "@googleapis/gmail": "^17.0.0",
-        "@starter/db": "workspace:*",
-        "@starter/logger": "workspace:*",
-        "@starter/utils": "workspace:*",
+        "@webld/db": "workspace:*",
+        "@webld/logger": "workspace:*",
+        "@webld/utils": "workspace:*",
         "google-auth-library": "^10.7.0",
         "mimetext": "^3.0.28",
       },
       "devDependencies": {
-        "@starter/tsconfig": "workspace:*",
         "@total-typescript/ts-reset": "^0.6.1",
         "@types/node": "^25.9.3",
         "@typescript/native-preview": "^7.0.0-dev.20260614.1",
+        "@webld/tsconfig": "workspace:*",
       },
     },
     "packages/cache": {
-      "name": "@starter/cache",
+      "name": "@webld/cache",
       "version": "1.0.0",
       "dependencies": {
         "@upstash/ratelimit": "^2.0.8",
@@ -182,14 +182,14 @@
         "ioredis": "^5.11.1",
       },
       "devDependencies": {
-        "@starter/tsconfig": "workspace:*",
         "@total-typescript/ts-reset": "^0.6.1",
         "@types/node": "^25.9.3",
         "@typescript/native-preview": "^7.0.0-dev.20260614.1",
+        "@webld/tsconfig": "workspace:*",
       },
     },
     "packages/db": {
-      "name": "@starter/db",
+      "name": "@webld/db",
       "version": "1.0.0",
       "dependencies": {
         "@vercel/functions": "^3.7.1",
@@ -198,17 +198,17 @@
         "pg": "^8.21.0",
       },
       "devDependencies": {
-        "@starter/tsconfig": "workspace:*",
         "@total-typescript/ts-reset": "^0.6.1",
         "@types/node": "^25.9.3",
         "@types/pg": "^8.20.0",
         "@typescript/native-preview": "^7.0.0-dev.20260614.1",
         "@vitejs/plugin-react": "^6.0.2",
+        "@webld/tsconfig": "workspace:*",
         "drizzle-kit": "^1.0.0-rc.4",
       },
     },
     "packages/email": {
-      "name": "@starter/email",
+      "name": "@webld/email",
       "version": "1.0.0",
       "dependencies": {
         "react": "^19.2.7",
@@ -217,7 +217,6 @@
       },
       "devDependencies": {
         "@react-email/ui": "^6.6.0",
-        "@starter/tsconfig": "workspace:*",
         "@testing-library/jest-dom": "^6.9.1",
         "@testing-library/react": "^16.3.2",
         "@total-typescript/ts-reset": "^0.6.1",
@@ -227,49 +226,50 @@
         "@types/react-dom": "19.2.3",
         "@typescript/native-preview": "^7.0.0-dev.20260614.1",
         "@vitejs/plugin-react": "^6.0.2",
+        "@webld/tsconfig": "workspace:*",
         "autoprefixer": "^10.5.0",
         "postcss": "^8.5.15",
         "tailwindcss": "^4.3.1",
       },
     },
     "packages/evals": {
-      "name": "@starter/evals",
+      "name": "@webld/evals",
       "version": "1.0.0",
       "dependencies": {
-        "@starter/ai": "workspace:*",
-        "@starter/server": "workspace:*",
+        "@webld/ai": "workspace:*",
+        "@webld/server": "workspace:*",
         "ai": "^6.0.205",
         "zod": "^4.4.3",
       },
       "devDependencies": {
-        "@starter/tsconfig": "workspace:*",
         "@types/node": "^25.9.3",
         "@typescript/native-preview": "^7.0.0-dev.20260614.1",
+        "@webld/tsconfig": "workspace:*",
         "better-sqlite3": "^12.10.1",
         "evalite": "beta",
         "vitest": "^4.1.8",
       },
     },
     "packages/logger": {
-      "name": "@starter/logger",
+      "name": "@webld/logger",
       "version": "1.0.0",
       "dependencies": {
         "@opentelemetry/api-logs": "^0.219.0",
         "@posthog/next": "^0.4.95",
       },
       "devDependencies": {
-        "@starter/tsconfig": "workspace:*",
         "@total-typescript/ts-reset": "^0.6.1",
         "@types/node": "^25.9.3",
         "@types/react": "^19.2.17",
         "@typescript/native-preview": "^7.0.0-dev.20260614.1",
+        "@webld/tsconfig": "workspace:*",
       },
       "peerDependencies": {
         "react": "^19.2.5",
       },
     },
     "packages/pdf": {
-      "name": "@starter/pdf",
+      "name": "@webld/pdf",
       "version": "1.0.0",
       "dependencies": {
         "@react-pdf/renderer": "^4.5.1",
@@ -278,16 +278,16 @@
         "react": "^19.2.7",
       },
       "devDependencies": {
-        "@starter/tsconfig": "workspace:*",
         "@types/bun": "^1.3.14",
         "@types/node": "^25.9.3",
         "@types/qrcode": "^1.5.6",
         "@types/react": "19.2.17",
         "@typescript/native-preview": "^7.0.0-dev.20260614.1",
+        "@webld/tsconfig": "workspace:*",
       },
     },
     "packages/server": {
-      "name": "@starter/server",
+      "name": "@webld/server",
       "version": "1.0.0",
       "dependencies": {
         "@ai-sdk/google": "^3.0.82",
@@ -296,16 +296,16 @@
         "@better-auth/stripe": "^1.6.18",
         "@better-fetch/fetch": "^1.3.0",
         "@googleapis/gmail": "^17.0.0",
-        "@starter/ai": "workspace:*",
-        "@starter/app-store": "workspace:*",
-        "@starter/cache": "workspace:*",
-        "@starter/db": "workspace:*",
-        "@starter/email": "workspace:*",
-        "@starter/logger": "workspace:*",
-        "@starter/utils": "workspace:*",
         "@trpc/server": "^11.17.0",
         "@types/pg": "^8.20.0",
         "@vercel/functions": "^3.7.1",
+        "@webld/ai": "workspace:*",
+        "@webld/app-store": "workspace:*",
+        "@webld/cache": "workspace:*",
+        "@webld/db": "workspace:*",
+        "@webld/email": "workspace:*",
+        "@webld/logger": "workspace:*",
+        "@webld/utils": "workspace:*",
         "ai": "^6.0.205",
         "better-auth": "^1.6.18",
         "countries-list": "^3.3.0",
@@ -321,13 +321,13 @@
         "zod": "^4.4.3",
       },
       "devDependencies": {
-        "@starter/tsconfig": "workspace:*",
         "@total-typescript/ts-reset": "^0.6.1",
         "@types/google.maps": "^3.65.1",
         "@types/node": "^25.9.3",
         "@types/react": "^19.2.17",
         "@types/react-dom": "^19.2.3",
         "@typescript/native-preview": "^7.0.0-dev.20260614.1",
+        "@webld/tsconfig": "workspace:*",
       },
       "peerDependencies": {
         "next": "^16.1.1",
@@ -336,14 +336,14 @@
       },
     },
     "packages/tsconfig": {
-      "name": "@starter/tsconfig",
+      "name": "@webld/tsconfig",
       "version": "0.0.0",
       "devDependencies": {
         "@typescript/native-preview": "^7.0.0-dev.20260614.1",
       },
     },
     "packages/ui": {
-      "name": "@starter/ui",
+      "name": "@webld/ui",
       "version": "0.0.0",
       "dependencies": {
         "@base-ui/react": "^1.5.0",
@@ -353,7 +353,7 @@
         "@radix-ui/react-navigation-menu": "^1.2.15",
         "@radix-ui/react-slot": "^1.2.5",
         "@radix-ui/react-tabs": "^1.1.14",
-        "@starter/logger": "workspace:*",
+        "@webld/logger": "workspace:*",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cmdk": "1.1.1",
@@ -379,7 +379,6 @@
         "zod": "^4.4.3",
       },
       "devDependencies": {
-        "@starter/tsconfig": "workspace:*",
         "@tailwindcss/postcss": "^4.3.1",
         "@total-typescript/ts-reset": "^0.6.1",
         "@types/node": "^25.9.3",
@@ -387,19 +386,20 @@
         "@types/react-dom": "^19.2.3",
         "@typescript/native-preview": "^7.0.0-dev.20260614.1",
         "@vitejs/plugin-react": "^6.0.2",
+        "@webld/tsconfig": "workspace:*",
         "autoprefixer": "^10.5.0",
         "postcss": "^8.5.15",
         "tailwindcss": "^4.3.1",
       },
     },
     "packages/utils": {
-      "name": "@starter/utils",
+      "name": "@webld/utils",
       "version": "1.0.0",
       "devDependencies": {
-        "@starter/tsconfig": "workspace:*",
         "@total-typescript/ts-reset": "^0.6.1",
         "@types/node": "^25.9.3",
         "@typescript/native-preview": "^7.0.0-dev.20260614.1",
+        "@webld/tsconfig": "workspace:*",
       },
     },
   },
@@ -1232,30 +1232,6 @@
 
     "@standard-schema/utils": ["@standard-schema/utils@0.3.0", "", {}, "sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g=="],
 
-    "@starter/ai": ["@starter/ai@workspace:packages/ai"],
-
-    "@starter/app-store": ["@starter/app-store@workspace:packages/app-store"],
-
-    "@starter/cache": ["@starter/cache@workspace:packages/cache"],
-
-    "@starter/db": ["@starter/db@workspace:packages/db"],
-
-    "@starter/email": ["@starter/email@workspace:packages/email"],
-
-    "@starter/evals": ["@starter/evals@workspace:packages/evals"],
-
-    "@starter/logger": ["@starter/logger@workspace:packages/logger"],
-
-    "@starter/pdf": ["@starter/pdf@workspace:packages/pdf"],
-
-    "@starter/server": ["@starter/server@workspace:packages/server"],
-
-    "@starter/tsconfig": ["@starter/tsconfig@workspace:packages/tsconfig"],
-
-    "@starter/ui": ["@starter/ui@workspace:packages/ui"],
-
-    "@starter/utils": ["@starter/utils@workspace:packages/utils"],
-
     "@stricli/auto-complete": ["@stricli/auto-complete@1.2.6", "", { "dependencies": { "@stricli/core": "^1.2.6" }, "bin": { "auto-complete": "dist/bin/cli.js" } }, "sha512-H7dectwnLBoyDrp4Vek1gTNdUWzqkEDt5X6oFoOPxPVbca5FA9ttBZ/OlfNvt14aeiZUsg1rC7GEHjIh3tjn2A=="],
 
     "@stricli/core": ["@stricli/core@1.2.6", "", {}, "sha512-j5fa1wyOLrP9WJqqLFEJeQviqb3cK46K+FXTuISEkG/H5C820YfKDoVQ3CDVdM5WLhEx1ARdpiW6+hU4tYHjCQ=="],
@@ -1633,6 +1609,30 @@
     "@webassemblyjs/wasm-parser": ["@webassemblyjs/wasm-parser@1.14.1", "", { "dependencies": { "@webassemblyjs/ast": "1.14.1", "@webassemblyjs/helper-api-error": "1.13.2", "@webassemblyjs/helper-wasm-bytecode": "1.13.2", "@webassemblyjs/ieee754": "1.13.2", "@webassemblyjs/leb128": "1.13.2", "@webassemblyjs/utf8": "1.13.2" } }, "sha512-JLBl+KZ0R5qB7mCnud/yyX08jWFw5MsoalJ1pQ4EdFlgj9VdXKGuENGsiCIjegI1W7p91rUlcB/LB5yRJKNTcQ=="],
 
     "@webassemblyjs/wast-printer": ["@webassemblyjs/wast-printer@1.14.1", "", { "dependencies": { "@webassemblyjs/ast": "1.14.1", "@xtuc/long": "4.2.2" } }, "sha512-kPSSXE6De1XOR820C90RIo2ogvZG+c3KiHzqUoO/F34Y2shGzesfqv7o57xrxovZJH/MetF5UjroJ/R/3isoiw=="],
+
+    "@webld/ai": ["@webld/ai@workspace:packages/ai"],
+
+    "@webld/app-store": ["@webld/app-store@workspace:packages/app-store"],
+
+    "@webld/cache": ["@webld/cache@workspace:packages/cache"],
+
+    "@webld/db": ["@webld/db@workspace:packages/db"],
+
+    "@webld/email": ["@webld/email@workspace:packages/email"],
+
+    "@webld/evals": ["@webld/evals@workspace:packages/evals"],
+
+    "@webld/logger": ["@webld/logger@workspace:packages/logger"],
+
+    "@webld/pdf": ["@webld/pdf@workspace:packages/pdf"],
+
+    "@webld/server": ["@webld/server@workspace:packages/server"],
+
+    "@webld/tsconfig": ["@webld/tsconfig@workspace:packages/tsconfig"],
+
+    "@webld/ui": ["@webld/ui@workspace:packages/ui"],
+
+    "@webld/utils": ["@webld/utils@workspace:packages/utils"],
 
     "@workflow/ai": ["@workflow/ai@5.0.0", "", { "dependencies": { "@ai-sdk/provider": "^3.0.0", "@workflow/serde": "^4.1.1", "zod": "4.3.6" }, "optionalDependencies": { "@ai-sdk/anthropic": "^3.0.0", "@ai-sdk/gateway": "^3.0.0", "@ai-sdk/google": "^3.0.0", "@ai-sdk/openai": "^3.0.0", "@ai-sdk/xai": "^3.0.0" }, "peerDependencies": { "@opentelemetry/api": "^1.0.0", "ai": "^6", "workflow": "^4.3.0" }, "optionalPeers": ["@opentelemetry/api"] }, "sha512-T/E3ZaemwNSqcOSbr2e+L5b+VFVjcPpeLx3ZS3jw81fEKOldr3WwulTVyq340FinxBJ9DoTztFwQc+uLBaNqJA=="],
 

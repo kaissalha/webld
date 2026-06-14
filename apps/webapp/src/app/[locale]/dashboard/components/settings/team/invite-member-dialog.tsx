@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { useTranslations } from "next-intl";
 
-import { Button } from "@starter/ui/components/button";
+import { Button } from "@webld/ui/components/button";
 import {
 	Dialog,
 	DialogContent,
@@ -12,10 +12,10 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-} from "@starter/ui/components/dialog";
-import { Input } from "@starter/ui/components/input";
-import { Label } from "@starter/ui/components/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@starter/ui/components/select";
+} from "@webld/ui/components/dialog";
+import { Input } from "@webld/ui/components/input";
+import { Label } from "@webld/ui/components/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@webld/ui/components/select";
 
 type InviteRole = "member" | "admin";
 

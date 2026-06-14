@@ -6,8 +6,8 @@ import Link from "next/link";
 
 import { ArrowRight, ChevronRight } from "lucide-react";
 
-import { Button } from "@starter/ui/components/button";
-import { cn } from "@starter/ui/lib/utils";
+import { Button } from "@webld/ui/components/button";
+import { cn } from "@webld/ui/lib/utils";
 
 import { Screenshot } from "../screenshot";
 

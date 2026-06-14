@@ -2,9 +2,9 @@
 
 import { useTranslations } from "next-intl";
 
-import { Button } from "@starter/ui/components/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@starter/ui/components/card";
-import { Spinner } from "@starter/ui/components/spinner";
+import { Button } from "@webld/ui/components/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@webld/ui/components/card";
+import { Spinner } from "@webld/ui/components/spinner";
 
 import { CreateOrganizationForm } from "./create-organization-form";
 import { InvitationList } from "./invitation-list";

@@ -1,5 +1,5 @@
 {
-	"name": "@starter/utils",
+	"name": "@webld/utils",
 	"version": "1.0.0",
 	"private": true,
 	"type": "module",
@@ -16,9 +16,9 @@
 		"typecheck": "tsgo --noEmit --skipLibCheck"
 	},
 	"devDependencies": {
-		"@starter/tsconfig": "workspace:*",
 		"@total-typescript/ts-reset": "^0.6.1",
 		"@types/node": "^25.9.3",
-		"@typescript/native-preview": "^7.0.0-dev.20260614.1"
+		"@typescript/native-preview": "^7.0.0-dev.20260614.1",
+		"@webld/tsconfig": "workspace:*"
 	}
 }

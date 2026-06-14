@@ -1,6 +1,6 @@
 "use client";
 
-import type { BaseChatUIMessage } from "@starter/server";
+import type { BaseChatUIMessage } from "@webld/server";
 
 export type ChatMessagePart = BaseChatUIMessage["parts"][number];
 export type ChatMessagePartType = ChatMessagePart["type"];

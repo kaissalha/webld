@@ -5,8 +5,8 @@ import {
 	type CreateEventInput,
 	type GoogleCalendarEvent,
 	type UpdateEventInput,
-} from "@starter/app-store";
-import { db, type OAuthConnection, oauthConnections } from "@starter/db";
+} from "@webld/app-store";
+import { db, type OAuthConnection, oauthConnections } from "@webld/db";
 
 import { refreshStoredOAuthAccessToken } from "./oauth-token-refresh";
 

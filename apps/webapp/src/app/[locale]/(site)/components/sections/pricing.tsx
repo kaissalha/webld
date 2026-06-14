@@ -5,12 +5,12 @@ import Link from "next/link";
 
 import { Check } from "lucide-react";
 
-import { Button } from "@starter/ui/components/button";
-import { cn } from "@starter/ui/lib/utils";
+import { Button } from "@webld/ui/components/button";
+import { cn } from "@webld/ui/lib/utils";
 
 const plans = [
 	{
-		name: "Starter",
+		name: "webld",
 		price: "$12",
 		period: "/mo",
 		subheadline: "Small teams getting started with shared inboxes",
@@ -30,7 +30,7 @@ const plans = [
 		subheadline: "Growing teams needing collaboration and insights",
 		badge: "Most popular",
 		features: [
-			"Everything in Starter",
+			"Everything in webld",
 			"Inbox Agent",
 			"Unlimited mailboxes",
 			"Collision detection",

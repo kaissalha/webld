@@ -1,8 +1,8 @@
 {
-	"extends": "@starter/tsconfig/react-lib.json",
+	"extends": "@webld/tsconfig/react-lib.json",
 	"compilerOptions": {
 		"paths": {
-			"@starter/ui/*": ["./src/*"]
+			"@webld/ui/*": ["./src/*"]
 		}
 	},
 	"include": ["."],

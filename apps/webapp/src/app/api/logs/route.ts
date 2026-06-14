@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { logger } from "@starter/logger/server";
+import { logger } from "@webld/logger/server";
 
 const logPayloadSchema = z.object({
 	level: z.enum(["debug", "info", "warn", "error"]),

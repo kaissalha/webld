@@ -7,8 +7,8 @@ import { useTranslations } from "next-intl";
 
 import { useTextareaResize } from "@/hooks/use-textarea-resize";
 import { useTRPC } from "@/lib/trpc";
-import { toast } from "@starter/ui/components/sonner";
-import { useCopyToClipboard } from "@starter/ui/hooks/use-copy-to-clipboard";
+import { toast } from "@webld/ui/components/sonner";
+import { useCopyToClipboard } from "@webld/ui/hooks/use-copy-to-clipboard";
 
 export type EmailDraftOutput = {
 	address: string;

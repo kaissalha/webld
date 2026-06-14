@@ -5,7 +5,7 @@ import { useCallback, useMemo, useReducer } from "react";
 import { useTranslations } from "next-intl";
 
 import { authClient } from "@/lib/auth-client";
-import { toast } from "@starter/ui/components/sonner";
+import { toast } from "@webld/ui/components/sonner";
 
 type SetupStep = "password" | "scan" | "verify";
 type DialogMode = "enable" | "disable";

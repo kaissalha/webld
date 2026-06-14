@@ -10,12 +10,12 @@ import { and, eq } from "drizzle-orm";
 import { render } from "react-email";
 import { v4 as uuidv4 } from "uuid";
 
-import { createTCPRedisClient } from "@starter/cache";
-import { db, members, organizations } from "@starter/db";
-import * as schema from "@starter/db/schema";
-import { InvitationEmail, OtpEmail } from "@starter/email";
-import { logger } from "@starter/logger/server";
-import { getBaseURL } from "@starter/utils";
+import { createTCPRedisClient } from "@webld/cache";
+import { db, members, organizations } from "@webld/db";
+import * as schema from "@webld/db/schema";
+import { InvitationEmail, OtpEmail } from "@webld/email";
+import { logger } from "@webld/logger/server";
+import { getBaseURL } from "@webld/utils";
 
 import { resend } from "./resend";
 import { stripeClient } from "./stripe";
@@ -35,10 +35,10 @@ if (!process.env.REDIS_URL) {
 const redis = createTCPRedisClient(process.env.REDIS_URL);
 
 export const auth = betterAuth({
-	appName: "Starter",
+	appName: "webld",
 	debug: true,
 	baseURL: getBaseURL().toString(),
-	trustedOrigins: [getBaseURL().toString(), "starter-mobile://", "mobile://"],
+	trustedOrigins: [getBaseURL().toString(), "webld-mobile://", "mobile://"],
 	database: drizzleAdapter(db, {
 		provider: "pg",
 		usePlural: true,
@@ -106,7 +106,7 @@ export const auth = betterAuth({
 				enabled: true,
 				plans: [
 					{
-						name: "starter",
+						name: "webld",
 						priceId: process.env.STRIPE_STARTER_PRICE_ID,
 					},
 					{

@@ -8,7 +8,7 @@ import { useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { createStore, type StoreApi } from "zustand/vanilla";
 
-import type { BaseChatUIMessage } from "@starter/server";
+import type { BaseChatUIMessage } from "@webld/server";
 
 import {
 	type ChatMessagePart,

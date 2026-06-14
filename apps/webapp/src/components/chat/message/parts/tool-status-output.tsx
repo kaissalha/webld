@@ -3,8 +3,8 @@
 import { CheckCircle2Icon, TriangleAlertIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Spinner } from "@starter/ui/components/spinner";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@starter/ui/components/tooltip";
+import { Spinner } from "@webld/ui/components/spinner";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@webld/ui/components/tooltip";
 
 import { formatToolName } from "./tool-output-helpers";
 

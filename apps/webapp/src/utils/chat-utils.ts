@@ -7,11 +7,11 @@ import { createUIMessageStream, JsonToSseTransformStream } from "ai";
 import { differenceInSeconds, formatISO } from "date-fns";
 import { createResumableStreamContext } from "resumable-stream/ioredis";
 
-import { createTCPRedisClient } from "@starter/cache";
-import type { DbChatMessage } from "@starter/db";
-import type { BaseChatUIMessage } from "@starter/server";
-import { getChatMessagesFromDb, getStreamIdsByChatId } from "@starter/server";
-import { auth } from "@starter/server/auth";
+import { createTCPRedisClient } from "@webld/cache";
+import type { DbChatMessage } from "@webld/db";
+import type { BaseChatUIMessage } from "@webld/server";
+import { getChatMessagesFromDb, getStreamIdsByChatId } from "@webld/server";
+import { auth } from "@webld/server/auth";
 
 if (!process.env.REDIS_URL) {
 	throw new Error("REDIS_URL is not set");

@@ -4,8 +4,8 @@ import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
 import { convertDbMessagesForUI } from "@/utils/chat-utils";
-import { getChat, getChatMessagesFromDb, type DashboardChatUIMessage } from "@starter/server";
-import { auth } from "@starter/server/auth";
+import { getChat, getChatMessagesFromDb, type DashboardChatUIMessage } from "@webld/server";
+import { auth } from "@webld/server/auth";
 
 import { DashboardChatPage } from "./components/dashboard-chat-page";
 

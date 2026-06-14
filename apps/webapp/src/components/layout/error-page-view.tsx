@@ -2,7 +2,7 @@
 
 import { ComputerIcon, RotateCcwIcon } from "lucide-react";
 
-import { Button } from "@starter/ui/components/button";
+import { Button } from "@webld/ui/components/button";
 
 export type ErrorPageViewProps = {
 	description: string;

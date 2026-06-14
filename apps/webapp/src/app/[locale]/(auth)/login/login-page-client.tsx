@@ -8,8 +8,8 @@ import { Logo } from "@/components/logo";
 import { useAuthLoginFlowStore } from "@/hooks/auth-login-flow-store";
 import { Link } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
-import { Button } from "@starter/ui/components/button";
-import { toast } from "@starter/ui/components/sonner";
+import { Button } from "@webld/ui/components/button";
+import { toast } from "@webld/ui/components/sonner";
 
 import { EmailLoginForm } from "./components/email-login-form";
 import { LoginGoogleButton } from "./components/login-google-button";

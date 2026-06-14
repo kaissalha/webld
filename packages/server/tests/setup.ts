@@ -16,7 +16,7 @@ const logger = {
 	warn: vi.fn(),
 };
 
-vi.mock("@starter/logger/server", () => {
+vi.mock("@webld/logger/server", () => {
 	return {
 		createServerLogger: () => logger,
 		logger,

@@ -1,5 +1,5 @@
 {
-	"name": "@starter/ui",
+	"name": "@webld/ui",
 	"version": "0.0.0",
 	"private": true,
 	"license": "MIT",
@@ -27,7 +27,7 @@
 		"@radix-ui/react-navigation-menu": "^1.2.15",
 		"@radix-ui/react-slot": "^1.2.5",
 		"@radix-ui/react-tabs": "^1.1.14",
-		"@starter/logger": "workspace:*",
+		"@webld/logger": "workspace:*",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"cmdk": "1.1.1",
@@ -53,7 +53,6 @@
 		"zod": "^4.4.3"
 	},
 	"devDependencies": {
-		"@starter/tsconfig": "workspace:*",
 		"@tailwindcss/postcss": "^4.3.1",
 		"@total-typescript/ts-reset": "^0.6.1",
 		"@types/node": "^25.9.3",
@@ -61,6 +60,7 @@
 		"@types/react-dom": "^19.2.3",
 		"@typescript/native-preview": "^7.0.0-dev.20260614.1",
 		"@vitejs/plugin-react": "^6.0.2",
+		"@webld/tsconfig": "workspace:*",
 		"autoprefixer": "^10.5.0",
 		"postcss": "^8.5.15",
 		"tailwindcss": "^4.3.1"

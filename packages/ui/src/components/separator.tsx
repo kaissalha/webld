@@ -1,6 +1,6 @@
 import { Separator as SeparatorPrimitive } from "@base-ui/react/separator";
 
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 const Separator = ({ className, orientation = "horizontal", ...props }: SeparatorPrimitive.Props) => {
 	return (

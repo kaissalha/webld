@@ -4,8 +4,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { withErrorHandler } from "@/utils/with-error-handler";
-import { getChat, type BaseChatUIMessage, saveOrUpdateChatMessage } from "@starter/server";
-import { auth } from "@starter/server/auth";
+import { getChat, type BaseChatUIMessage, saveOrUpdateChatMessage } from "@webld/server";
+import { auth } from "@webld/server/auth";
 
 const saveMessageSchema = z.object({
 	chatId: z.string().uuid(),

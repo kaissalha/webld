@@ -15,7 +15,7 @@ import {
 } from "@/components/chat/chat-attachments";
 import { ChatInput, ChatInputSubmit, ChatInputTextArea } from "@/components/chat/chat-input";
 import { useChatDropHandlers } from "@/components/chat/use-chat-drop-handlers";
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 const EMPTY_ATTACHMENTS: ChatFileAttachment[] = [];
 

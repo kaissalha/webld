@@ -3,15 +3,15 @@
 import { MoreVerticalIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@starter/ui/components/avatar";
-import { Badge } from "@starter/ui/components/badge";
-import { Button } from "@starter/ui/components/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@webld/ui/components/avatar";
+import { Badge } from "@webld/ui/components/badge";
+import { Button } from "@webld/ui/components/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
-} from "@starter/ui/components/dropdown-menu";
+} from "@webld/ui/components/dropdown-menu";
 
 export type TeamMemberData = {
 	id: string;

@@ -7,9 +7,9 @@ import validator from "validator";
 import { z } from "zod";
 
 import type { TranslationFunction } from "@/types/translation";
-import { Button } from "@starter/ui/components/button";
-import { Field, FieldControl, FieldError, FieldLabel } from "@starter/ui/components/field";
-import { Form } from "@starter/ui/components/form";
+import { Button } from "@webld/ui/components/button";
+import { Field, FieldControl, FieldError, FieldLabel } from "@webld/ui/components/field";
+import { Form } from "@webld/ui/components/form";
 
 const loginSchema = (t: TranslationFunction<"account.login">) =>
 	z.object({

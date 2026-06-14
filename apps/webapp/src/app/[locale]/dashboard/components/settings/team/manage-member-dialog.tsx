@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 
-import { Button } from "@starter/ui/components/button";
+import { Button } from "@webld/ui/components/button";
 import {
 	Dialog,
 	DialogContent,
@@ -10,7 +10,7 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-} from "@starter/ui/components/dialog";
+} from "@webld/ui/components/dialog";
 
 import type { TeamRowEntry } from "./team-member-row";
 

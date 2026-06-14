@@ -1,4 +1,4 @@
-import { getBaseURL } from "@starter/utils";
+import { getBaseURL } from "@webld/utils";
 
 import type { OAuthAppConfig } from "../types.ts";
 

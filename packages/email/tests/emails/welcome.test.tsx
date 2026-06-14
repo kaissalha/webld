@@ -10,7 +10,7 @@ describe("WelcomeEmail", () => {
 		const html = await render(<WelcomeEmail fullName='Ada Lovelace' />);
 
 		expect(html).toContain("Ada");
-		expect(html).toContain("Welcome to Starter");
+		expect(html).toContain("Welcome to webld");
 	});
 
 	it("renders default name when fullName is missing", async () => {
@@ -22,6 +22,6 @@ describe("WelcomeEmail", () => {
 	it("handles missing first name gracefully", async () => {
 		const html = await render(<WelcomeEmail fullName='' />);
 
-		expect(html).toContain("Welcome to Starter");
+		expect(html).toContain("Welcome to webld");
 	});
 });

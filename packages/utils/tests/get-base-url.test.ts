@@ -65,7 +65,7 @@ describe("getBaseURL", () => {
 
 		const url = getBaseURL();
 
-		expect(url.toString()).toBe("https://starter-webapp.vercel.app/");
+		expect(url.toString()).toBe("https://webld-webapp.vercel.app/");
 	});
 
 	it("uses production URL when on master branch", () => {
@@ -73,7 +73,7 @@ describe("getBaseURL", () => {
 
 		const url = getBaseURL();
 
-		expect(url.toString()).toBe("https://starter-webapp.vercel.app/");
+		expect(url.toString()).toBe("https://webld-webapp.vercel.app/");
 	});
 
 	it("uses branch URL when provided", () => {
@@ -91,7 +91,7 @@ describe("getBaseURL", () => {
 
 		const url = getBaseURL();
 
-		expect(url.toString()).toBe("https://starter-webapp.vercel.app/");
+		expect(url.toString()).toBe("https://webld-webapp.vercel.app/");
 	});
 
 	it("prefers branch URL over preview URL", () => {

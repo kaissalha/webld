@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 
 import Image from "next/image";
 
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 const testimonials = [
 	{

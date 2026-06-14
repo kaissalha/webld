@@ -9,7 +9,7 @@ import {
 } from "@/components/chat/chat-attachments";
 import { useChatSession } from "@/components/chat/stores/chat-session-store";
 import { useChatFileUpload } from "@/components/chat/use-chat-file-upload";
-import type { BaseChatUIMessage } from "@starter/server";
+import type { BaseChatUIMessage } from "@webld/server";
 
 export type ChatState = {
 	attachmentError: ChatAttachmentErrorCode | null;

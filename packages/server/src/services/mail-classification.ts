@@ -1,8 +1,8 @@
 import { waitUntil } from "@vercel/functions";
 import { Output, generateText } from "ai";
 
-import { models } from "@starter/ai/models";
-import { buildMailClassificationPrompt, mailThreadClassificationSchema } from "@starter/ai/prompts";
+import { models } from "@webld/ai/models";
+import { buildMailClassificationPrompt, mailThreadClassificationSchema } from "@webld/ai/prompts";
 import {
 	type GmailDriver,
 	getMailClassificationLabelName,
@@ -11,8 +11,8 @@ import {
 	type MailClassificationLabelName,
 	type MailLabelSummary,
 	type ThreadPreview,
-} from "@starter/app-store";
-import { logger } from "@starter/logger/server";
+} from "@webld/app-store";
+import { logger } from "@webld/logger/server";
 
 const MAIL_CLASSIFICATION_LABEL_WRITE_CONCURRENCY = 3;
 

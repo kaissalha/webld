@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { OAuthConnection } from "@starter/db";
+import type { OAuthConnection } from "@webld/db";
 
 const { mockSelect, mockFrom, mockWhere, mockLimit, mockUpdate, mockSet, mockUpdateWhere } = vi.hoisted(() => ({
 	mockSelect: vi.fn(),
@@ -12,7 +12,7 @@ const { mockSelect, mockFrom, mockWhere, mockLimit, mockUpdate, mockSet, mockUpd
 	mockUpdateWhere: vi.fn(),
 }));
 
-vi.mock("@starter/db", () => ({
+vi.mock("@webld/db", () => ({
 	db: {
 		select: mockSelect,
 		update: mockUpdate,
@@ -25,7 +25,7 @@ const { refreshOAuthProviderAccessToken, isOAuthTokenRevokedError } = vi.hoisted
 	isOAuthTokenRevokedError: vi.fn(() => false),
 }));
 
-vi.mock("@starter/app-store", () => ({
+vi.mock("@webld/app-store", () => ({
 	refreshOAuthProviderAccessToken,
 	isOAuthTokenRevokedError,
 	oauthProvidersWithAccessTokenRefresh: ["gmail"],

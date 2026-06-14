@@ -2,7 +2,7 @@
 
 import { Meter as MeterPrimitive } from "@base-ui/react/meter";
 
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 const Meter = ({ className, children, ...props }: MeterPrimitive.Root.Props) => {
 	return (

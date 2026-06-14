@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { type Locale, locales } from "@/i18n/routing";
-import { auth } from "@starter/server/auth";
+import { auth } from "@webld/server/auth";
 
 export const publicMiddleware = async (request: NextRequest) => {
 	const session = await auth.api.getSession({

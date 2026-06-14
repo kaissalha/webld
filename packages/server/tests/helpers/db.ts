@@ -11,7 +11,7 @@ import {
 	notes,
 	oauthConnections,
 	organizations,
-} from "@starter/db";
+} from "@webld/db";
 
 export const resetDatabase = async () => {
 	await db.delete(aiChatMessages);

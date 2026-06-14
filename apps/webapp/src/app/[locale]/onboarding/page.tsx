@@ -6,7 +6,7 @@ import { getLocale } from "next-intl/server";
 
 import { redirect } from "@/i18n/navigation";
 import { getTranslations } from "@/lib/i18n";
-import { auth } from "@starter/server/auth";
+import { auth } from "@webld/server/auth";
 
 import { OnboardingClient } from "./components/onboarding-client";
 import { getOnboardingRedirectPath } from "./components/onboarding-utils";

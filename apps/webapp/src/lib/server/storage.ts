@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { type MediaAccess, mediaAccessValues } from "@/constants/upload";
 import { parseJsonRecord } from "@/utils/parse-json-payload";
-import { logger } from "@starter/logger/server";
+import { logger } from "@webld/logger/server";
 
 type PutBase64Options = {
 	prefix?: string;

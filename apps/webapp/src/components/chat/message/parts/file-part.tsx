@@ -5,7 +5,7 @@ import Image from "next/image";
 import { FileIcon, ImageIcon, PaperclipIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 export type FilePartProps = {
 	url: string;

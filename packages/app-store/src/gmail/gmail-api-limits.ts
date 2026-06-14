@@ -1,4 +1,4 @@
-import { logger } from "@starter/logger/server";
+import { logger } from "@webld/logger/server";
 
 const GMAIL_MAILBOX_REQUEST_CONCURRENCY = 4;
 const GMAIL_REQUEST_MAX_ATTEMPTS = 4;

@@ -6,7 +6,7 @@ import { type UseChatHelpers } from "@ai-sdk/react";
 import { type DataUIPart } from "ai";
 import { lastAssistantMessageIsCompleteWithApprovalResponses, lastAssistantMessageIsCompleteWithToolCalls } from "ai";
 
-import type { BaseChatUIMessage } from "@starter/server";
+import type { BaseChatUIMessage } from "@webld/server";
 
 export type UseAutoResumeParams<TMessage extends BaseChatUIMessage = BaseChatUIMessage> = {
 	autoResume: boolean;

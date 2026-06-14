@@ -1,7 +1,7 @@
 import { gmail, type gmail_v1, auth as gmailAuth } from "@googleapis/gmail";
 import { createMimeMessage } from "mimetext";
 
-import { logger } from "@starter/logger/server";
+import { logger } from "@webld/logger/server";
 
 import { OAuthTokenRevokedError } from "../types";
 import { gmailConfig } from "./config";

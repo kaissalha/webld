@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 import { ChatMessageMarkdown } from "../chat-message-markdown";
 

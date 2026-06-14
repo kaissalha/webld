@@ -3,8 +3,8 @@ import type * as React from "react";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 
-import { Separator } from "@starter/ui/components/separator";
-import { cn } from "@starter/ui/lib/utils";
+import { Separator } from "@webld/ui/components/separator";
+import { cn } from "@webld/ui/lib/utils";
 
 const Group = ({ className, children, ...props }: { className?: string; children: React.ReactNode }) => {
 	return (

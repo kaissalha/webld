@@ -1,4 +1,4 @@
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 export const Logo = ({ className }: { className?: string }) => {
 	return (

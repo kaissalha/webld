@@ -1,5 +1,5 @@
 {
-	"name": "@starter/evals",
+	"name": "@webld/evals",
 	"version": "1.0.0",
 	"private": true,
 	"type": "module",
@@ -10,15 +10,15 @@
 		"typecheck": "tsgo --noEmit --skipLibCheck"
 	},
 	"dependencies": {
-		"@starter/ai": "workspace:*",
-		"@starter/server": "workspace:*",
+		"@webld/ai": "workspace:*",
+		"@webld/server": "workspace:*",
 		"ai": "^6.0.205",
 		"zod": "^4.4.3"
 	},
 	"devDependencies": {
-		"@starter/tsconfig": "workspace:*",
 		"@types/node": "^25.9.3",
 		"@typescript/native-preview": "^7.0.0-dev.20260614.1",
+		"@webld/tsconfig": "workspace:*",
 		"better-sqlite3": "^12.10.1",
 		"evalite": "beta",
 		"vitest": "^4.1.8"

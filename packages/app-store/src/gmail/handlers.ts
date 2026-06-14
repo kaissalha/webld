@@ -2,8 +2,8 @@ import { betterFetch } from "@better-fetch/fetch";
 import { and, eq } from "drizzle-orm";
 import { OAuth2Client } from "google-auth-library";
 
-import { db, oauthConnections } from "@starter/db";
-import { logger } from "@starter/logger/server";
+import { db, oauthConnections } from "@webld/db";
+import { logger } from "@webld/logger/server";
 
 import { GMAIL_SCOPES, gmailConfig } from "./config.ts";
 

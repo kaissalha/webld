@@ -1,8 +1,8 @@
 import { Output, generateText } from "ai";
 import { createScorer, evalite } from "evalite";
 
-import { models } from "@starter/ai/models";
-import { buildMailClassificationPrompt, mailThreadClassificationSchema } from "@starter/ai/prompts";
+import { models } from "@webld/ai/models";
+import { buildMailClassificationPrompt, mailThreadClassificationSchema } from "@webld/ai/prompts";
 
 const MAIL_CLASSIFICATION_LABELS = ["to respond", "meeting update", "fyi", "notification", "marketing"] as const;
 

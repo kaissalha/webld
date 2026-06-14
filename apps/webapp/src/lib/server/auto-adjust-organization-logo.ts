@@ -1,6 +1,6 @@
 import type { MediaAccess } from "@/constants/upload";
 import { createStorageRecord } from "@/services/storage";
-import { logger } from "@starter/logger/server";
+import { logger } from "@webld/logger/server";
 
 import { removeImageBackground } from "./remove-image-background";
 import { hasTransparentPixels, trimAndPadTransparentImage } from "./sharp-image-processing";

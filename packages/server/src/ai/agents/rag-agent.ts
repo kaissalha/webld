@@ -1,8 +1,8 @@
 import { stepCountIs, ToolLoopAgent } from "ai";
 import { z } from "zod";
 
-import { models } from "@starter/ai/models";
-import { ragAnswerSystemPrompt } from "@starter/ai/prompts";
+import { models } from "@webld/ai/models";
+import { ragAnswerSystemPrompt } from "@webld/ai/prompts";
 
 import { retrieveKnowledgeTool } from "../tools";
 import { appContextSchema } from "../types";

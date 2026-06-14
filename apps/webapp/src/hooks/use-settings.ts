@@ -5,7 +5,7 @@ import { useCallback } from "react";
 import { createParser, useQueryState } from "nuqs";
 import { z } from "zod";
 
-import { useIsMobile } from "@starter/ui/hooks/use-mobile";
+import { useIsMobile } from "@webld/ui/hooks/use-mobile";
 
 const SettingsSchema = z.enum(["list", "profile", "organization", "team", "security", "subscription"]);
 

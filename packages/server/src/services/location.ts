@@ -4,7 +4,7 @@ import { betterFetch } from "@better-fetch/fetch";
 import { getCountryData, type TCountryCode } from "countries-list";
 import { z } from "zod";
 
-import { logger } from "@starter/logger/server";
+import { logger } from "@webld/logger/server";
 
 export type Place = google.maps.places.PlaceResult;
 

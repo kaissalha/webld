@@ -5,7 +5,7 @@ A Redis-based key-value storage package with caching and rate limiting functiona
 Usage example:
 
 ```typescript
-import { createCache, createRateLimiter, createRedisClient } from "@starter/cache";
+import { createCache, createRateLimiter, createRedisClient } from "@webld/cache";
 
 export const redis = createRedisClient({
 	url: process.env.UPSTASH_URL!,

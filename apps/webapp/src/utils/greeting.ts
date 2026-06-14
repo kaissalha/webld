@@ -1,5 +1,5 @@
 import { getTranslations } from "@/lib/i18n";
-import { getTimezone } from "@starter/server";
+import { getTimezone } from "@webld/server";
 
 /**
  * Gets the greeting type based on the hour of the day

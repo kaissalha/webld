@@ -9,7 +9,7 @@ help: ## Show this help message
 .PHONY: env
 env: ## Pull environment variables from Vercel
 	cd apps/webapp && \
-	bunx vercel link --yes --scope kais-salhas-projects --project starter-webapp && \
+	bunx vercel link --yes --scope kais-salhas-projects --project webld && \
 	bunx vercel env pull
 
 
@@ -21,18 +21,18 @@ db: ## Start the database
 # Reset database command
 .PHONY: reset_db
 reset_db:
-	docker-compose run --rm app-db dropdb -h app-db -U starter starter --force
-	docker-compose run --rm app-db createdb -h app-db -U starter starter
+	docker-compose run --rm app-db dropdb -h app-db -U webld webld --force
+	docker-compose run --rm app-db createdb -h app-db -U webld webld
 	$(MAKE) migrate
 
 
 .PHONY: migrate
 migrate: ## Apply pending database migrations
-	bunx dotenv-cli -e apps/webapp/.env.local -- bun --filter @starter/db migrate
+	bunx dotenv-cli -e apps/webapp/.env.local -- bun --filter @webld/db migrate
 
 .PHONY: studio
 studio: ## Open Drizzle Studio
-	bunx dotenv-cli -e ./apps/webapp/.env.local -- bun --filter @starter/db studio
+	bunx dotenv-cli -e ./apps/webapp/.env.local -- bun --filter @webld/db studio
 
 .PHONY: update-deps
 update-deps: ## Update dependencies to latest (including patch) across monorepo

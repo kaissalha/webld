@@ -3,7 +3,7 @@ import { useState } from "react";
 import { renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import type { BaseChatUIMessage } from "@starter/server";
+import type { BaseChatUIMessage } from "@webld/server";
 
 import { type UseAutoResumeParams, useAutoResume } from "../../src/hooks/chat/use-auto-resume";
 

@@ -5,9 +5,9 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { ImageIcon, Trash2Icon, UploadIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@starter/ui/components/avatar";
-import { Button } from "@starter/ui/components/button";
-import { cn } from "@starter/ui/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@webld/ui/components/avatar";
+import { Button } from "@webld/ui/components/button";
+import { cn } from "@webld/ui/lib/utils";
 
 type LogoPickerProps = {
 	accept?: string;

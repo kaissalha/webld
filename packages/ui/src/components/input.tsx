@@ -4,7 +4,7 @@ import type * as React from "react";
 
 import { Input as InputPrimitive } from "@base-ui/react/input";
 
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 export type InputProps = Omit<InputPrimitive.Props & React.RefAttributes<HTMLInputElement>, "size"> & {
 	size?: "sm" | "default" | "lg" | number;

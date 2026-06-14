@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 import { extractUrlMetadata } from "../../lib/get-url-metadata";
-import type { StarterRouterFactoryOptions } from "../shared";
+import type { WebldRouterFactoryOptions } from "../shared";
 
-export const createChatRouter = ({ createTRPCRouter, protectedProcedure }: StarterRouterFactoryOptions) =>
+export const createChatRouter = ({ createTRPCRouter, protectedProcedure }: WebldRouterFactoryOptions) =>
 	createTRPCRouter({
 		getUrlMetadata: protectedProcedure
 			.input(

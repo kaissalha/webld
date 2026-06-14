@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 
 import { authClient } from "@/lib/auth-client";
 import { resolveAuthClientResult } from "@/lib/auth-client-request";
-import { toast } from "@starter/ui/components/sonner";
+import { toast } from "@webld/ui/components/sonner";
 
 import type { ManageAction } from "./manage-member-dialog";
 import type { TeamInvitationData, TeamMemberData, TeamRowEntry } from "./team-member-row";

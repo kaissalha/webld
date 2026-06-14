@@ -7,8 +7,8 @@ import { useTranslations } from "next-intl";
 
 import { useTRPC } from "@/lib/trpc";
 import { getInitials } from "@/utils/string";
-import { PreviewCard, PreviewCardPopup, PreviewCardTrigger } from "@starter/ui/components/preview-card";
-import { cn } from "@starter/ui/lib/utils";
+import { PreviewCard, PreviewCardPopup, PreviewCardTrigger } from "@webld/ui/components/preview-card";
+import { cn } from "@webld/ui/lib/utils";
 
 const baseLinkStyles = "truncate rounded-xl bg-muted/50 px-2 py-1 text-xs text-muted-foreground transition-colors";
 

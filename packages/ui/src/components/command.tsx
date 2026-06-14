@@ -12,10 +12,10 @@ import {
 	AutocompleteList,
 	AutocompleteSeparator,
 	AutocompleteCollection as CommandCollection,
-} from "@starter/ui/components/autocomplete";
-import { DialogBackdrop } from "@starter/ui/components/dialog";
-import { Input } from "@starter/ui/components/input";
-import { cn } from "@starter/ui/lib/utils";
+} from "@webld/ui/components/autocomplete";
+import { DialogBackdrop } from "@webld/ui/components/dialog";
+import { Input } from "@webld/ui/components/input";
+import { cn } from "@webld/ui/lib/utils";
 
 const Command = ({
 	autoHighlight = "always",

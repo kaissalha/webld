@@ -5,7 +5,7 @@ import { useCallback, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { authClient } from "@/lib/auth-client";
-import { toast } from "@starter/ui/components/sonner";
+import { toast } from "@webld/ui/components/sonner";
 
 import type { PlanId } from "./plans-config";
 

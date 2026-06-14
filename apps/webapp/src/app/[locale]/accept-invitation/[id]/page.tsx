@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { getLocale } from "next-intl/server";
 
 import { redirect } from "@/i18n/navigation";
-import { auth } from "@starter/server/auth";
+import { auth } from "@webld/server/auth";
 
 import { AcceptInvitationClient } from "./accept-invitation-client";
 

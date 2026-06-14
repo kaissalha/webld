@@ -5,7 +5,7 @@ import { useId } from "react";
 import { CheckIcon, CopyIcon, SendIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Button } from "@starter/ui/components/button";
+import { Button } from "@webld/ui/components/button";
 
 import { type EmailDraftOutput, useEmailDraftToolController } from "./use-email-draft-tool-controller";
 

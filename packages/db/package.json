@@ -1,5 +1,5 @@
 {
-	"name": "@starter/db",
+	"name": "@webld/db",
 	"version": "1.0.0",
 	"private": true,
 	"type": "module",
@@ -30,12 +30,12 @@
 		"pg": "^8.21.0"
 	},
 	"devDependencies": {
-		"@starter/tsconfig": "workspace:*",
 		"@total-typescript/ts-reset": "^0.6.1",
 		"@types/node": "^25.9.3",
 		"@types/pg": "^8.20.0",
 		"@typescript/native-preview": "^7.0.0-dev.20260614.1",
 		"@vitejs/plugin-react": "^6.0.2",
+		"@webld/tsconfig": "workspace:*",
 		"drizzle-kit": "^1.0.0-rc.4"
 	}
 }

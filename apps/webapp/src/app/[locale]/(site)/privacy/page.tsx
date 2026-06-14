@@ -1,6 +1,6 @@
 import { Link } from "@/i18n/navigation";
 import { generateLocalizedStaticParams } from "@/i18n/routing";
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 import { Footer } from "../components/sections/footer";
 import { Navbar } from "../components/sections/navbar";

@@ -1,6 +1,6 @@
 import type * as React from "react";
 
-import { cn } from "@starter/ui/lib/utils";
+import { cn } from "@webld/ui/lib/utils";
 
 const Kbd = ({ className, ...props }: React.ComponentProps<"kbd">) => {
 	return (

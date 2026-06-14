@@ -8,11 +8,11 @@ import { Logo } from "@/components/logo";
 import { Link, useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
 import { resolveAuthClientResult } from "@/lib/auth-client-request";
-import { Alert, AlertDescription, AlertTitle } from "@starter/ui/components/alert";
-import { Badge } from "@starter/ui/components/badge";
-import { Button } from "@starter/ui/components/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@starter/ui/components/card";
-import { toast } from "@starter/ui/components/sonner";
+import { Alert, AlertDescription, AlertTitle } from "@webld/ui/components/alert";
+import { Badge } from "@webld/ui/components/badge";
+import { Button } from "@webld/ui/components/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@webld/ui/components/card";
+import { toast } from "@webld/ui/components/sonner";
 
 type AcceptInvitationClientProps = {
 	invitationEmail?: string;

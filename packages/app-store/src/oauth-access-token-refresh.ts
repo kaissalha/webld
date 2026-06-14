@@ -1,4 +1,4 @@
-import type { OAuthProvider } from "@starter/db";
+import type { OAuthProvider } from "@webld/db";
 
 export type OAuthAccessTokenRefreshInput = {
 	accessToken: string;

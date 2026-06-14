@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 
-import { SidebarTrigger } from "@starter/ui/components/sidebar";
+import { SidebarTrigger } from "@webld/ui/components/sidebar";
 
 import { HomeChatInput } from "./components/home-chat-input";
 import { HomePageHeader, HomePageHeaderSkeleton } from "./components/home-page-header";
