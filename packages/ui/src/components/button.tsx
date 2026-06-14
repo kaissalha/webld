@@ -65,7 +65,7 @@ const loaderVariants = cva("loader animate-spin", {
 
 const Loader = ({ variant }: { variant: VariantProps<typeof loaderVariants>["variant"] }) => {
 	return (
-		<div className='absolute inset-s-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
+		<div className='absolute inset-s-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rtl:translate-x-1/2'>
 			<LoaderIcon className={cn(loaderVariants({ variant }))} />
 		</div>
 	);

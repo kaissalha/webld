@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -27,34 +27,31 @@ export const LoginPageClient = () => {
 		reset: s.reset,
 	}));
 
-	const handleEmailSubmit = useCallback(
-		async (submittedEmail: string) => {
-			const result = await authClient.emailOtp.sendVerificationOtp({
-				email: submittedEmail,
-				type: "sign-in",
-			});
+	const handleEmailSubmit = async (submittedEmail: string) => {
+		const result = await authClient.emailOtp.sendVerificationOtp({
+			email: submittedEmail,
+			type: "sign-in",
+		});
 
-			if (result.error) {
-				toast.error(t("errors.invalidCredentials"));
-				return;
-			}
+		if (result.error) {
+			toast.error(t("errors.invalidCredentials"));
+			return;
+		}
 
-			beginOtp({ email: submittedEmail });
-		},
-		[beginOtp, t]
-	);
+		beginOtp({ email: submittedEmail });
+	};
 
-	const handleBack = useCallback(() => {
+	const handleBack = () => {
 		reset();
-	}, [reset]);
+	};
 
-	const handleBackToMethods = useCallback(() => {
+	const handleBackToMethods = () => {
 		setIsEmailPath(false);
-	}, []);
+	};
 
 	return (
 		<div className='bg-background relative flex min-h-dvh'>
-			<nav className='pointer-events-none fixed top-0 right-0 left-0 z-50 w-full'>
+			<nav className='pointer-events-none fixed inset-x-0 top-0 z-50 w-full'>
 				<div className='relative flex items-center px-4 py-3 sm:px-4 md:px-4 lg:px-4 xl:py-4 xl:px-6 2xl:px-8'>
 					<Link
 						href='/'

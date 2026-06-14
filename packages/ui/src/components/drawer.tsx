@@ -1,6 +1,7 @@
 "use client";
 
-import * as React from "react";
+import { createContext, use, useMemo, useState } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 import { Drawer as DrawerPrimitive } from "@base-ui/react/drawer";
 import { CheckIcon, ChevronRightIcon, XIcon } from "lucide-react";
@@ -23,12 +24,12 @@ type DrawerContextValue = {
 	swipeDirection: DrawerSwipeDirection;
 };
 
-const DrawerContext = React.createContext<DrawerContextValue>({
+const DrawerContext = createContext<DrawerContextValue>({
 	position: "bottom",
 	swipeDirection: "down",
 });
 
-const useDrawerContext = () => React.useContext(DrawerContext);
+const useDrawerContext = () => use(DrawerContext);
 
 type DrawerProps = DrawerPrimitive.Root.Props & {
 	position?: DrawerPosition;
@@ -36,9 +37,16 @@ type DrawerProps = DrawerPrimitive.Root.Props & {
 
 const Drawer = ({ position = "bottom", swipeDirection, ...props }: DrawerProps) => {
 	const resolvedSwipeDirection = swipeDirection ?? drawerSwipeDirections[position];
+	const contextValue = useMemo(
+		() => ({
+			position,
+			swipeDirection: resolvedSwipeDirection,
+		}),
+		[position, resolvedSwipeDirection]
+	);
 
 	return (
-		<DrawerContext.Provider value={{ position, swipeDirection: resolvedSwipeDirection }}>
+		<DrawerContext.Provider value={contextValue}>
 			<DrawerPrimitive.Root
 				data-position={position}
 				data-slot='drawer'
@@ -98,7 +106,7 @@ const DrawerViewport = ({ className, ...props }: DrawerPrimitive.Viewport.Props)
 	);
 };
 
-const DrawerBar = ({ className, ...props }: React.ComponentProps<"div">) => {
+const DrawerBar = ({ className, ...props }: ComponentProps<"div">) => {
 	return (
 		<div data-slot='drawer-bar-wrap' className='flex justify-center px-4 pt-3'>
 			<div data-slot='drawer-bar' className={cn("h-1 w-12 rounded-full bg-border", className)} {...props} />
@@ -197,13 +205,7 @@ const DrawerPopup = ({
 	);
 };
 
-const withOptionalSelection = ({
-	allowSelection,
-	children,
-}: {
-	allowSelection: boolean;
-	children: React.ReactNode;
-}) => {
+const withOptionalSelection = ({ allowSelection, children }: { allowSelection: boolean; children: ReactNode }) => {
 	if (!allowSelection) {
 		return children;
 	}
@@ -215,7 +217,7 @@ const DrawerHeader = ({
 	className,
 	allowSelection = false,
 	...props
-}: React.ComponentProps<"div"> & {
+}: ComponentProps<"div"> & {
 	allowSelection?: boolean;
 }) => {
 	return withOptionalSelection({
@@ -235,7 +237,7 @@ const DrawerFooter = ({
 	allowSelection = true,
 	variant = "default",
 	...props
-}: React.ComponentProps<"div"> & {
+}: ComponentProps<"div"> & {
 	allowSelection?: boolean;
 	variant?: "default" | "bare";
 }) => {
@@ -276,7 +278,7 @@ const DrawerDescription = ({ className, ...props }: DrawerPrimitive.Description.
 	);
 };
 
-type DrawerPanelProps = React.ComponentProps<"div"> & {
+type DrawerPanelProps = ComponentProps<"div"> & {
 	allowSelection?: boolean;
 	scrollFade?: boolean;
 	scrollable?: boolean;
@@ -311,7 +313,7 @@ const DrawerPanel = ({
 const drawerMenuItemClassName =
 	"flex w-full items-center gap-3 rounded-xl px-3 py-2 text-start text-sm font-medium text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:bg-accent focus-visible:text-foreground disabled:pointer-events-none disabled:opacity-64 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
 
-const DrawerMenu = ({ className, ...props }: React.ComponentProps<"div">) => {
+const DrawerMenu = ({ className, ...props }: ComponentProps<"div">) => {
 	return <div data-slot='drawer-menu' className={cn("flex flex-col p-1", className)} {...props} />;
 };
 
@@ -321,7 +323,7 @@ const DrawerMenuItem = ({
 	variant = "default",
 	type = "button",
 	...props
-}: React.ComponentProps<"button"> & {
+}: ComponentProps<"button"> & {
 	variant?: "default" | "destructive";
 }) => {
 	return (
@@ -340,11 +342,11 @@ const DrawerMenuItem = ({
 	);
 };
 
-const DrawerMenuGroup = ({ className, ...props }: React.ComponentProps<"div">) => {
+const DrawerMenuGroup = ({ className, ...props }: ComponentProps<"div">) => {
 	return <div data-slot='drawer-menu-group' className={cn("flex flex-col", className)} {...props} />;
 };
 
-const DrawerMenuGroupLabel = ({ className, ...props }: React.ComponentProps<"div">) => {
+const DrawerMenuGroupLabel = ({ className, ...props }: ComponentProps<"div">) => {
 	return (
 		<div
 			data-slot='drawer-menu-group-label'
@@ -363,7 +365,7 @@ const DrawerMenuTrigger = ({ className, children, ...props }: DrawerPrimitive.Tr
 	);
 };
 
-type DrawerMenuCheckboxItemProps = Omit<React.ComponentProps<"button">, "onChange"> & {
+type DrawerMenuCheckboxItemProps = Omit<ComponentProps<"button">, "onChange"> & {
 	checked?: boolean;
 	defaultChecked?: boolean;
 	onCheckedChange?: (checked: boolean) => void;
@@ -381,7 +383,7 @@ const DrawerMenuCheckboxItem = ({
 	type = "button",
 	...props
 }: DrawerMenuCheckboxItemProps) => {
-	const [uncontrolledChecked, setUncontrolledChecked] = React.useState(defaultChecked);
+	const [uncontrolledChecked, setUncontrolledChecked] = useState(defaultChecked);
 	const checked = checkedProp ?? uncontrolledChecked;
 
 	return (
@@ -415,7 +417,7 @@ const DrawerMenuCheckboxItem = ({
 					<span
 						className={cn(
 							"block size-4 rounded-full bg-background shadow-sm transition-transform",
-							checked ? "translate-x-3" : "translate-x-0"
+							checked ? "translate-x-3 rtl:-translate-x-3" : "translate-x-0"
 						)}
 					/>
 				</span>
@@ -440,9 +442,9 @@ type DrawerMenuRadioGroupContextValue = {
 	value?: string;
 };
 
-const DrawerMenuRadioGroupContext = React.createContext<DrawerMenuRadioGroupContextValue>({});
+const DrawerMenuRadioGroupContext = createContext<DrawerMenuRadioGroupContextValue>({});
 
-type DrawerMenuRadioGroupProps = React.ComponentProps<"div"> & {
+type DrawerMenuRadioGroupProps = ComponentProps<"div"> & {
 	defaultValue?: string;
 	onValueChange?: (value: string) => void;
 	value?: string;
@@ -456,22 +458,24 @@ const DrawerMenuRadioGroup = ({
 	value: valueProp,
 	...props
 }: DrawerMenuRadioGroupProps) => {
-	const [uncontrolledValue, setUncontrolledValue] = React.useState(defaultValue);
+	const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
 	const value = valueProp ?? uncontrolledValue;
+	const contextValue = useMemo<DrawerMenuRadioGroupContextValue>(
+		() => ({
+			value,
+			onValueChange: (nextValue) => {
+				if (valueProp === undefined) {
+					setUncontrolledValue(nextValue);
+				}
+
+				onValueChange?.(nextValue);
+			},
+		}),
+		[onValueChange, value, valueProp]
+	);
 
 	return (
-		<DrawerMenuRadioGroupContext.Provider
-			value={{
-				value,
-				onValueChange: (nextValue) => {
-					if (valueProp === undefined) {
-						setUncontrolledValue(nextValue);
-					}
-
-					onValueChange?.(nextValue);
-				},
-			}}
-		>
+		<DrawerMenuRadioGroupContext.Provider value={contextValue}>
 			<div
 				data-slot='drawer-menu-radio-group'
 				role='radiogroup'
@@ -484,7 +488,7 @@ const DrawerMenuRadioGroup = ({
 	);
 };
 
-type DrawerMenuRadioItemProps = React.ComponentProps<"button"> & {
+type DrawerMenuRadioItemProps = ComponentProps<"button"> & {
 	value: string;
 };
 
@@ -496,7 +500,7 @@ const DrawerMenuRadioItem = ({
 	value,
 	...props
 }: DrawerMenuRadioItemProps) => {
-	const { onValueChange, value: selectedValue } = React.useContext(DrawerMenuRadioGroupContext);
+	const { onValueChange, value: selectedValue } = use(DrawerMenuRadioGroupContext);
 	const checked = selectedValue === value;
 
 	return (

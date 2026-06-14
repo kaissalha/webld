@@ -1,6 +1,6 @@
 export const BouncingDotsLoader = () => {
 	return (
-		<div className='flex items-center justify-center space-x-1.5'>
+		<div className='flex items-center justify-center gap-1.5'>
 			<div
 				className='animate-bouncing-loader h-1 w-1 rounded-full bg-current opacity-100'
 				style={{ animationDelay: "0s" }}
