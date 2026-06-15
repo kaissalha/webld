@@ -35,10 +35,10 @@ describe("protectedMiddleware", () => {
 	it("redirects unauthenticated users to login and preserves the requested path", async () => {
 		getSession.mockResolvedValue(null);
 
-		const response = await protectedMiddleware(createRequest("https://example.com/en/dashboard/notes"));
+		const response = await protectedMiddleware(createRequest("https://example.com/en/dashboard/chat"));
 
 		expect(response?.headers.get("location")).toBe(
-			"https://example.com/en/login?redirect_url=%2Fen%2Fdashboard%2Fnotes"
+			"https://example.com/en/login?redirect_url=%2Fen%2Fdashboard%2Fchat"
 		);
 	});
 
@@ -46,7 +46,7 @@ describe("protectedMiddleware", () => {
 		getSession.mockResolvedValue(createSession({ activeOrganizationId: null }));
 
 		const response = await protectedMiddleware(
-			createRequest("https://example.com/en/dashboard/notes?filter=recent")
+			createRequest("https://example.com/en/dashboard/chat?filter=recent")
 		);
 
 		expect(response).toBeUndefined();

@@ -48,7 +48,7 @@ const organizationProcedure = protectedProcedure.use(({ ctx, next }) => {
 	});
 });
 
-export type CreateWebldTRPCOptions = {
+export type createTRPCOptions = {
 	getSession: () => Promise<webldSession>;
 };
 

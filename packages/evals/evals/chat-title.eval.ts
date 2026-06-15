@@ -52,12 +52,12 @@ evalite<ChatTitleInput, string, ChatTitleExpected>("Dashboard chat title prompt"
 		},
 		{
 			input: {
-				message: "Show me upcoming calendar events for next week and flag any customer calls that overlap",
+				message: "Find all Acme contacts and draft a concise follow-up for the customer success lead",
 			},
 			expected: {
 				keywordGroups: [
-					["calendar", "events"],
-					["upcoming", "next week", "overlap"],
+					["Acme", "contacts"],
+					["follow-up", "follow up", "customer success"],
 				],
 			},
 		},

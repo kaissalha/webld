@@ -17,7 +17,6 @@
 		"total": "Total",
 		"subtotal": "Subtotal",
 		"tax": "Tax ({rate}%)",
-		"grandTotal": "Total",
-		"notes": "Notes"
+		"grandTotal": "Total"
 	}
 }

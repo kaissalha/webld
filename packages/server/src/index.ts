@@ -17,9 +17,6 @@ export * from "./lib/stripe";
 export * from "./services/chat";
 export * from "./services/contacts";
 export * from "./services/location";
-export * from "./services/mail";
-export * from "./services/oauth-token-refresh";
-export * from "./services/notes";
 export * from "./services/rag";
 
 // =============================================================================

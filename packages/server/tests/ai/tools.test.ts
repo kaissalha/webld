@@ -1,22 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const {
-	createContact,
-	formatRagChunksForContext,
-	getContact,
-	listAllCalendarEvents,
-	listContacts,
-	listMailThreads,
-	readInitialMailThreadListPage,
-	retrieveRagChunks,
-} = vi.hoisted(() => ({
+const { createContact, formatRagChunksForContext, getContact, listContacts, retrieveRagChunks } = vi.hoisted(() => ({
 	createContact: vi.fn(),
 	formatRagChunksForContext: vi.fn(),
 	getContact: vi.fn(),
-	listAllCalendarEvents: vi.fn(),
 	listContacts: vi.fn(),
-	listMailThreads: vi.fn(),
-	readInitialMailThreadListPage: vi.fn(),
 	retrieveRagChunks: vi.fn(),
 }));
 
@@ -24,15 +12,6 @@ vi.mock("../../src/services/contacts", () => ({
 	createContact,
 	getContact,
 	listContacts,
-}));
-
-vi.mock("../../src/services/google-calendar", () => ({
-	listAllCalendarEvents,
-}));
-
-vi.mock("../../src/services/mail", () => ({
-	listMailThreads,
-	readInitialMailThreadListPage,
 }));
 
 vi.mock("../../src/services/rag", () => ({
@@ -46,9 +25,7 @@ import { composeEmailTool } from "../../src/ai/tools/compose-email";
 import { createContactTool } from "../../src/ai/tools/create-contact";
 import { getContactTool } from "../../src/ai/tools/get-contact";
 import { getContactsTool } from "../../src/ai/tools/get-contacts";
-import { listCalendarEventsTool } from "../../src/ai/tools/list-calendar-events";
 import { retrieveKnowledgeTool } from "../../src/ai/tools/retrieve-knowledge";
-import { searchMailThreadsTool } from "../../src/ai/tools/search-mail-threads";
 
 const collect = async <T>(generator: AsyncIterable<T>) => {
 	const outputs: T[] = [];
@@ -156,80 +133,10 @@ describe("ai tools", () => {
 		);
 	});
 
-	it("searchMailThreadsTool returns Gmail threads", async () => {
-		listMailThreads.mockReturnValue("mail-stream");
-		readInitialMailThreadListPage.mockResolvedValue({
-			connectionEmail: "owner@example.com",
-			threads: [
-				{
-					id: "thread-1",
-					isStarred: false,
-					isUnread: true,
-					labelIds: [],
-					receivedOn: "2026-05-01T10:00:00.000Z",
-					sender: { email: "lead@example.com", name: "Sam Test" },
-					snippet: "Checking in",
-					subject: "Follow-up",
-				},
-			],
-		});
-
-		const outputs = await runTool(
-			searchMailThreadsTool.execute,
-			{ folder: "inbox", maxResults: 10, query: "lead@example.com" },
-			{ organizationId: "org-1" }
-		);
-
-		expect(outputs.at(-1)).toEqual(
-			expect.objectContaining({
-				connectionEmail: "owner@example.com",
-				status: "success",
-				threads: expect.arrayContaining([expect.objectContaining({ id: "thread-1" })]),
-				totalCount: 1,
-			})
-		);
-		expect(readInitialMailThreadListPage).toHaveBeenCalledWith({ stream: "mail-stream" });
-	});
-
-	it("listCalendarEventsTool returns upcoming events", async () => {
-		listAllCalendarEvents.mockResolvedValue({
-			calendars: [],
-			connectionId: "connection-1",
-			events: [
-				{
-					calendarId: "primary",
-					calendarName: "Primary",
-					created: "2026-05-01T10:00:00.000Z",
-					end: { dateTime: "2026-05-02T11:00:00.000Z" },
-					htmlLink: "https://calendar.google.com/event?eid=1",
-					id: "event-1",
-					location: "Office",
-					start: { dateTime: "2026-05-02T10:00:00.000Z" },
-					status: "confirmed",
-					summary: "Customer follow-up",
-				},
-			],
-		});
-
-		const outputs = await runTool(
-			listCalendarEventsTool.execute,
-			{ daysAhead: 7, maxResults: 10 },
-			{ organizationId: "org-1" }
-		);
-
-		expect(outputs.at(-1)).toEqual(
-			expect.objectContaining({
-				events: expect.arrayContaining([expect.objectContaining({ id: "event-1" })]),
-				status: "success",
-				totalCount: 1,
-			})
-		);
-	});
-
 	it("retrieveKnowledgeTool returns indexed context", async () => {
 		retrieveRagChunks.mockResolvedValue([
 			{
-				content: "Use concise follow-up notes after demos.",
+				content: "Use concise follow-up summaries after demos.",
 				document: {
 					id: "doc-1",
 					name: "Sales playbook",
@@ -239,17 +146,17 @@ describe("ai tools", () => {
 				similarity: 0.82,
 			},
 		]);
-		formatRagChunksForContext.mockReturnValue("[1] Use concise follow-up notes after demos.");
+		formatRagChunksForContext.mockReturnValue("[1] Use concise follow-up summaries after demos.");
 
 		const outputs = await runTool(
 			retrieveKnowledgeTool.execute,
-			{ query: "follow-up notes", similarityThreshold: 0.4, topK: 5 },
+			{ query: "follow-up summaries", similarityThreshold: 0.4, topK: 5 },
 			{ organizationId: "org-1" }
 		);
 
 		expect(outputs.at(-1)).toEqual(
 			expect.objectContaining({
-				context: "[1] Use concise follow-up notes after demos.",
+				context: "[1] Use concise follow-up summaries after demos.",
 				found: true,
 				status: "success",
 			})

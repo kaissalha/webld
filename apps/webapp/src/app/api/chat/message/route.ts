@@ -12,9 +12,6 @@ const saveMessageSchema = z.object({
 	message: z.looseObject({}),
 });
 
-/**
- * Save a message without AI response - useful for practitioner notes
- */
 export const POST = withErrorHandler(async (req: Request) => {
 	const [body, session] = await Promise.all([req.json(), auth.api.getSession({ headers: await headers() })]);
 

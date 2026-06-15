@@ -90,13 +90,9 @@
 		"startConversation": "Start a conversation",
 		"askAnything": "Ask me anything about your business and I'll help you out.",
 		"suggestions": {
-			"mail": {
-				"summarize": "Summarize inbox",
-				"draft": "Draft a reply"
-			},
 			"dashboard": {
-				"today": "What's on today?",
-				"overview": "CRM overview"
+				"contacts": "Find contacts",
+				"knowledge": "Search knowledge"
 			}
 		},
 		"generalDescription": "Start a conversation with your AI assistant about general topics related to your business.",
@@ -195,7 +191,7 @@
 			},
 			"testimonials": {
 				"slide0": {
-					"lead": "We finally have one place for workspaceal notes, billing, and follow-ups,",
+					"lead": "We finally have one place for workspace context, billing, and follow-ups,",
 					"punct": " ",
 					"highlight": "and the team onboards new staff in a day instead of a week\"",
 					"name": "Jordan Lee",
@@ -490,10 +486,6 @@
 		"title": "Something went wrong",
 		"description": "It looks like there was an error, try reloading the page",
 		"reload": "Reload page"
-	},
-	"mail": {
-		"send": "Send",
-		"sent": "Message sent"
 	},
 	"settings": {
 		"tabs": {

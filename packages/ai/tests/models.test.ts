@@ -41,24 +41,16 @@ describe("models", () => {
 
 		const { embeddingModels, models } = await import("../src/models");
 
-		expect(gatewayMock.mock.calls).toEqual([["google/gemini-3-flash"], ["openai/gpt-oss-120b"]]);
+		expect(gatewayMock.mock.calls).toEqual([["google/gemini-3-flash"]]);
 		expect(gatewayEmbeddingModelMock).toHaveBeenCalledWith("google/gemini-embedding-2");
 		expect(devToolsMiddlewareMock).toHaveBeenCalledTimes(1);
 		expect(wrapLanguageModelMock).toHaveBeenNthCalledWith(1, {
 			middleware: ["devtools-middleware"],
 			model: { model: "google/gemini-3-flash" },
 		});
-		expect(wrapLanguageModelMock).toHaveBeenNthCalledWith(2, {
-			middleware: ["devtools-middleware"],
-			model: { model: "openai/gpt-oss-120b" },
-		});
 		expect(models.fast.model).toEqual({
 			middleware: ["devtools-middleware"],
 			model: { model: "google/gemini-3-flash" },
-		});
-		expect(models.mailClassification.model).toEqual({
-			middleware: ["devtools-middleware"],
-			model: { model: "openai/gpt-oss-120b" },
 		});
 		expect(embeddingModels.rag).toEqual({
 			dimensions: 1536,
@@ -78,17 +70,9 @@ describe("models", () => {
 			middleware: [],
 			model: { model: "google/gemini-3-flash" },
 		});
-		expect(wrapLanguageModelMock).toHaveBeenNthCalledWith(2, {
-			middleware: [],
-			model: { model: "openai/gpt-oss-120b" },
-		});
 		expect(models.fast.model).toEqual({
 			middleware: [],
 			model: { model: "google/gemini-3-flash" },
-		});
-		expect(models.mailClassification.model).toEqual({
-			middleware: [],
-			model: { model: "openai/gpt-oss-120b" },
 		});
 		expect(embeddingModels.rag.dimensions).toBe(1536);
 	});

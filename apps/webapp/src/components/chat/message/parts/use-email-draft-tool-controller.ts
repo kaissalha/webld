@@ -2,11 +2,9 @@
 
 import { useEffect, useState } from "react";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
 import { useTextareaResize } from "@/hooks/use-textarea-resize";
-import { useTRPC } from "@/lib/trpc";
 import { toast } from "@webld/ui/components/sonner";
 import { useCopyToClipboard } from "@webld/ui/hooks/use-copy-to-clipboard";
 
@@ -45,11 +43,7 @@ const parseRecipients = ({ address }: { address: string }) => {
 };
 
 export const useEmailDraftToolController = ({ output }: { output: EmailDraftOutput }) => {
-	const trpc = useTRPC();
-	const queryClient = useQueryClient();
-	const tCommon = useTranslations("common");
 	const tEmailDraft = useTranslations("components.chat.message.tool.emailDraft");
-	const tMail = useTranslations("mail");
 	const [address, setAddress] = useState(output.address);
 	const [title, setTitle] = useState(output.title);
 	const [content, setContent] = useState(output.content);
@@ -60,34 +54,8 @@ export const useEmailDraftToolController = ({ output }: { output: EmailDraftOutp
 			toast.success(tEmailDraft("copiedMessage"));
 		},
 	});
-	const connectionsQuery = useQuery(trpc.mail.listConnections.queryOptions());
-	const activeConnection = connectionsQuery.data?.find((connection) => connection.status === "connected");
-	const recipients = parseRecipients({ address });
 	const canCopyMessage = content.length > 0;
 	const canSendAction = address.trim().length > 0 || title.trim().length > 0 || content.length > 0;
-	const canSendWithGmail =
-		Boolean(activeConnection) &&
-		recipients.length > 0 &&
-		recipients.every(({ email }) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
-
-	const sendMutation = useMutation(
-		trpc.mail.send.mutationOptions({
-			onSuccess: async () => {
-				toast.success(tMail("sent"));
-				await Promise.all([
-					queryClient.invalidateQueries({ queryKey: trpc.mail.listThreads.queryKey() }),
-					activeConnection
-						? queryClient.invalidateQueries({
-								queryKey: trpc.mail.getLabelCounts.queryKey({ connectionId: activeConnection.id }),
-							})
-						: Promise.resolve(),
-				]);
-			},
-			onError: () => {
-				toast.error(tCommon("errors.somethingWentWrong"));
-			},
-		})
-	);
 
 	useEffect(() => {
 		if (!openedMailApp) {
@@ -106,31 +74,16 @@ export const useEmailDraftToolController = ({ output }: { output: EmailDraftOutp
 		window.location.href = buildMailtoHref({ address, content, title });
 	};
 
-	const handleSend = () => {
-		if (canSendWithGmail && activeConnection) {
-			sendMutation.mutate({
-				connectionId: activeConnection.id,
-				to: recipients,
-				subject: title,
-				body: content,
-			});
-			return;
-		}
-
-		openMailApp();
-	};
-
 	return {
 		address,
 		canCopyMessage,
 		canSendAction,
-		canSendWithGmail,
 		content,
 		copyToClipboard,
-		handleSend,
+		handleSend: openMailApp,
 		isCopied,
-		isSending: sendMutation.isPending,
-		mailActionLabel: canSendWithGmail ? tMail("send") : tEmailDraft("openInMailApp"),
+		isSending: false,
+		mailActionLabel: tEmailDraft("openInMailApp"),
 		openedMailApp,
 		setAddress,
 		setContent,

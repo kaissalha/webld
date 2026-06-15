@@ -139,21 +139,4 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.organizations.id,
 		}),
 	},
-
-	// Notes relations
-	notes: {
-		organization: r.one.organizations({
-			from: r.notes.organizationId,
-			to: r.organizations.id,
-		}),
-		mentions: r.many.noteMentions(),
-	},
-
-	// Note Mentions relations
-	noteMentions: {
-		note: r.one.notes({
-			from: r.noteMentions.noteId,
-			to: r.notes.id,
-		}),
-	},
 }));

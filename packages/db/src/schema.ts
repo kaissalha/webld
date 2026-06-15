@@ -21,9 +21,6 @@ export {
 } from "./schema/integrations/oauth-connections.ts";
 // Media
 export { uploadedMedia, uploadedMediaAccess, uploadedMediaAccessValues } from "./schema/media/storage.ts";
-export { noteMentionResourceType, noteMentions } from "./schema/notes/note-mentions.ts";
-// Notes schema
-export { notes } from "./schema/notes/notes.ts";
 // Contacts schema
 export { contacts } from "./schema/contacts/contacts.ts";
 // RAG schema

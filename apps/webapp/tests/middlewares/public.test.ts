@@ -44,11 +44,11 @@ describe("publicMiddleware", () => {
 		getSession.mockResolvedValue(createSession({ activeOrganizationId: null }));
 
 		const response = await publicMiddleware(
-			createRequest("https://example.com/en/login?redirect_url=%2Fdashboard%2Fnotes")
+			createRequest("https://example.com/en/login?redirect_url=%2Fdashboard%2Fchat")
 		);
 
 		expect(response?.headers.get("location")).toBe(
-			"https://example.com/en/dashboard?redirect_url=%2Fdashboard%2Fnotes"
+			"https://example.com/en/dashboard?redirect_url=%2Fdashboard%2Fchat"
 		);
 	});
 

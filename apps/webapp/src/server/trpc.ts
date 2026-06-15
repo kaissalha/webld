@@ -1,9 +1,9 @@
 import { headers } from "next/headers";
 
-import { createWebldTRPC } from "@webld/server";
+import { createTRPC } from "@webld/server";
 import { auth } from "@webld/server/auth";
 
-const trpc = createWebldTRPC({
+const trpc = createTRPC({
 	getSession: async () =>
 		auth.api.getSession({
 			headers: await headers(),

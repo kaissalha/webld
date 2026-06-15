@@ -1,7 +1,5 @@
 "use client";
 
-import { useCallback } from "react";
-
 import { useTranslations } from "next-intl";
 
 import { useChatSession } from "@/components/chat/stores/chat-session-store";
@@ -15,19 +13,16 @@ export const DashboardChatEmptyState = ({ onNewChat }: DashboardChatEmptyStatePr
 	const t = useTranslations("chats");
 	const sendMessage = useChatSession((state) => state.runtimeActions.sendMessage);
 
-	const handleSuggestionSelect = useCallback(
-		async ({ text }: { text: string }) => {
-			if (!sendMessage) {
-				return;
-			}
+	const handleSuggestionSelect = async ({ text }: { text: string }) => {
+		if (!sendMessage) {
+			return;
+		}
 
-			await sendMessage({
-				role: "user",
-				parts: [{ type: "text", text }],
-			});
-		},
-		[sendMessage]
-	);
+		await sendMessage({
+			role: "user",
+			parts: [{ type: "text", text }],
+		});
+	};
 
 	return (
 		<div className='mx-auto flex max-w-2xl flex-col items-center gap-4 px-4 text-center'>
@@ -39,16 +34,16 @@ export const DashboardChatEmptyState = ({ onNewChat }: DashboardChatEmptyStatePr
 				<Button
 					type='button'
 					variant='outline'
-					onClick={() => handleSuggestionSelect({ text: t("suggestions.dashboard.today") })}
+					onClick={() => handleSuggestionSelect({ text: t("suggestions.dashboard.contacts") })}
 				>
-					{t("suggestions.dashboard.today")}
+					{t("suggestions.dashboard.contacts")}
 				</Button>
 				<Button
 					type='button'
 					variant='outline'
-					onClick={() => handleSuggestionSelect({ text: t("suggestions.dashboard.overview") })}
+					onClick={() => handleSuggestionSelect({ text: t("suggestions.dashboard.knowledge") })}
 				>
-					{t("suggestions.dashboard.overview")}
+					{t("suggestions.dashboard.knowledge")}
 				</Button>
 				<Button type='button' variant='ghost' onClick={onNewChat}>
 					{t("newChat")}

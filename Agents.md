@@ -91,14 +91,13 @@
 - **apps/webapp**: Next.js 16 app (App Router, next-intl i18n, better-auth, tRPC, AI SDK)
   `src/app` holds routes and API handlers; `src/components` holds app-specific UI; `src/server`, `src/services`, and `src/workflows` hold domain logic and orchestration
 - **packages/ai**: Shared AI models, prompt helpers, and AI SDK configuration
-- **packages/app-store**: Third-party app integrations and OAuth-backed connectors (Gmail, Google Calendar)
 - **packages/cache**: Redis/KV utilities and rate-limit helpers (Upstash + ioredis)
 - **packages/db**: Drizzle ORM + PostgreSQL schema and migrations
 - **packages/email**: React Email templates with Resend
 - **packages/evals**: Evalite-based evaluation suite for prompts and AI behavior
 - **packages/logger**: Shared logging and observability helpers for client/server usage
 - **packages/pdf**: React PDF templates and document-generation helpers
-- **packages/server**: Server-side services and lib integrations (AI agents/tools, auth, payments, Resend, Dub, tRPC)
+- **packages/server**: Server-side services and lib integrations (AI agents/tools, auth, payments, Resend, tRPC)
 - **packages/tsconfig**: Shared TypeScript configs (base, web, node, react-lib, react-native)
 - **packages/ui**: Shared UI components, hooks, and global design tokens (Tailwind v4, CVA, Base UI/Radix)
 - **packages/utils**: Shared utility functions (get-base-url)

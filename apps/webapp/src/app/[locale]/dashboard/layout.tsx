@@ -21,7 +21,7 @@ const AppSidebarFallback = () => (
 		</SidebarHeader>
 		<SidebarContent>
 			<div className='flex flex-col gap-1 px-3 py-2'>
-				{["home", "contacts", "notes", "mail", "calendar"].map((item) => (
+				{["home", "contacts"].map((item) => (
 					<div key={item} className='flex h-8 items-center gap-2 rounded-md px-2'>
 						<div className='size-4 animate-pulse rounded bg-sidebar-accent' />
 					</div>
@@ -52,7 +52,7 @@ const DashboardContentFallback = () => (
 					<div className='h-4 w-72 max-w-full animate-pulse rounded bg-muted' />
 				</div>
 				<div className='grid gap-4 pb-10 md:grid-cols-2'>
-					{["contacts", "notes", "mail", "calendar"].map((item) => (
+					{["contacts", "knowledge"].map((item) => (
 						<div key={item} className='rounded-xl border bg-card p-4'>
 							<div className='mb-4 h-4 w-28 animate-pulse rounded bg-muted' />
 							<div className='space-y-2'>

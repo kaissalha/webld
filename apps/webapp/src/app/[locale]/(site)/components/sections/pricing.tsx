@@ -17,7 +17,7 @@ const plans = [
 		features: [
 			"Shared inbox for up to 2 mailboxes",
 			"Tagging & assignment",
-			"Private notes",
+			"Customer context",
 			"Automatic replies",
 			"Email support",
 		],

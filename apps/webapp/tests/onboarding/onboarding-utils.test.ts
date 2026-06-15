@@ -12,8 +12,8 @@ describe("onboarding utils", () => {
 		});
 
 		it("strips the locale prefix from internal redirect paths", () => {
-			expect(getOnboardingRedirectPath({ redirectUrl: "/en/dashboard/notes?view=all" })).toBe(
-				"/dashboard/notes?view=all"
+			expect(getOnboardingRedirectPath({ redirectUrl: "/en/dashboard/chat?view=all" })).toBe(
+				"/dashboard/chat?view=all"
 			);
 		});
 

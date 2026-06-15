@@ -28,9 +28,6 @@ export const models: ModelRegistry = {
 	fast: {
 		model: createModel({ modelId: "google/gemini-3-flash" }),
 	},
-	mailClassification: {
-		model: createModel({ modelId: "openai/gpt-oss-120b" }),
-	},
 };
 
 export const embeddingModels: EmbeddingModelRegistry = {
