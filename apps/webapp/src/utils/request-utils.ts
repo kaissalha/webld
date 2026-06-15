@@ -24,24 +24,6 @@ type ResolveRequestPathOptions = {
 	handlerPath?: string;
 };
 
-type GetRequestBaseUrlOptions = {
-	fallbackPort?: number | string;
-};
-
-export const getFirstHeaderValue = (request: NextRequest, headerName: string) => {
-	const value = request.headers.get(headerName);
-	if (!value || value.trim() === "") {
-		return null;
-	}
-
-	return (
-		value
-			.split(",")
-			.map((part) => part.trim())
-			.find((part) => part.length > 0) ?? null
-	);
-};
-
 export const resolveRequestPath = (
 	request: NextRequest,
 	{
@@ -82,22 +64,3 @@ export const resolveRequestPath = (
 
 export const isPathExcluded = (path: string, excludedPrefixes: readonly string[]) =>
 	excludedPrefixes.some((prefix) => path.startsWith(prefix));
-
-export const getRequestBaseUrl = (
-	request: NextRequest,
-	{ fallbackPort = process.env.PORT || 3000 }: GetRequestBaseUrlOptions = {}
-) => {
-	const forwardedHost = getFirstHeaderValue(request, "x-forwarded-host");
-	const host = getFirstHeaderValue(request, "host");
-	const resolvedHost = firstNonEmpty(forwardedHost, host);
-
-	if (resolvedHost) {
-		const forwardedProto = getFirstHeaderValue(request, "x-forwarded-proto");
-		const protocolFromUrl = request.nextUrl.protocol.replace(/:$/, "");
-		const protocol = firstNonEmpty(forwardedProto, protocolFromUrl) ?? "https";
-
-		return `${protocol}://${resolvedHost}`;
-	}
-
-	return request.nextUrl.origin || `http://localhost:${fallbackPort}`;
-};

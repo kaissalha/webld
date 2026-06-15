@@ -4,13 +4,63 @@ import { NextResponse } from "next/server";
 
 import { getMarkdownForPath, loadConfig } from "accept-md-runtime";
 
-import { getRequestBaseUrl, isPathExcluded, resolveRequestPath } from "@/utils/request-utils";
+import { isPathExcluded, resolveRequestPath } from "@/utils/request-utils";
 import { withErrorHandler } from "@/utils/with-error-handler";
 
 const cache = new Map();
 const HANDLER_PATH = "/api/accept-md";
 const EXCLUDED_PATH_PREFIXES = ["/api/", "/_next/"] as const;
 const NOT_FOUND_MARKDOWN = "# 404 Not Found\n\nThe requested page could not be found.\n";
+
+type BaseURLRequest = {
+	headers: {
+		get: (name: string) => string | null;
+	};
+	nextUrl?: {
+		protocol: string;
+		origin: string;
+	};
+};
+
+const firstNonEmpty = (...values: Array<string | null | undefined>) => {
+	for (const value of values) {
+		if (typeof value === "string" && value.trim() !== "") {
+			return value;
+		}
+	}
+
+	return null;
+};
+
+const getFirstHeaderValue = (request: BaseURLRequest, headerName: string) => {
+	const value = request.headers.get(headerName);
+	if (!value || value.trim() === "") {
+		return null;
+	}
+
+	return (
+		value
+			.split(",")
+			.map((part) => part.trim())
+			.find((part) => part.length > 0) ?? null
+	);
+};
+
+const getBaseURLFromRequest = (request: BaseURLRequest, fallbackPort: number | string) => {
+	const forwardedHost = getFirstHeaderValue(request, "x-forwarded-host");
+	const host = getFirstHeaderValue(request, "host");
+	const resolvedHost = firstNonEmpty(forwardedHost, host);
+
+	if (resolvedHost) {
+		const forwardedProto = getFirstHeaderValue(request, "x-forwarded-proto");
+		const protocolFromUrl = request.nextUrl?.protocol.replace(/:$/, "");
+		const protocol = firstNonEmpty(forwardedProto, protocolFromUrl) ?? "https";
+
+		return new URL(`${protocol}://${resolvedHost}`);
+	}
+
+	return request.nextUrl?.origin ? new URL(request.nextUrl.origin) : new URL(`http://localhost:${fallbackPort}`);
+};
 
 const getFetchErrorStatusCode = (error: unknown) => {
 	if (!(error instanceof Error)) {
@@ -49,7 +99,7 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
 	try {
 		const markdown = await getMarkdownForPath({
 			pathname: path,
-			baseUrl: config.baseUrl ?? getRequestBaseUrl(request),
+			baseUrl: config.baseUrl ?? getBaseURLFromRequest(request, 3000).origin,
 			config,
 			cache: config.cache !== false ? cache : undefined,
 			headers,

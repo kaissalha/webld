@@ -6,7 +6,6 @@ import { useTranslations } from "next-intl";
 
 import { LogoPicker } from "@/components/organization/logo-picker";
 import { authClient } from "@/lib/auth-client";
-import { resolveAuthClientResult } from "@/lib/auth-client-request";
 import { uploadFromClient } from "@/lib/storage";
 import { toast } from "@webld/ui/components/sonner";
 
@@ -84,13 +83,9 @@ export const OrganizationLogoUpload = ({ canEdit, organization }: OrganizationLo
 			return;
 		}
 
-		const result = await resolveAuthClientResult({
-			request: () =>
-				authClient.organization.update({
-					data: { logo: blob.url },
-					organizationId: organization.id,
-				}),
-			fallbackMessage: tCommon("saveError"),
+		const result = await authClient.organization.update({
+			data: { logo: blob.url },
+			organizationId: organization.id,
 		});
 
 		if (result.error) {
@@ -110,13 +105,9 @@ export const OrganizationLogoUpload = ({ canEdit, organization }: OrganizationLo
 
 		setIsUploading(true);
 
-		const result = await resolveAuthClientResult({
-			request: () =>
-				authClient.organization.update({
-					data: { logo: "" },
-					organizationId: organization.id,
-				}),
-			fallbackMessage: tCommon("saveError"),
+		const result = await authClient.organization.update({
+			data: { logo: "" },
+			organizationId: organization.id,
 		});
 
 		if (result.error) {

@@ -5,7 +5,6 @@ import { useReducer } from "react";
 import { useTranslations } from "next-intl";
 
 import { authClient } from "@/lib/auth-client";
-import { resolveAuthClientResult } from "@/lib/auth-client-request";
 import { toast } from "@webld/ui/components/sonner";
 
 type OrganizationSettingsState = {
@@ -76,13 +75,9 @@ export const useOrganizationSettingsForm = ({
 			return;
 		}
 
-		const result = await resolveAuthClientResult({
-			request: () =>
-				authClient.organization.update({
-					data,
-					organizationId: organization.id,
-				}),
-			fallbackMessage: tCommon("saveError"),
+		const result = await authClient.organization.update({
+			data,
+			organizationId: organization.id,
 		});
 
 		dispatch({ type: "set-saving", value: false });

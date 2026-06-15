@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { authClient } from "@/lib/auth-client";
-import { resolveAuthClientResult } from "@/lib/auth-client-request";
 import { toast } from "@webld/ui/components/sonner";
 
 import type { ManageAction } from "./manage-member-dialog";
@@ -119,13 +118,10 @@ export const useTeamTabController = () => {
 
 	const handleSendInvite = async ({ email, role }: { email: string; role: InviteRole }) => {
 		setIsSendingInvite(true);
-		const result = await resolveAuthClientResult({
-			request: () => authClient.organization.inviteMember({ email, role }),
-			fallbackMessage: t("errors.invite"),
-		});
+		const result = await authClient.organization.inviteMember({ email, role });
 		setIsSendingInvite(false);
 
-		if (result.error) {
+		if (result?.error) {
 			const message = result.error.message ?? t("errors.invite");
 			toast.error(message);
 			return { error: message };
@@ -142,11 +138,8 @@ export const useTeamTabController = () => {
 
 		try {
 			if (action.type === "cancel-invitation") {
-				const result = await resolveAuthClientResult({
-					request: () => authClient.organization.cancelInvitation({ invitationId: action.invitationId }),
-					fallbackMessage: t("errors.cancelInvitation"),
-				});
-				if (result.error) {
+				const result = await authClient.organization.cancelInvitation({ invitationId: action.invitationId });
+				if (result?.error) {
 					toast.error(result.error.message ?? t("errors.cancelInvitation"));
 					return;
 				}
@@ -154,22 +147,16 @@ export const useTeamTabController = () => {
 				toast.success(t("manage.invitation.success"));
 			} else if (action.type === "resend-invitation") {
 				const role = action.role === "admin" || action.role === "owner" ? action.role : "member";
-				const result = await resolveAuthClientResult({
-					request: () => authClient.organization.inviteMember({ email: action.email, role, resend: true }),
-					fallbackMessage: t("errors.resend"),
-				});
-				if (result.error) {
+				const result = await authClient.organization.inviteMember({ email: action.email, role, resend: true });
+				if (result?.error) {
 					toast.error(result.error.message ?? t("errors.resend"));
 					return;
 				}
 
 				toast.success(t("manage.invitation.resent", { email: action.email }));
 			} else {
-				const result = await resolveAuthClientResult({
-					request: () => authClient.organization.removeMember({ memberIdOrEmail: action.memberId }),
-					fallbackMessage: t("errors.remove"),
-				});
-				if (result.error) {
+				const result = await authClient.organization.removeMember({ memberIdOrEmail: action.memberId });
+				if (result?.error) {
 					toast.error(result.error.message ?? t("errors.remove"));
 					return;
 				}

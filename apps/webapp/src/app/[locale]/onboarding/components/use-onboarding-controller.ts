@@ -7,7 +7,6 @@ import { useTranslations } from "next-intl";
 
 import { useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
-import { requireAuthClientData, resolveAuthClientResult } from "@/lib/auth-client-request";
 import { uploadFromClient } from "@/lib/storage";
 import { toast } from "@webld/ui/components/sonner";
 
@@ -48,10 +47,8 @@ const uploadOrganizationLogo = async ({
 	uploadErrorMessage: string;
 }) => {
 	try {
-		await requireAuthClientData({
-			request: () => authClient.organization.setActive({ organizationId }),
-			fallbackMessage: uploadErrorMessage,
-		});
+		const setActiveResult = await authClient.organization.setActive({ organizationId });
+		if (setActiveResult?.error) throw new Error(setActiveResult.error.message ?? uploadErrorMessage);
 
 		const pathname = `organizations/${organizationId}/logo-${Date.now()}.${getLogoFileExtension({
 			file: logoFile,
@@ -67,14 +64,11 @@ const uploadOrganizationLogo = async ({
 			},
 		});
 
-		await requireAuthClientData({
-			request: () =>
-				authClient.organization.update({
-					data: { logo: blob.url },
-					organizationId,
-				}),
-			fallbackMessage: uploadErrorMessage,
+		const updateResult = await authClient.organization.update({
+			data: { logo: blob.url },
+			organizationId,
 		});
+		if (updateResult?.error) throw new Error(updateResult.error.message ?? uploadErrorMessage);
 	} catch {
 		toast.error(uploadErrorMessage);
 	}
@@ -96,12 +90,9 @@ export const useOnboardingController = ({ redirectPath }: { redirectPath: string
 		queryKey: ["onboarding", "user-invitations"],
 		enabled: !isOrganizationsPending && (organizations?.length ?? 0) === 0,
 		queryFn: async () => {
-			const data = await requireAuthClientData<OnboardingInvitation[]>({
-				request: () => authClient.organization.listUserInvitations(),
-				fallbackMessage: t("errors.loadInvitations"),
-			});
-
-			return data ?? [];
+			const r = await authClient.organization.listUserInvitations();
+			if (r?.error) throw new Error(r.error.message ?? t("errors.loadInvitations"));
+			return (r?.data as OnboardingInvitation[] | null) ?? [];
 		},
 		staleTime: 30_000,
 	});
@@ -111,11 +102,11 @@ export const useOnboardingController = ({ redirectPath }: { redirectPath: string
 		mutateAsync: acceptInvitation,
 		variables: acceptInvitationVariables,
 	} = useMutation({
-		mutationFn: ({ invitationId }: { invitationId: string }) =>
-			requireAuthClientData({
-				request: () => authClient.organization.acceptInvitation({ invitationId }),
-				fallbackMessage: t("errors.acceptInvitation"),
-			}),
+		mutationFn: async ({ invitationId }: { invitationId: string }) => {
+			const r = await authClient.organization.acceptInvitation({ invitationId });
+			if (r?.error) throw new Error(r.error.message ?? t("errors.acceptInvitation"));
+			return r?.data;
+		},
 		onSuccess: () => {
 			router.replace(redirectPath);
 		},
@@ -127,31 +118,23 @@ export const useOnboardingController = ({ redirectPath }: { redirectPath: string
 	const { isPending: isCreatingOrganization, mutateAsync: createOrganization } = useMutation({
 		mutationFn: async ({ name, logoFile }: { name: string; logoFile?: File | null }) => {
 			const normalizedName = name.trim();
-			let result = await resolveAuthClientResult<OrganizationSummary>({
-				request: () =>
-					authClient.organization.create({
-						name: normalizedName,
-						slug: buildOrganizationSlug({ name: normalizedName }),
-					}),
-				fallbackMessage: t("errors.createOrganization"),
+			let result = await authClient.organization.create({
+				name: normalizedName,
+				slug: buildOrganizationSlug({ name: normalizedName }),
 			});
 
-			if (result.error?.code === "ORGANIZATION_SLUG_ALREADY_TAKEN") {
-				result = await resolveAuthClientResult<OrganizationSummary>({
-					request: () =>
-						authClient.organization.create({
-							name: normalizedName,
-							slug: buildOrganizationSlug({
-								name: normalizedName,
-								suffix: Date.now().toString(36).slice(-6),
-							}),
-						}),
-					fallbackMessage: t("errors.createOrganization"),
+			if (result?.error?.code === "ORGANIZATION_SLUG_ALREADY_TAKEN") {
+				result = await authClient.organization.create({
+					name: normalizedName,
+					slug: buildOrganizationSlug({
+						name: normalizedName,
+						suffix: Date.now().toString(36).slice(-6),
+					}),
 				});
 			}
 
-			if (result.error || !result.data) {
-				throw new Error(result.error?.message ?? t("errors.createOrganization"));
+			if (result?.error || !result?.data) {
+				throw new Error(result?.error?.message ?? t("errors.createOrganization"));
 			}
 
 			if (logoFile) {
@@ -162,7 +145,7 @@ export const useOnboardingController = ({ redirectPath }: { redirectPath: string
 				});
 			}
 
-			return result.data;
+			return result.data as OrganizationSummary;
 		},
 		onSuccess: () => {
 			router.replace(redirectPath);
@@ -176,11 +159,11 @@ export const useOnboardingController = ({ redirectPath }: { redirectPath: string
 		mutateAsync: restoreOrganization,
 		status: restoreStatus,
 	} = useMutation({
-		mutationFn: ({ organizationId }: { organizationId: string }) =>
-			requireAuthClientData({
-				request: () => authClient.organization.setActive({ organizationId }),
-				fallbackMessage: t("errors.restoreOrganization"),
-			}),
+		mutationFn: async ({ organizationId }: { organizationId: string }) => {
+			const r = await authClient.organization.setActive({ organizationId });
+			if (r?.error) throw new Error(r.error.message ?? t("errors.restoreOrganization"));
+			return r?.data;
+		},
 		onSuccess: () => {
 			router.replace(redirectPath);
 		},

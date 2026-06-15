@@ -32,7 +32,6 @@ const NavbarLink = ({
 
 const navLinks = [
 	{ href: "#features" as Route, label: "Features" },
-	{ href: "#pricing" as Route, label: "Pricing" },
 	{ href: "#testimonials" as Route, label: "Testimonials" },
 	{ href: "#faqs" as Route, label: "FAQ" },
 ];

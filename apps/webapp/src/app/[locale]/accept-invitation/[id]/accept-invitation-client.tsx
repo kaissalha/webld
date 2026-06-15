@@ -7,7 +7,6 @@ import { useTranslations } from "next-intl";
 import { Logo } from "@/components/logo";
 import { Link, useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
-import { resolveAuthClientResult } from "@/lib/auth-client-request";
 import { Alert, AlertDescription, AlertTitle } from "@webld/ui/components/alert";
 import { Badge } from "@webld/ui/components/badge";
 import { Button } from "@webld/ui/components/button";
@@ -51,24 +50,18 @@ export const AcceptInvitationClient = ({
 
 	const handleAccept = async () => {
 		setIsAccepting(true);
-		const result = await resolveAuthClientResult({
-			request: () => authClient.organization.acceptInvitation({ invitationId }),
-			fallbackMessage: t("errors.accept"),
-		});
+		const result = await authClient.organization.acceptInvitation({ invitationId });
 		setIsAccepting(false);
 
-		if (result.error) {
+		if (result?.error) {
 			toast.error(t("errors.accept"));
 			return;
 		}
 
-		const organizationId = result.data?.invitation?.organizationId;
+		const organizationId = result?.data?.invitation?.organizationId;
 
 		if (organizationId) {
-			await resolveAuthClientResult({
-				request: () => authClient.organization.setActive({ organizationId }),
-				fallbackMessage: t("errors.accept"),
-			});
+			await authClient.organization.setActive({ organizationId });
 		}
 
 		toast.success(t("success"));
@@ -77,13 +70,10 @@ export const AcceptInvitationClient = ({
 
 	const handleReject = async () => {
 		setIsRejecting(true);
-		const result = await resolveAuthClientResult({
-			request: () => authClient.organization.rejectInvitation({ invitationId }),
-			fallbackMessage: t("errors.reject"),
-		});
+		const result = await authClient.organization.rejectInvitation({ invitationId });
 		setIsRejecting(false);
 
-		if (result.error) {
+		if (result?.error) {
 			toast.error(t("errors.reject"));
 			return;
 		}

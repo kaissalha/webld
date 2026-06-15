@@ -18,11 +18,12 @@ export * from "./services/chat";
 export * from "./services/contacts";
 export * from "./services/location";
 export * from "./services/rag";
+export * from "./services/storage";
 
 // =============================================================================
 // TRPC
 // =============================================================================
-export * from "./trpc/create-webld-trpc";
+export * from "./trpc/create-trpc";
 
 // =============================================================================
 // Types

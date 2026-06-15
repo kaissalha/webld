@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { DEFAULT_MAX_UPLOAD_FILE_SIZE_MB, mediaAccessValues } from "@/constants/upload";
 import { getBlob, handleClientUpload } from "@/lib/server/storage";
-import { createStorageRecord, findStorageByUrl } from "@/services/storage";
 import { parseJsonPayload } from "@/utils/parse-json-payload";
 import { withErrorHandler } from "@/utils/with-error-handler";
 import { db, members } from "@webld/db";
+import { createStorageRecord, findStorageByUrl } from "@webld/server";
 import { auth } from "@webld/server/auth";
 
 const uploadClientPayloadSchema = z.object({

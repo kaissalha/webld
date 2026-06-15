@@ -12,9 +12,9 @@
 			"default": "./src/index.ts"
 		},
 		"./trpc": {
-			"types": "./src/trpc/create-webld-trpc.ts",
-			"import": "./src/trpc/create-webld-trpc.ts",
-			"default": "./src/trpc/create-webld-trpc.ts"
+			"types": "./src/trpc/create-trpc.ts",
+			"import": "./src/trpc/create-trpc.ts",
+			"default": "./src/trpc/create-trpc.ts"
 		},
 		"./auth": {
 			"types": "./src/lib/auth.ts",
