@@ -73,7 +73,7 @@ When you run `turbo run lint`, Turborepo finds all packages with a `lint` script
 
 ```json
 {
-  "$schema": "https://v2-9-19-canary-4.turborepo.dev/schema.json",
+  "$schema": "https://v2-9-17-canary-1.turborepo.dev/schema.json",
   "globalEnv": ["CI"],
   "globalDependencies": ["tsconfig.json"],
   "tasks": {
@@ -97,7 +97,7 @@ When the `globalConfiguration` future flag is enabled, global options move under
 
 ```json
 {
-  "$schema": "https://v2-9-19-canary-4.turborepo.dev/schema.json",
+  "$schema": "https://v2-9-17-canary-1.turborepo.dev/schema.json",
   "futureFlags": { "globalConfiguration": true },
   "global": {
     "inputs": ["tsconfig.json"],
@@ -137,7 +137,7 @@ Use `turbo.json` in individual packages to override root settings:
   "extends": ["//"],
   "tasks": {
     "build": {
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
+      "outputs": [".next/**", "!.next/cache/**"]
     }
   }
 }
@@ -185,18 +185,13 @@ By default, array fields in Package Configurations **replace** root values. Use 
   "tasks": {
     "build": {
       // Inherits "dist/**" from root, adds ".next/**"
-      "outputs": [
-        "$TURBO_EXTENDS$",
-        ".next/**",
-        "!.next/cache/**",
-        "!.next/dev/**"
-      ]
+      "outputs": ["$TURBO_EXTENDS$", ".next/**", "!.next/cache/**"]
     }
   }
 }
 ```
 
-Without `$TURBO_EXTENDS$`, outputs would only be `[".next/**", "!.next/cache/**", "!.next/dev/**"]`.
+Without `$TURBO_EXTENDS$`, outputs would only be `[".next/**", "!.next/cache/**"]`.
 
 **Works with:**
 
@@ -233,7 +228,7 @@ Use `turbo.jsonc` extension to add comments with IDE support:
   "tasks": {
     "build": {
       // Next.js outputs
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
+      "outputs": [".next/**", "!.next/cache/**"]
     }
   }
 }
