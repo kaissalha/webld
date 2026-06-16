@@ -12,7 +12,6 @@ import {
 
 import { AppSidebar } from "./components/layout/sidebar/app-sidebar";
 import { SettingsModal } from "./components/settings/settings-modal";
-import { PlanSelectionDialog } from "./components/subscription/plan-selection-dialog";
 
 const AppSidebarFallback = () => (
 	<Sidebar collapsible='icon' purpose='navigation'>
@@ -79,7 +78,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 					<Suspense fallback={<DashboardContentFallback />}>{children}</Suspense>
 				</SidebarInset>
 			</SidebarProvider>
-			<PlanSelectionDialog />
 			<Suspense fallback={null}>
 				<SettingsModal />
 			</Suspense>

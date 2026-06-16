@@ -7,7 +7,7 @@ import { z } from "zod";
 
 import { useIsMobile } from "@webld/ui/hooks/use-mobile";
 
-const SettingsSchema = z.enum(["list", "profile", "organization", "team", "security", "subscription"]);
+const SettingsSchema = z.enum(["list", "profile", "organization", "team", "security"]);
 
 export type Settings = z.infer<typeof SettingsSchema>;
 

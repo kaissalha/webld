@@ -12,7 +12,9 @@ import {
 } from "@webld/ui/components/credenza";
 import { useIsMobile } from "@webld/ui/hooks/use-mobile";
 
-import { DesktopSettings, MobileSettings, useSettingsTabs } from "./settings-modal-internals";
+import { DesktopSettings } from "./desktop-settings";
+import { MobileSettings } from "./mobile-settings";
+import { useSettingsTabs } from "./settings-tabs";
 
 export const SettingsModal = () => {
 	const t = useTranslations("breadcrumbs");

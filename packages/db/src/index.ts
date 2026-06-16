@@ -58,7 +58,6 @@ export * from "./schema/integrations/oauth-connections.ts";
 export * from "./schema/media/storage.ts";
 export * from "./schema/rag/document-chunks.ts";
 export * from "./schema/rag/documents.ts";
-export * from "./schema/subscription.ts";
 export * from "./utils/pagination.ts";
 export * from "./utils/search.ts";
 export * from "./utils/sorting.ts";

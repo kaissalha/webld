@@ -9,7 +9,7 @@
 	"type": "module",
 	"scripts": {
 		"build": "turbo run build",
-		"dev": "turbo run dev dev:ai dev:stripe dev:blob",
+		"dev": "turbo run dev dev:ai dev:blob",
 		"eval:ci": "turbo run eval:ci --filter=@webld/evals",
 		"eval:dev": "turbo run eval:dev --filter=@webld/evals",
 		"eval:export": "turbo run eval:export --filter=@webld/evals",

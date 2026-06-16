@@ -26,6 +26,3 @@ export { contacts } from "./schema/contacts/contacts.ts";
 // RAG schema
 export { ragDocumentChunks } from "./schema/rag/document-chunks.ts";
 export { ragDocumentSourceType, ragDocumentStatus, ragDocuments } from "./schema/rag/documents.ts";
-
-// Subscription schema
-export { subscriptions } from "./schema/subscription.ts";

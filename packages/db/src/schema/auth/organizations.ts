@@ -10,13 +10,9 @@ export const organizations = pgTable(
 		slug: text("slug"),
 		logo: text("logo"),
 		metadata: text("metadata"),
-		stripeCustomerId: text("stripe_customer_id"),
 		...timeFields,
 	},
-	(table) => [
-		index("organization_slug_idx").on(table.slug),
-		index("organization_stripe_customer_id_idx").on(table.stripeCustomerId),
-	]
+	(table) => [index("organization_slug_idx").on(table.slug)]
 );
 
 // Types

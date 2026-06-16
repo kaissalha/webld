@@ -44,6 +44,6 @@ This repo is a Bun workspaces + Turborepo monorepo centered around a Next.js 16 
 
 ## Local Development Notes
 
-- The root `bun dev` script runs Turborepo-managed dev tasks, including the web app and optional AI/Stripe helpers where configured.
+- The root `bun dev` script runs Turborepo-managed dev tasks, including the web app and optional AI/blob helpers where configured.
 - Local database development uses the Postgres service defined in `docker-compose.yml`.
 - Most shared packages are imported into `apps/webapp`, so package-level changes are usually exercised from the web app.

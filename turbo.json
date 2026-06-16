@@ -21,10 +21,6 @@
 			"cache": false,
 			"outputs": ["packages/evals/.evalite/ui/**"]
 		},
-		"dev:stripe": {
-			"cache": false,
-			"persistent": true
-		},
 		"dev:blob": {
 			"cache": false,
 			"persistent": true
@@ -49,7 +45,6 @@
 				"GOOGLE_MAPS_BACKEND_KEY",
 				"NEXT_PUBLIC_ENABLE_QUERY_DEVTOOLS",
 				"NEXT_PUBLIC_POSTHOG_KEY",
-				"NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
 				"POSTHOG_PERSONAL_API_KEY",
 				"POSTHOG_PROJECT_ID",
 				"REACT_SCAN",
@@ -58,11 +53,7 @@
 				"UPSTASH_TOKEN",
 				"UPSTASH_URL",
 				"VERCEL_BLOB_CALLBACK_URL",
-				"DUB_API_KEY",
-				"STRIPE_SECRET_KEY",
-				"STRIPE_WEBHOOK_SECRET",
-				"STRIPE_STARTER_PRICE_ID",
-				"STRIPE_PRO_PRICE_ID"
+				"DUB_API_KEY"
 			]
 		},
 		"lint": {

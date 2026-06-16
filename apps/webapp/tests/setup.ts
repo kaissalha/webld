@@ -13,7 +13,6 @@ import "./mocks/vercel";
 import "./mocks/web-apis";
 import "./mocks/workflow";
 
-process.env.STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY ?? "test-stripe-key";
 process.env.RESEND_KEY = process.env.RESEND_KEY ?? "test-resend-key";
 process.env.DUB_API_KEY = process.env.DUB_API_KEY ?? "test-dub-key";
 process.env.GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID ?? "test-google-client-id";

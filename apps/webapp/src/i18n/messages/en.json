@@ -152,7 +152,6 @@
 	"account": {
 		"settings": "Settings",
 		"logout": "Logout",
-		"billing": "Billing",
 		"notifications": "Notifications",
 		"login": {
 			"pageTitle": "Sign in | webld",
@@ -191,7 +190,7 @@
 			},
 			"testimonials": {
 				"slide0": {
-					"lead": "We finally have one place for workspace context, billing, and follow-ups,",
+					"lead": "We finally have one place for workspace context, contacts, and follow-ups,",
 					"punct": " ",
 					"highlight": "and the team onboards new staff in a day instead of a week\"",
 					"name": "Jordan Lee",
@@ -394,43 +393,6 @@
 		"globalDescription": "We apologize for the inconvenience. An unexpected error has occurred.",
 		"tryAgain": "Try again"
 	},
-	"subscription": {
-		"dialog": {
-			"title": "Choose your plan",
-			"description": "Select a plan to unlock all features and take your business to the next level.",
-			"perMonth": "month",
-			"getStarted": "Get Started",
-			"selectPlan": "Select Plan",
-			"footer": "All plans include a 14-day free trial. Cancel anytime.",
-			"badges": {
-				"popular": "Most Popular"
-			},
-			"plans": {
-				"webld": {
-					"description": "Perfect for small teams getting started"
-				},
-				"pro": {
-					"description": "For growing teams that need more power"
-				}
-			},
-			"features": {
-				"upTo5Users": "Up to 5 team members",
-				"basicAnalytics": "Basic analytics",
-				"emailSupport": "Email support",
-				"5gbStorage": "5 GB storage",
-				"unlimitedUsers": "Unlimited team members",
-				"advancedAnalytics": "Advanced analytics & reports",
-				"prioritySupport": "Priority support",
-				"unlimitedStorage": "Unlimited storage",
-				"apiAccess": "API access",
-				"customIntegrations": "Custom integrations"
-			}
-		},
-		"upgrade": {
-			"title": "Upgrade your plan",
-			"description": "Choose a plan that best fits your needs and unlock more features."
-		}
-	},
 	"components": {
 		"chat": {
 			"input": {
@@ -492,7 +454,6 @@
 			"profile": "General",
 			"organization": "Workspace",
 			"team": "Team",
-			"subscription": "Subscription",
 			"security": "Security"
 		},
 		"profile": {
@@ -608,28 +569,6 @@
 					"remove": "Remove",
 					"success": "{name} has been removed"
 				}
-			}
-		},
-		"subscription": {
-			"currentPlan": "Current Plan",
-			"description": "Manage your subscription and billing settings.",
-			"freePlan": "Free Plan",
-			"freePlanDescription": "You're currently on the free plan. Upgrade to unlock more features.",
-			"manageBilling": "Manage Billing",
-			"upgradeComingSoon": "Upgrade options coming soon!",
-			"renewsOn": "Renews on {date}",
-			"status": {
-				"active": "Active",
-				"canceled": "Canceled",
-				"trialing": "Trial"
-			},
-			"features": {
-				"title": "Plan Features",
-				"description": "What's included in your current plan.",
-				"feature1": "Unlimited contacts",
-				"feature2": "AI-powered insights",
-				"feature3": "Email integrations",
-				"feature4": "Priority support"
 			}
 		},
 		"security": {

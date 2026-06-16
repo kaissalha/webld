@@ -73,7 +73,6 @@ CREATE TABLE "organizations" (
 	"slug" text,
 	"logo" text,
 	"metadata" text,
-	"stripe_customer_id" text,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -199,28 +198,6 @@ CREATE TABLE "rag_documents" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "subscriptions" (
-	"id" text PRIMARY KEY,
-	"plan" text NOT NULL,
-	"reference_id" text NOT NULL,
-	"stripe_customer_id" text,
-	"stripe_subscription_id" text,
-	"status" text DEFAULT 'incomplete' NOT NULL,
-	"period_start" timestamp with time zone,
-	"period_end" timestamp with time zone,
-	"trial_start" timestamp with time zone,
-	"trial_end" timestamp with time zone,
-	"cancel_at_period_end" boolean DEFAULT false,
-	"cancel_at" timestamp with time zone,
-	"canceled_at" timestamp with time zone,
-	"ended_at" timestamp with time zone,
-	"seats" integer,
-	"billing_interval" text,
-	"stripe_schedule_id" text,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
 CREATE INDEX "chat_organization_id_idx" ON "ai_chats" ("organization_id");--> statement-breakpoint
 CREATE INDEX "chat_created_at_idx" ON "ai_chats" ("created_at");--> statement-breakpoint
 CREATE INDEX "message_chat_id_idx" ON "ai_chat_messages" ("chat_id");--> statement-breakpoint
@@ -233,7 +210,6 @@ CREATE INDEX "invitation_organization_id_idx" ON "invitations" ("organization_id
 CREATE INDEX "member_user_id_idx" ON "members" ("user_id");--> statement-breakpoint
 CREATE INDEX "member_organization_id_idx" ON "members" ("organization_id");--> statement-breakpoint
 CREATE INDEX "organization_slug_idx" ON "organizations" ("slug");--> statement-breakpoint
-CREATE INDEX "organization_stripe_customer_id_idx" ON "organizations" ("stripe_customer_id");--> statement-breakpoint
 CREATE INDEX "session_user_id_idx" ON "sessions" ("user_id");--> statement-breakpoint
 CREATE INDEX "session_token_idx" ON "sessions" ("token");--> statement-breakpoint
 CREATE INDEX "two_factors_secret_idx" ON "two_factors" ("secret");--> statement-breakpoint
@@ -254,10 +230,6 @@ CREATE INDEX "rag_document_chunks_organization_id_idx" ON "rag_document_chunks" 
 CREATE INDEX "rag_document_chunks_embedding_idx" ON "rag_document_chunks" USING hnsw ("embedding" vector_cosine_ops);--> statement-breakpoint
 CREATE INDEX "rag_documents_organization_id_idx" ON "rag_documents" ("organization_id");--> statement-breakpoint
 CREATE INDEX "rag_documents_organization_status_idx" ON "rag_documents" ("organization_id","status");--> statement-breakpoint
-CREATE INDEX "subscription_reference_id_idx" ON "subscriptions" ("reference_id");--> statement-breakpoint
-CREATE INDEX "subscription_stripe_customer_id_idx" ON "subscriptions" ("stripe_customer_id");--> statement-breakpoint
-CREATE INDEX "subscription_stripe_subscription_id_idx" ON "subscriptions" ("stripe_subscription_id");--> statement-breakpoint
-CREATE INDEX "subscription_status_idx" ON "subscriptions" ("status");--> statement-breakpoint
 ALTER TABLE "ai_chats" ADD CONSTRAINT "ai_chats_organization_id_organizations_id_fkey" FOREIGN KEY ("organization_id") REFERENCES "organizations"("id") ON DELETE CASCADE;--> statement-breakpoint
 ALTER TABLE "ai_chat_messages" ADD CONSTRAINT "ai_chat_messages_chat_id_ai_chats_id_fkey" FOREIGN KEY ("chat_id") REFERENCES "ai_chats"("id") ON DELETE CASCADE;--> statement-breakpoint
 ALTER TABLE "ai_chat_streams" ADD CONSTRAINT "ai_chat_streams_chat_id_ai_chats_id_fkey" FOREIGN KEY ("chat_id") REFERENCES "ai_chats"("id") ON DELETE CASCADE;--> statement-breakpoint

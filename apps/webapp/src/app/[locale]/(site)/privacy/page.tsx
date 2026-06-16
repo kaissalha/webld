@@ -44,7 +44,6 @@ export default function PrivacyPage() {
 							<p>We collect information you provide directly to us, such as when you:</p>
 							<ul>
 								<li>Create an account or fill out a form</li>
-								<li>Make a purchase or subscription</li>
 								<li>Communicate with us via email, chat, or other channels</li>
 								<li>Participate in surveys, promotions, or other interactive features</li>
 								<li>Request customer support or otherwise communicate with us</li>
@@ -52,8 +51,7 @@ export default function PrivacyPage() {
 
 							<p>
 								The types of information we may collect include your name, email address, postal
-								address, phone number, payment information, and any other information you choose to
-								provide.
+								address, phone number, and any other information you choose to provide.
 							</p>
 
 							<h2>Information We Collect Automatically</h2>
@@ -84,17 +82,13 @@ export default function PrivacyPage() {
 							<p>We use the information we collect to:</p>
 							<ul>
 								<li>Provide, maintain, and improve our Services</li>
-								<li>Process transactions and send you related information</li>
 								<li>Send you technical notices, updates, security alerts, and support messages</li>
 								<li>Respond to your comments, questions, and requests</li>
 								<li>Communicate with you about products, services, offers, and events</li>
 								<li>
 									Monitor and analyze trends, usage, and activities in connection with our Services
 								</li>
-								<li>
-									Detect, investigate, and prevent fraudulent transactions and other illegal
-									activities
-								</li>
+								<li>Detect, investigate, and prevent fraud and other illegal activities</li>
 								<li>Personalize and improve the Services</li>
 							</ul>
 

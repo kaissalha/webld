@@ -1,12 +1,11 @@
 import { expo } from "@better-auth/expo";
 import { redisStorage } from "@better-auth/redis-storage";
-import { stripe } from "@better-auth/stripe";
 import { waitUntil } from "@vercel/functions";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { emailOTP, organization, twoFactor } from "better-auth/plugins";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { render } from "react-email";
 import { v4 as uuidv4 } from "uuid";
 
@@ -18,11 +17,6 @@ import { logger } from "@webld/logger/server";
 import { getBaseURL } from "@webld/utils";
 
 import { resend } from "./resend";
-import { stripeClient } from "./stripe";
-
-if (!process.env.STRIPE_WEBHOOK_SECRET) {
-	throw new Error("STRIPE_WEBHOOK_SECRET is not set");
-}
 
 if (!db) {
 	throw new Error("Database not found");
@@ -51,17 +45,6 @@ export const auth = betterAuth({
 		expo(),
 		twoFactor(),
 		organization({
-			schema: {
-				organization: {
-					additionalFields: {
-						stripeCustomerId: {
-							type: "string",
-							required: false,
-							fieldName: "stripe_customer_id",
-						},
-					},
-				},
-			},
 			async sendInvitationEmail({ id, email, role, organization, inviter }) {
 				const inviteLink = new URL(`/accept-invitation/${id}`, getBaseURL()).toString();
 				const html = await render(
@@ -96,53 +79,6 @@ export const auth = betterAuth({
 						},
 					});
 				}
-			},
-		}),
-		stripe({
-			stripeClient,
-			stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
-			createCustomerOnSignUp: false, // Customers are created per-organization, not per-user
-			subscription: {
-				enabled: true,
-				plans: [
-					{
-						name: "webld",
-						priceId: process.env.STRIPE_STARTER_PRICE_ID,
-					},
-					{
-						name: "pro",
-						priceId: process.env.STRIPE_PRO_PRICE_ID,
-					},
-				],
-				authorizeReference: async ({ user, referenceId, action }) => {
-					// Check if the user is an owner or admin of the organization
-					const [member] = await db
-						.select()
-						.from(members)
-						.where(and(eq(members.organizationId, referenceId), eq(members.userId, user.id)))
-						.limit(1)
-						.execute();
-
-					if (!member) {
-						return false;
-					}
-
-					// Allow owners and admins to manage subscriptions
-					if (
-						action === "upgrade-subscription" ||
-						action === "cancel-subscription" ||
-						action === "restore-subscription" ||
-						action === "billing-portal"
-					) {
-						return member.role === "owner" || member.role === "admin";
-					}
-
-					// Allow all members to list/view subscriptions
-					return true;
-				},
-			},
-			organization: {
-				enabled: true,
 			},
 		}),
 		emailOTP({
