@@ -262,7 +262,7 @@ export const writeToConsole = ({
 
 export const createLogger = ({ sendLog, sendException }: CreateLoggerOptions): Logger => {
 	const log = ({ level, message, metadata, error }: LogPayload) => {
-		if (process.env.NEXT_PUBLIC_VERCEL_ENV === "development") {
+		if (process.env.NODE_ENV === "development") {
 			writeToConsole({
 				level,
 				message,

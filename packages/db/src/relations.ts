@@ -37,6 +37,8 @@ export const relations = defineRelations(schema, (r) => ({
 		sessions: r.many.sessions(),
 		uploadedMedia: r.many.uploadedMedia(),
 		ragDocuments: r.many.ragDocuments(),
+		memories: r.many.memories(),
+		chatEpisodes: r.many.chatEpisodes(),
 	},
 
 	members: {
@@ -83,6 +85,36 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		messages: r.many.aiChatMessages(),
 		streams: r.many.aiChatStreams(),
+		episode: r.one.chatEpisodes({
+			from: r.aiChats.id,
+			to: r.chatEpisodes.chatId,
+			optional: true,
+		}),
+	},
+
+	// Memory relations
+	memories: {
+		organization: r.one.organizations({
+			from: r.memories.organizationId,
+			to: r.organizations.id,
+		}),
+		sourceChat: r.one.aiChats({
+			from: r.memories.sourceChatId,
+			to: r.aiChats.id,
+			optional: true,
+		}),
+	},
+
+	// Chat episode relations
+	chatEpisodes: {
+		chat: r.one.aiChats({
+			from: r.chatEpisodes.chatId,
+			to: r.aiChats.id,
+		}),
+		organization: r.one.organizations({
+			from: r.chatEpisodes.organizationId,
+			to: r.organizations.id,
+		}),
 	},
 
 	// AI Chat Messages relations

@@ -16,6 +16,7 @@ export * from "./lib/resend";
 export * from "./services/chat";
 export * from "./services/contacts";
 export * from "./services/location";
+export * from "./services/memory";
 export * from "./services/rag";
 export * from "./services/storage";
 

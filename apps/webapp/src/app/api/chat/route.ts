@@ -18,21 +18,34 @@ import { z } from "zod";
 import { convertDbMessagesForUI, streamContext } from "@/utils/chat-utils";
 import { withErrorHandler } from "@/utils/with-error-handler";
 import { models } from "@webld/ai/models";
-import { dashboardChatTitlePrompt, dashboardChatTitleSchema } from "@webld/ai/prompts";
+import { dashboardChatTitlePrompt, dashboardChatTitleSchema, memoryContextPrompt } from "@webld/ai/prompts";
 import { logger } from "@webld/logger/server";
 import {
 	createStreamId,
 	dashboardChatAgent,
 	type DashboardChatUIMessage,
+	embedChatMessage,
+	episodeToText,
+	extractAndUpdateMemories,
 	getChat,
 	getChatMessagesFromDb,
 	getStream,
+	memoryToText,
+	reflectOnChat,
 	saveChat,
 	saveOrUpdateChatMessage,
+	searchMemories,
+	searchOlderMessages,
+	searchRelatedChats,
 	updateChatTitle,
 	waitForRagDocumentsReady,
 } from "@webld/server";
 import { auth } from "@webld/server/auth";
+
+const MEMORY_WINDOW_SIZE = 10;
+const OLD_MESSAGES_TO_USE = 10;
+const MEMORIES_TO_USE = 3;
+const RELATED_CHATS_TO_USE = 3;
 
 const dashboardChatRequestSchema = z.object({
 	message: z.looseObject({}),
@@ -219,7 +232,48 @@ export const POST = withErrorHandler(async (req: Request) => {
 		}
 	}
 
-	const modelMessages = await convertToModelMessages(prepareMessagesForModel(uiMessages));
+	const recentMessages = uiMessages.slice(-MEMORY_WINDOW_SIZE);
+	const olderMessages = uiMessages.slice(0, -MEMORY_WINDOW_SIZE);
+	const recentMessageIds = recentMessages.map((message) => message.id);
+
+	const [relevantOlderMessages, relevantMemories, relatedChats] = await Promise.all([
+		olderMessages.length > 0
+			? searchOlderMessages({
+					chatId,
+					excludeMessageIds: recentMessageIds,
+					organizationId,
+					recentMessages,
+					topK: OLD_MESSAGES_TO_USE,
+				})
+			: Promise.resolve([]),
+		searchMemories({ messages: recentMessages, organizationId, topK: MEMORIES_TO_USE }),
+		searchRelatedChats({
+			currentChatId: chatId,
+			messages: recentMessages,
+			organizationId,
+			topK: RELATED_CHATS_TO_USE,
+		}),
+	]);
+
+	const relevantOlderMessageIds = new Set(relevantOlderMessages.map((result) => result.id));
+	const oldMessagesToUse = olderMessages.filter((message) => relevantOlderMessageIds.has(message.id));
+	const messageHistoryForLLM = [...oldMessagesToUse, ...recentMessages];
+
+	const modelMessages = await convertToModelMessages(prepareMessagesForModel(messageHistoryForLLM));
+
+	if (relevantMemories.length > 0 || relatedChats.length > 0) {
+		modelMessages.unshift({
+			role: "system",
+			content: memoryContextPrompt({
+				memories: relevantMemories.map((result) => ({
+					id: result.memory.id,
+					text: memoryToText(result.memory),
+				})),
+				relatedChats: relatedChats.map((result) => episodeToText(result.episode)),
+			}),
+		});
+	}
+
 	let shouldRunCancellationLoop = true;
 
 	const stream = createUIMessageStream<DashboardChatUIMessage>({
@@ -298,6 +352,33 @@ export const POST = withErrorHandler(async (req: Request) => {
 					})
 				)
 			);
+
+			after(async () => {
+				try {
+					await Promise.all([
+						chatMessage.role === "user"
+							? embedChatMessage({ message: { id: chatMessage.id, parts: chatMessage.parts } })
+							: Promise.resolve(),
+						...assistantMessages.map((message) =>
+							embedChatMessage({ message: { id: message.id, parts: message.parts } })
+						),
+					]);
+
+					await extractAndUpdateMemories({
+						chatId,
+						messages: [...recentMessages, ...assistantMessages],
+						organizationId,
+					});
+
+					await reflectOnChat({ chatId, organizationId });
+				} catch (error) {
+					logger.error({
+						error,
+						message: "Error updating dashboard chat memory",
+						metadata: { chatId, organizationId },
+					});
+				}
+			});
 
 			if (!isNewChat) {
 				return;

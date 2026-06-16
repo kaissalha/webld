@@ -1,4 +1,4 @@
-import { index, jsonb, pgEnum, pgTable, uuid } from "drizzle-orm/pg-core";
+import { index, jsonb, pgEnum, pgTable, uuid, vector } from "drizzle-orm/pg-core";
 
 import { timeFields } from "../helpers/time.ts";
 import { aiChats } from "./chat.ts";
@@ -17,9 +17,14 @@ export const aiChatMessages = pgTable(
 			.references(() => aiChats.id, { onDelete: "cascade" }),
 		role: messageRole("role").notNull(),
 		parts: jsonb("parts").notNull().$type<Array<{ type: string; [key: string]: unknown }>>(),
+		embedding: vector("embedding", { dimensions: 1536 }),
 		...timeFields,
 	},
-	(table) => [index("message_chat_id_idx").on(table.chatId), index("message_created_at_idx").on(table.createdAt)]
+	(table) => [
+		index("message_chat_id_idx").on(table.chatId),
+		index("message_created_at_idx").on(table.createdAt),
+		index("message_embedding_idx").using("hnsw", table.embedding.op("vector_cosine_ops")),
+	]
 );
 
 // Types

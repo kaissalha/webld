@@ -81,3 +81,136 @@ export const dashboardChatTitleSchema = z.object({
 export const ragAnswerSystemPrompt = `You are a RAG assistant for organization knowledge.
 
 Use retrieveKnowledge before answering factual questions about indexed documents. Base answers on retrieved chunks, cite sources with bracketed citation numbers, and be clear when the knowledge base does not contain enough information.`;
+
+type MemoryForPrompt = {
+	id: string;
+	text: string;
+};
+
+export const memoryExtractionSchema = z.object({
+	updates: z
+		.array(
+			z.object({
+				id: z.string().describe("The ID of the existing memory to update"),
+				title: z.string().describe("The updated memory title"),
+				content: z.string().describe("The updated memory content"),
+			})
+		)
+		.describe("Existing memories to update"),
+	deletions: z.array(z.string()).describe("Array of existing memory IDs to delete"),
+	additions: z
+		.array(
+			z.object({
+				title: z.string().describe("The memory title"),
+				content: z.string().describe("The memory content"),
+			})
+		)
+		.describe("Brand new memories to add"),
+});
+
+export const memoryExtractionSystemPrompt = ({
+	memories,
+}: {
+	memories: MemoryForPrompt[];
+}) => `You are a memory management agent that extracts and maintains permanent information about the organization and its users from conversations with the CRM assistant.
+
+<existing-memories>
+${
+	memories.length > 0
+		? memories.map((memory) => `<memory id="${memory.id}">${memory.text}</memory>`).join("\n\n")
+		: "(no existing memories)"
+}
+</existing-memories>
+
+Your job is to:
+1. Analyze the conversation history
+2. Extract NEW permanent facts worth remembering
+3. Update existing memories if they should be modified
+4. Delete memories that are no longer relevant or accurate
+
+Only store PERMANENT information that:
+- Is unlikely to change over time (preferences, traits, characteristics, workflows)
+- Will be relevant for weeks, months, or years
+- Helps personalize future interactions
+- Represents lasting facts about the organization, its contacts, or how the user likes to work
+
+Examples of what TO store:
+- "The team prefers concise, bullet-point email drafts"
+- "The organization sells B2B logistics software"
+- "The user's name is Sarah Chen and she signs emails as 'Sarah'"
+- "Primary point of contact for Acme Corp is jane@acme.com"
+
+Examples of what NOT to store:
+- "User asked to list contacts today"
+- "User said hello"
+- "User is drafting one specific email right now" (too temporary)
+
+For each operation:
+- UPDATES: Provide the existing memory ID, new title, and new content
+- DELETIONS: Provide memory IDs that are no longer relevant
+- ADDITIONS: Provide title and content for brand new memories
+
+Be conservative - only add memories that will genuinely help personalize future conversations. If nothing is worth storing, return empty arrays.`;
+
+export const chatReflectionSchema = z.object({
+	tags: z
+		.array(z.string())
+		.describe(
+			"2-4 keywords that would help identify similar future conversations. Use specific terms like 'contact_creation', 'email_drafting', 'knowledge_lookup'"
+		),
+	summary: z.string().describe("One sentence describing what the conversation accomplished"),
+	whatWorkedWell: z.string().describe("Most effective approach or strategy used in this conversation"),
+	whatToAvoid: z.string().describe("Most important pitfall or ineffective approach to avoid"),
+});
+
+export const chatReflectionSystemPrompt = `You are analyzing conversations with a CRM assistant to create summaries that will help guide future interactions. Your task is to extract key elements that would be most helpful when encountering similar conversations in the future.
+
+Review the conversation and create a memory reflection following these rules:
+
+1. For any field where you don't have enough information or the field isn't relevant, use "N/A"
+2. Be extremely concise - each string should be one clear, actionable sentence
+3. Focus only on information that would be useful for handling similar future conversations
+4. tags should be specific enough to match similar situations but general enough to be reusable
+
+Examples:
+- Good tags: ["contact_creation", "duplicate_check", "email_validation"]
+- Bad tags: ["crm", "conversation", "questions"]
+
+- Good summary: "Created a new contact for Acme Corp after confirming no duplicate existed"
+- Bad summary: "Helped the user with a contact"
+
+- Good whatWorkedWell: "Searching existing contacts before creating to avoid duplicates"
+- Bad whatWorkedWell: "Used the tools well"
+
+- Good whatToAvoid: "Drafting an email before confirming the recipient's correct address"
+- Bad whatToAvoid: "Made a mistake"`;
+
+export const memoryContextPrompt = ({
+	memories,
+	relatedChats,
+}: {
+	memories: MemoryForPrompt[];
+	relatedChats: string[];
+}) => {
+	const memoriesSection =
+		memories.length > 0
+			? memories.map((memory) => `<memory id="${memory.id}">${memory.text}</memory>`).join("\n")
+			: "(no relevant memories)";
+
+	const relatedChatsSection =
+		relatedChats.length > 0
+			? relatedChats.map((chat) => `<chat>\n${chat}\n</chat>`).join("\n")
+			: "(no related past conversations)";
+
+	return `<memories>
+Here are some long-term memories that may be relevant to the conversation:
+
+${memoriesSection}
+</memories>
+
+<related-chats>
+Here are summaries of related past conversations. Use what worked well and avoid what did not:
+
+${relatedChatsSection}
+</related-chats>`;
+};
