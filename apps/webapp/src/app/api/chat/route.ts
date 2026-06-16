@@ -259,6 +259,16 @@ export const POST = withErrorHandler(async (req: Request) => {
 	const oldMessagesToUse = olderMessages.filter((message) => relevantOlderMessageIds.has(message.id));
 	const messageHistoryForLLM = [...oldMessagesToUse, ...recentMessages];
 
+	const conversationHistory = recentMessages.flatMap((message) => {
+		if (message.role !== "user" && message.role !== "assistant") {
+			return [];
+		}
+
+		const content = getMessageText(message).trim();
+
+		return content ? [{ role: message.role, content }] : [];
+	});
+
 	const modelMessages = await convertToModelMessages(prepareMessagesForModel(messageHistoryForLLM));
 
 	if (relevantMemories.length > 0 || relatedChats.length > 0) {
@@ -323,6 +333,7 @@ export const POST = withErrorHandler(async (req: Request) => {
 				messages: modelMessages,
 				options: {
 					aiContext: {
+						conversationHistory,
 						currentUser: {
 							email: session.user.email ?? undefined,
 							name: session.user.name ?? undefined,

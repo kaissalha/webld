@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { createContact, formatRagChunksForContext, getContact, listContacts, retrieveRagChunks } = vi.hoisted(() => ({
+const { createContact, createRagChunkSnippet, getContact, listContacts, retrieveRagChunks } = vi.hoisted(() => ({
 	createContact: vi.fn(),
-	formatRagChunksForContext: vi.fn(),
+	createRagChunkSnippet: vi.fn(),
 	getContact: vi.fn(),
 	listContacts: vi.fn(),
 	retrieveRagChunks: vi.fn(),
@@ -15,7 +15,7 @@ vi.mock("../../src/services/contacts", () => ({
 }));
 
 vi.mock("../../src/services/rag", () => ({
-	formatRagChunksForContext,
+	createRagChunkSnippet,
 	retrieveRagChunks,
 }));
 
@@ -133,9 +133,11 @@ describe("ai tools", () => {
 		);
 	});
 
-	it("retrieveKnowledgeTool returns indexed context", async () => {
+	it("retrieveKnowledgeTool returns ranked snippets", async () => {
 		retrieveRagChunks.mockResolvedValue([
 			{
+				chunkId: "chunk-1",
+				chunkIndex: 0,
 				content: "Use concise follow-up summaries after demos.",
 				document: {
 					id: "doc-1",
@@ -143,21 +145,27 @@ describe("ai tools", () => {
 					source: null,
 					sourceType: "text",
 				},
+				metadata: {},
 				similarity: 0.82,
 			},
 		]);
-		formatRagChunksForContext.mockReturnValue("[1] Use concise follow-up summaries after demos.");
+		createRagChunkSnippet.mockReturnValue("Use concise follow-up summaries after demos.");
 
 		const outputs = await runTool(
 			retrieveKnowledgeTool.execute,
-			{ query: "follow-up summaries", similarityThreshold: 0.4, topK: 5 },
+			{ searchQuery: "follow-up summaries", topK: 5 },
 			{ organizationId: "org-1" }
 		);
 
 		expect(outputs.at(-1)).toEqual(
 			expect.objectContaining({
-				context: "[1] Use concise follow-up summaries after demos.",
 				found: true,
+				results: expect.arrayContaining([
+					expect.objectContaining({
+						chunkId: "chunk-1",
+						snippet: "Use concise follow-up summaries after demos.",
+					}),
+				]),
 				status: "success",
 			})
 		);

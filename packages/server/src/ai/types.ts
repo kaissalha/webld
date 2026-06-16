@@ -16,6 +16,14 @@ export const appContextSchema = z
 				name: z.string().optional(),
 			})
 			.optional(),
+		conversationHistory: z
+			.array(
+				z.object({
+					role: z.enum(["user", "assistant"]),
+					content: z.string(),
+				})
+			)
+			.optional(),
 		locale: z.string().optional(),
 		timezone: z.string().optional(),
 	})

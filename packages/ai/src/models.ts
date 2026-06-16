@@ -28,6 +28,9 @@ export const models: ModelRegistry = {
 	fast: {
 		model: createModel({ modelId: "google/gemini-3-flash" }),
 	},
+	rerank: {
+		model: createModel({ modelId: "google/gemini-3-flash-lite" }),
+	},
 };
 
 export const embeddingModels: EmbeddingModelRegistry = {

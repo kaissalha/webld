@@ -1,0 +1,2 @@
+ALTER TABLE "rag_document_chunks" ADD COLUMN "fts" tsvector GENERATED ALWAYS AS (to_tsvector('english'::regconfig, COALESCE("rag_document_chunks"."content", ''))) STORED;--> statement-breakpoint
+CREATE INDEX "rag_document_chunks_fts_idx" ON "rag_document_chunks" USING gin ("fts" tsvector_ops);

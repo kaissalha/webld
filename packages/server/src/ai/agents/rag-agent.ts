@@ -4,12 +4,13 @@ import { z } from "zod";
 import { models } from "@webld/ai/models";
 import { ragAnswerSystemPrompt } from "@webld/ai/prompts";
 
-import { retrieveKnowledgeTool } from "../tools";
+import { getKnowledgeContentTool, retrieveKnowledgeTool } from "../tools";
 import { appContextSchema } from "../types";
 
 export const ragAgent = new ToolLoopAgent({
 	model: models.fast.model,
 	tools: {
+		getKnowledgeContent: getKnowledgeContentTool,
 		retrieveKnowledge: retrieveKnowledgeTool,
 	},
 	callOptionsSchema: z

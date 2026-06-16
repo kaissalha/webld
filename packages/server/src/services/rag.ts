@@ -1,9 +1,10 @@
-import { embed, embedMany } from "ai";
-import { and, cosineDistance, desc, eq, sql } from "drizzle-orm";
+import { embed, embedMany, generateObject } from "ai";
+import { and, asc, cosineDistance, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import { createHash } from "node:crypto";
 
-import { embeddingModels } from "@webld/ai/models";
-import { db, ragDocumentChunks, ragDocuments } from "@webld/db";
+import { embeddingModels, models } from "@webld/ai/models";
+import { ragRerankSchema, ragRerankSystemPrompt } from "@webld/ai/prompts";
+import { buildSearchQuery, db, ragDocumentChunks, ragDocuments } from "@webld/db";
 
 const RAG_DOCUMENT_WAIT_INTERVAL_MS = 1500;
 const RAG_DOCUMENT_WAIT_TIMEOUT_MS = 4.5 * 60 * 1000;
@@ -448,33 +449,79 @@ export const upsertRagTextDocument = async ({
 	});
 };
 
-export const retrieveRagChunks = async ({
+const RRF_K = 60;
+const RAG_CANDIDATES_PER_RETRIEVER = 30;
+const SNIPPET_LENGTH = 150;
+
+export type RagRerankConversationMessage = {
+	content: string;
+	role: "assistant" | "user";
+};
+
+const ragChunkColumns = {
+	chunkIndex: ragDocumentChunks.chunkIndex,
+	chunkId: ragDocumentChunks.id,
+	content: ragDocumentChunks.content,
+	documentId: ragDocuments.id,
+	documentName: ragDocuments.name,
+	documentSource: ragDocuments.source,
+	documentSourceType: ragDocuments.sourceType,
+	metadata: ragDocumentChunks.metadata,
+};
+
+type RagChunkRow = {
+	chunkId: string;
+	chunkIndex: number;
+	content: string;
+	documentId: string;
+	documentName: string;
+	documentSource: string | null;
+	documentSourceType: "text" | "file" | "url";
+	metadata: Record<string, unknown>;
+};
+
+const toRetrievedRagChunk = ({ row, score }: { row: RagChunkRow; score: number }): RetrievedRagChunk => ({
+	chunkId: row.chunkId,
+	chunkIndex: row.chunkIndex,
+	content: row.content,
+	document: {
+		id: row.documentId,
+		name: row.documentName,
+		source: row.documentSource,
+		sourceType: row.documentSourceType,
+	},
+	metadata: row.metadata,
+	similarity: score,
+});
+
+export const createRagChunkSnippet = ({ content }: { content: string }) => {
+	const normalized = content.replaceAll(/\s+/gu, " ").trim();
+
+	if (normalized.length <= SNIPPET_LENGTH) {
+		return normalized;
+	}
+
+	return `${normalized.slice(0, SNIPPET_LENGTH).trim()}...`;
+};
+
+export const searchRagChunksBySemantic = async ({
+	limit = RAG_CANDIDATES_PER_RETRIEVER,
 	organizationId,
 	query,
-	similarityThreshold = 0.4,
-	topK = 5,
 }: {
+	limit?: number;
 	organizationId: string;
 	query: string;
-	similarityThreshold?: number;
-	topK?: number;
 }): Promise<RetrievedRagChunk[]> => {
+	if (!query.trim()) {
+		return [];
+	}
+
 	const queryEmbedding = await generateRagEmbedding({ value: query });
 	const similarity = sql<number>`1 - (${cosineDistance(ragDocumentChunks.embedding, queryEmbedding)})`;
-	const candidateLimit = Math.max(topK * 4, 20);
 
-	const candidates = await db
-		.select({
-			chunkId: ragDocumentChunks.id,
-			chunkIndex: ragDocumentChunks.chunkIndex,
-			content: ragDocumentChunks.content,
-			documentId: ragDocuments.id,
-			documentName: ragDocuments.name,
-			documentSource: ragDocuments.source,
-			documentSourceType: ragDocuments.sourceType,
-			metadata: ragDocumentChunks.metadata,
-			similarity,
-		})
+	const rows = await db
+		.select({ ...ragChunkColumns, score: similarity })
 		.from(ragDocumentChunks)
 		.innerJoin(ragDocuments, eq(ragDocumentChunks.documentId, ragDocuments.id))
 		.where(
@@ -484,31 +531,237 @@ export const retrieveRagChunks = async ({
 				eq(ragDocuments.status, "ready")
 			)
 		)
-		.orderBy((row) => desc(row.similarity))
-		.limit(candidateLimit);
+		.orderBy((row) => desc(row.score))
+		.limit(limit);
 
-	const usefulCandidates = candidates
-		.map((candidate) => ({
-			...candidate,
-			similarity: Number(candidate.similarity),
-		}))
-		.filter((candidate) => candidate.content.trim().length > 0);
-	const aboveThreshold = usefulCandidates.filter((candidate) => candidate.similarity >= similarityThreshold);
-	const selectedCandidates = (aboveThreshold.length > 0 ? aboveThreshold : usefulCandidates).slice(0, topK);
+	return rows
+		.filter((row) => row.content.trim().length > 0)
+		.map((row) => toRetrievedRagChunk({ row, score: Number(row.score) }));
+};
 
-	return selectedCandidates.map((candidate) => ({
-		chunkId: candidate.chunkId,
-		chunkIndex: candidate.chunkIndex,
-		content: candidate.content,
-		document: {
-			id: candidate.documentId,
-			name: candidate.documentName,
-			source: candidate.documentSource,
-			sourceType: candidate.documentSourceType,
-		},
-		metadata: candidate.metadata,
-		similarity: candidate.similarity,
-	}));
+export const searchRagChunksByKeyword = async ({
+	limit = RAG_CANDIDATES_PER_RETRIEVER,
+	organizationId,
+	query,
+}: {
+	limit?: number;
+	organizationId: string;
+	query: string;
+}): Promise<RetrievedRagChunk[]> => {
+	const tsquery = buildSearchQuery(query);
+
+	if (!tsquery) {
+		return [];
+	}
+
+	const rank = sql<number>`ts_rank(${ragDocumentChunks.fts}, to_tsquery('english', ${tsquery}))`;
+
+	const rows = await db
+		.select({ ...ragChunkColumns, score: rank })
+		.from(ragDocumentChunks)
+		.innerJoin(ragDocuments, eq(ragDocumentChunks.documentId, ragDocuments.id))
+		.where(
+			and(
+				eq(ragDocumentChunks.organizationId, organizationId),
+				eq(ragDocuments.organizationId, organizationId),
+				eq(ragDocuments.status, "ready"),
+				sql`${ragDocumentChunks.fts} @@ to_tsquery('english', ${tsquery})`
+			)
+		)
+		.orderBy((row) => desc(row.score))
+		.limit(limit);
+
+	return rows
+		.filter((row) => row.content.trim().length > 0)
+		.map((row) => toRetrievedRagChunk({ row, score: Number(row.score) }));
+};
+
+export const reciprocalRankFusion = <T>({
+	k = RRF_K,
+	rankings,
+	toId,
+}: {
+	k?: number;
+	rankings: T[][];
+	toId: (item: T) => string;
+}): { item: T; score: number }[] => {
+	const fusedScores = new Map<string, number>();
+	const itemsById = new Map<string, T>();
+
+	for (const ranking of rankings) {
+		ranking.forEach((item, rank) => {
+			const id = toId(item);
+			fusedScores.set(id, (fusedScores.get(id) ?? 0) + 1 / (k + rank));
+			itemsById.set(id, item);
+		});
+	}
+
+	return Array.from(fusedScores.entries())
+		.sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
+		.flatMap(([id, score]) => {
+			const item = itemsById.get(id);
+
+			return item ? [{ item, score }] : [];
+		});
+};
+
+export const rerankRagChunks = async ({
+	candidates,
+	conversationHistory = [],
+	query,
+	topK = 5,
+}: {
+	candidates: RetrievedRagChunk[];
+	conversationHistory?: RagRerankConversationMessage[];
+	query: string;
+	topK?: number;
+}): Promise<RetrievedRagChunk[]> => {
+	if (candidates.length <= 1) {
+		return candidates.slice(0, topK);
+	}
+
+	try {
+		const { object } = await generateObject({
+			model: models.rerank.model,
+			schema: ragRerankSchema,
+			system: ragRerankSystemPrompt,
+			messages: [
+				...conversationHistory,
+				{
+					role: "user",
+					content: `Search query: ${query}\n\nCandidate chunks:\n${candidates
+						.map((candidate, index) => `[${index}] (from ${candidate.document.name})\n${candidate.content}`)
+						.join("\n\n")}`,
+				},
+			],
+		});
+
+		const reranked = object.resultIds
+			.filter((id) => Number.isInteger(id) && id >= 0 && id < candidates.length)
+			.flatMap((id) => {
+				const candidate = candidates[id];
+
+				return candidate ? [candidate] : [];
+			});
+
+		if (reranked.length === 0) {
+			return candidates.slice(0, topK);
+		}
+
+		return reranked.slice(0, topK);
+	} catch {
+		return candidates.slice(0, topK);
+	}
+};
+
+/**
+ * Hybrid retrieval: keyword (Postgres full-text search) + semantic (pgvector)
+ * fused with reciprocal rank fusion, then reranked by a cheap LLM.
+ */
+export const retrieveRagChunks = async ({
+	conversationHistory,
+	keywords,
+	organizationId,
+	searchQuery,
+	topK = 5,
+}: {
+	conversationHistory?: RagRerankConversationMessage[];
+	keywords?: string[];
+	organizationId: string;
+	searchQuery?: string;
+	topK?: number;
+}): Promise<RetrievedRagChunk[]> => {
+	const keywordQuery = keywords?.length ? keywords.join(" ") : (searchQuery ?? "");
+	const semanticQuery = searchQuery?.trim() ? searchQuery : (keywords?.join(" ") ?? "");
+
+	const [keywordResults, semanticResults] = await Promise.all([
+		keywordQuery ? searchRagChunksByKeyword({ organizationId, query: keywordQuery }) : Promise.resolve([]),
+		semanticQuery ? searchRagChunksBySemantic({ organizationId, query: semanticQuery }) : Promise.resolve([]),
+	]);
+
+	const fused = reciprocalRankFusion({
+		rankings: [keywordResults, semanticResults],
+		toId: (chunk) => chunk.chunkId,
+	});
+
+	if (fused.length === 0) {
+		return [];
+	}
+
+	const candidates = fused
+		.slice(0, RAG_CANDIDATES_PER_RETRIEVER)
+		.map(({ item, score }) => ({ ...item, similarity: score }));
+
+	const query = [keywords?.join(" "), searchQuery].filter(Boolean).join(" ");
+
+	return rerankRagChunks({ candidates, conversationHistory, query, topK });
+};
+
+export const getRagChunksByIds = async ({
+	chunkIds,
+	organizationId,
+}: {
+	chunkIds: string[];
+	organizationId: string;
+}): Promise<RetrievedRagChunk[]> => {
+	if (chunkIds.length === 0) {
+		return [];
+	}
+
+	const rows = await db
+		.select(ragChunkColumns)
+		.from(ragDocumentChunks)
+		.innerJoin(ragDocuments, eq(ragDocumentChunks.documentId, ragDocuments.id))
+		.where(
+			and(
+				eq(ragDocumentChunks.organizationId, organizationId),
+				eq(ragDocuments.organizationId, organizationId),
+				inArray(ragDocumentChunks.id, chunkIds)
+			)
+		);
+
+	const orderById = new Map(chunkIds.map((id, index) => [id, index]));
+
+	return rows
+		.toSorted((a, b) => (orderById.get(a.chunkId) ?? 0) - (orderById.get(b.chunkId) ?? 0))
+		.map((row) => toRetrievedRagChunk({ row, score: 0 }));
+};
+
+export const getRagChunkNeighbors = async ({
+	chunkId,
+	organizationId,
+	radius = 1,
+}: {
+	chunkId: string;
+	organizationId: string;
+	radius?: number;
+}): Promise<RetrievedRagChunk[]> => {
+	const [target] = await db
+		.select({ chunkIndex: ragDocumentChunks.chunkIndex, documentId: ragDocumentChunks.documentId })
+		.from(ragDocumentChunks)
+		.where(and(eq(ragDocumentChunks.id, chunkId), eq(ragDocumentChunks.organizationId, organizationId)))
+		.limit(1);
+
+	if (!target) {
+		return [];
+	}
+
+	const rows = await db
+		.select(ragChunkColumns)
+		.from(ragDocumentChunks)
+		.innerJoin(ragDocuments, eq(ragDocumentChunks.documentId, ragDocuments.id))
+		.where(
+			and(
+				eq(ragDocumentChunks.organizationId, organizationId),
+				eq(ragDocuments.organizationId, organizationId),
+				eq(ragDocumentChunks.documentId, target.documentId),
+				gte(ragDocumentChunks.chunkIndex, target.chunkIndex - radius),
+				lte(ragDocumentChunks.chunkIndex, target.chunkIndex + radius)
+			)
+		)
+		.orderBy(asc(ragDocumentChunks.chunkIndex));
+
+	return rows.map((row) => toRetrievedRagChunk({ row, score: 0 }));
 };
 
 export const formatRagChunksForContext = ({ chunks }: { chunks: RetrievedRagChunk[] }) =>

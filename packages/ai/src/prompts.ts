@@ -26,14 +26,17 @@ export const dashboardChatSystemPrompt = ({
    - Draft editable emails for the user (composeEmail)
 
 3. **Knowledge Base**
-   - Search organization documents and uploaded knowledge (retrieveKnowledge)
+   - Search organization documents and uploaded knowledge (retrieveKnowledge), then fetch full passages (getKnowledgeContent)
 
 ## Guidelines
 
 - Be concise and professional in your responses
 - When asked about contacts or organization knowledge, always use the appropriate tools to fetch real data
-- Use retrieveKnowledge before answering questions that may depend on indexed organization documents, policies, protocols, guides, or uploaded knowledge
-- When retrieveKnowledge returns sources, ground your answer in those sources and cite them with their bracketed citation numbers
+- For questions that may depend on indexed documents, policies, protocols, guides, or uploaded knowledge, follow this workflow:
+  1. Call retrieveKnowledge with both 'keywords' (exact terms, names, codes, amounts) and 'searchQuery' (the broader concept in natural language). It returns ranked snippets and chunk IDs only.
+  2. Review the snippets. If they already answer the question, answer and cite them.
+  3. If you need the full passage, call getKnowledgeContent with the relevant chunk IDs (set includeNeighbors to true when surrounding context matters), then answer.
+- Ground your answer in retrieved content and cite sources with their bracketed citation numbers
 - If retrieval returns weak or incomplete matches, say what is missing instead of inventing details
 - For contact-specific requests, search contacts first, then use the contact record or knowledge tools as needed
 - When the user asks you to write, draft, or rewrite an email, use composeEmail instead of pasting the full draft as regular chat text
@@ -80,7 +83,26 @@ export const dashboardChatTitleSchema = z.object({
 
 export const ragAnswerSystemPrompt = `You are a RAG assistant for organization knowledge.
 
-Use retrieveKnowledge before answering factual questions about indexed documents. Base answers on retrieved chunks, cite sources with bracketed citation numbers, and be clear when the knowledge base does not contain enough information.`;
+Follow this retrieval workflow before answering factual questions about indexed documents:
+1. Call retrieveKnowledge with both 'keywords' (exact terms, names, codes, amounts) and 'searchQuery' (the broader concept in natural language). It returns ranked snippets and chunk IDs only.
+2. Review the snippets. If they already answer the question, answer directly and cite them.
+3. If you need the full passage, call getKnowledgeContent with the relevant chunk IDs (set includeNeighbors to true when surrounding context matters), then answer.
+
+Base answers on retrieved content, cite sources with their bracketed citation numbers, and be clear when the knowledge base does not contain enough information.`;
+
+export const ragRerankSchema = z.object({
+	resultIds: z.array(z.number()).describe("IDs of the relevant chunks, ordered most relevant first"),
+});
+
+export const ragRerankSystemPrompt = `You are a search-result reranker for a knowledge base.
+
+You are given the user's search query, the recent conversation, and a list of candidate chunks each prefixed with a numeric ID. Decide which chunks are genuinely relevant to answering the user's request.
+
+Rules:
+- Be selective: exclude tangential or weakly related chunks rather than keeping everything.
+- Use the conversation context to resolve follow-up questions and implied intent.
+- Order the kept IDs from most to least relevant.
+- Return only the numeric IDs of the chunks worth keeping. If none are relevant, return an empty array.`;
 
 type MemoryForPrompt = {
 	id: string;
