@@ -24,7 +24,10 @@
 - Prefer string constants over tiny helper functions that only return a storage key or other static string.
 - Avoid defensive helper wrappers like `isRecord` unless they are truly necessary at a boundary. Prefer direct shape checks and simpler assumptions in app code.
 - Keep all AI prompts, output schemas used directly by prompts, and prompt tests in `packages/ai`; application and server code should import them from `@webld/ai/prompts` instead of defining prompt strings inline.
-- Keep prompt and model behavior evals in `packages/evals`; add or update a relevant eval whenever a production prompt is introduced or materially changed.
+- Keep prompt and model behavior evals in `packages/evals`; add or update a relevant eval whenever a production prompt is introduced or materially changed. Read the `ai-evals` skill before writing or changing evals.
+- Use the `rag-retrieval` skill when building or improving document/knowledge retrieval, hybrid search, chunking, reranking, query rewriting, or RAG tools.
+- Use the `agent-memory` skill when implementing or extending semantic, working, or episodic memory, memory extraction, or cross-chat recall.
+- Use the `human-in-the-loop` skill when adding approval gates to consequential agent tool calls or wiring approve/reject UI in chat.
 - Do not create generic nullable predicate helpers like `isDefined`, `isPresent`, or `isNonNull`. Use explicit local control flow, `flatMap`, or a narrow inline type predicate at the boundary that needs it.
 - Do not create one-line named helpers that only wrap property access, a simple condition, a static string, or a single `map`/`filter` expression. Inline that code unless the helper has multiple real consumers and a domain name that improves readability.
 - For repeated feature workflows such as PDF preview/download, query-param selection, or modal submission flows, extract adjacent reusable hooks instead of duplicating local state machines.
@@ -101,6 +104,17 @@
 - **packages/tsconfig**: Shared TypeScript configs (base, web, node, react-lib, react-native)
 - **packages/ui**: Shared UI components, hooks, and global design tokens (Tailwind v4, CVA, Base UI/Radix)
 - **packages/utils**: Shared utility functions (get-base-url)
+
+## AI Skills
+
+Read the relevant skill before implementing or changing AI retrieval, memory, evals, or approval flows. Each skill points at the canonical code in this repo.
+
+| Skill               | Path                                        | Use when                                                                                     |
+| ------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `rag-retrieval`     | `.agents/skills/rag-retrieval/SKILL.md`     | RAG pipeline, hybrid search, FTS + pgvector, RRF, reranking, metadata-first retrieval tools  |
+| `agent-memory`      | `.agents/skills/agent-memory/SKILL.md`      | Semantic / working / episodic memory, memory extraction, long conversations, personalization |
+| `ai-evals`          | `.agents/skills/ai-evals/SKILL.md`          | Evalite evals, prompt/agent benchmarks, deterministic and LLM-as-judge scorers               |
+| `human-in-the-loop` | `.agents/skills/human-in-the-loop/SKILL.md` | Tool approval before consequential actions, approve/reject UI, gating risky tool calls       |
 
 ## Relevant llms.txt
 

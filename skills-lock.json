@@ -127,12 +127,6 @@
       "skillPath": ".agents/skills/remotion-best-practices/SKILL.md",
       "computedHash": "9ddcc88dc6383855c8da2c5a0e01ce3a569fe965f8560f18e4148c927c0f27b3"
     },
-    "skill-writing": {
-      "source": "millionco/expect",
-      "sourceType": "github",
-      "skillPath": ".agents/skills/skill-writing/SKILL.md",
-      "computedHash": "aa0a33f2f4b1d390b021ca8ec69f16bbd7e3c56fb6daf771382502f1ac05fa4e"
-    },
     "turborepo": {
       "source": "vercel/turborepo",
       "sourceType": "github",
