@@ -12,12 +12,12 @@
 	"dependencies": {
 		"@webld/ai": "workspace:*",
 		"@webld/server": "workspace:*",
-		"ai": "^6.0.206",
+		"ai": "^6.0.207",
 		"zod": "^4.4.3"
 	},
 	"devDependencies": {
 		"@types/node": "^25.9.3",
-		"@typescript/native-preview": "^7.0.0-dev.20260616.1",
+		"@typescript/native-preview": "^7.0.0-dev.20260617.2",
 		"@webld/tsconfig": "workspace:*",
 		"better-sqlite3": "^12.11.1",
 		"evalite": "beta",
