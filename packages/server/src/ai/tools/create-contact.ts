@@ -2,7 +2,7 @@ import { tool } from "ai";
 import { z } from "zod";
 
 import { createContact } from "../../services/contacts";
-import type { AppContext } from "../types";
+import { appContextSchema } from "../types";
 
 const contactSchema = z.object({
 	createdAt: z.string(),
@@ -15,6 +15,7 @@ const contactSchema = z.object({
 
 export const createContactTool = tool({
 	description: "Create a CRM contact in the organization. Requires first name, last name, and email.",
+	contextSchema: appContextSchema,
 	inputSchema: z.object({
 		email: z.email().describe("The contact's email address"),
 		firstName: z.string().describe("The contact's first name"),
@@ -27,12 +28,10 @@ export const createContactTool = tool({
 		message: z.string().optional(),
 		status: z.enum(["loading", "success", "error"]),
 	}),
-	async *execute({ email, firstName, lastName, phoneNumber }, { experimental_context }) {
-		const ctx = experimental_context as AppContext;
-
+	async *execute({ email, firstName, lastName, phoneNumber }, { context }) {
 		yield { status: "loading", message: `Creating contact ${firstName} ${lastName}...` };
 
-		if (!ctx.organizationId) {
+		if (!context.organizationId) {
 			yield { status: "error", error: "Organization context not found" };
 			return;
 		}
@@ -42,7 +41,7 @@ export const createContactTool = tool({
 				email,
 				firstName,
 				lastName,
-				organizationId: ctx.organizationId,
+				organizationId: context.organizationId,
 				phoneNumber,
 			});
 

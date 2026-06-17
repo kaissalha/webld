@@ -1,13 +1,14 @@
 import { tool } from "ai";
 import { z } from "zod";
 
-import type { AppContext } from "../types";
+import { appContextSchema } from "../types";
 
 const NAME_PLACEHOLDER_PATTERN = /\[Your Name\]|\{\{?\s*your[\s_-]*name\s*\}?\}/gi;
 
 export const composeEmailTool = tool({
 	description:
 		"Draft an email for the user in a structured composer UI. Use this when the user asks to write, draft, or revise an email. Include the recipient address when it is known, and provide a polished subject and body that the user can edit before sending.",
+	contextSchema: appContextSchema,
 	inputSchema: z.object({
 		content: z.string().describe("The plain-text email body with paragraph breaks."),
 		title: z.string().describe("The email subject line."),
@@ -18,8 +19,8 @@ export const composeEmailTool = tool({
 		content: z.string(),
 		title: z.string(),
 	}),
-	execute: async ({ content, title, to }, { experimental_context }) => {
-		const currentUserName = (experimental_context as AppContext | undefined)?.currentUser?.name?.trim();
+	execute: async ({ content, title, to }, { context }) => {
+		const currentUserName = context.currentUser?.name?.trim();
 		const normalizedContent = currentUserName
 			? content.replace(NAME_PLACEHOLDER_PATTERN, currentUserName)
 			: content

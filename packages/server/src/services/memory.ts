@@ -176,7 +176,7 @@ export const extractAndUpdateMemories = async ({
 	const { object } = await generateObject({
 		model: models.fast.model,
 		schema: memoryExtractionSchema,
-		system: memoryExtractionSystemPrompt({
+		instructions: memoryExtractionSystemPrompt({
 			memories: existingMemories.map((memory) => ({ id: memory.id, text: memoryToText(memory) })),
 		}),
 		messages: await convertToModelMessages(filteredMessages),
@@ -286,7 +286,7 @@ export const reflectOnChat = async ({ chatId, organizationId }: { chatId: string
 	const { object } = await generateObject({
 		model: models.fast.model,
 		schema: chatReflectionSchema,
-		system: chatReflectionSystemPrompt,
+		instructions: chatReflectionSystemPrompt,
 		prompt: chatToText({ messages: chat.messages, title: chat.title }),
 	});
 

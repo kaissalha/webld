@@ -2,7 +2,7 @@ import { tool } from "ai";
 import { z } from "zod";
 
 import { createRagChunkSnippet, retrieveRagChunks } from "../../services/rag";
-import type { AppContext } from "../types";
+import { appContextSchema } from "../types";
 
 const knowledgeSearchResultSchema = z.object({
 	chunkId: z.string(),
@@ -20,6 +20,7 @@ const knowledgeSearchResultSchema = z.object({
 export const retrieveKnowledgeTool = tool({
 	description:
 		"Search indexed organization knowledge with hybrid keyword + semantic retrieval. Returns ranked snippets and chunk IDs only - call getKnowledgeContent with the chunk IDs you need to read the full passages before answering.",
+	contextSchema: appContextSchema,
 	inputSchema: z.object({
 		keywords: z
 			.array(z.string())
@@ -38,16 +39,14 @@ export const retrieveKnowledgeTool = tool({
 		results: z.array(knowledgeSearchResultSchema).optional(),
 		status: z.enum(["loading", "success", "error"]),
 	}),
-	async *execute({ keywords, searchQuery, topK }, { experimental_context }) {
-		const ctx = experimental_context as AppContext;
-
+	async *execute({ keywords, searchQuery, topK }, { context }) {
 		yield {
 			found: false,
 			message: "Searching organization knowledge...",
 			status: "loading",
 		};
 
-		if (!ctx.organizationId) {
+		if (!context.organizationId) {
 			yield {
 				error: "Organization context not found",
 				found: false,
@@ -69,9 +68,9 @@ export const retrieveKnowledgeTool = tool({
 
 		try {
 			const chunks = await retrieveRagChunks({
-				conversationHistory: ctx.conversationHistory,
+				conversationHistory: context.conversationHistory,
 				keywords,
-				organizationId: ctx.organizationId,
+				organizationId: context.organizationId,
 				searchQuery,
 				topK,
 			});

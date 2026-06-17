@@ -10,6 +10,7 @@ import {
 	lastAssistantMessageIsCompleteWithToolCalls,
 	Output,
 	smoothStream,
+	toUIMessageStream,
 	validateUIMessages,
 } from "ai";
 import { v4 as uuidv4 } from "uuid";
@@ -270,19 +271,16 @@ export const POST = withErrorHandler(async (req: Request) => {
 	});
 
 	const modelMessages = await convertToModelMessages(prepareMessagesForModel(messageHistoryForLLM));
-
-	if (relevantMemories.length > 0 || relatedChats.length > 0) {
-		modelMessages.unshift({
-			role: "system",
-			content: memoryContextPrompt({
-				memories: relevantMemories.map((result) => ({
-					id: result.memory.id,
-					text: memoryToText(result.memory),
-				})),
-				relatedChats: relatedChats.map((result) => episodeToText(result.episode)),
-			}),
-		});
-	}
+	const memoryContext =
+		relevantMemories.length > 0 || relatedChats.length > 0
+			? memoryContextPrompt({
+					memories: relevantMemories.map((result) => ({
+						id: result.memory.id,
+						text: memoryToText(result.memory),
+					})),
+					relatedChats: relatedChats.map((result) => episodeToText(result.episode)),
+				})
+			: undefined;
 
 	let shouldRunCancellationLoop = true;
 
@@ -338,6 +336,7 @@ export const POST = withErrorHandler(async (req: Request) => {
 							email: session.user.email ?? undefined,
 							name: session.user.name ?? undefined,
 						},
+						memoryContext,
 						organizationId,
 					},
 				},
@@ -346,7 +345,7 @@ export const POST = withErrorHandler(async (req: Request) => {
 			});
 
 			result.consumeStream();
-			writer.merge(result.toUIMessageStream({ sendReasoning: true }));
+			writer.merge(toUIMessageStream({ stream: result.stream, sendReasoning: true }));
 		},
 		generateId: uuidv4,
 		onFinish: async ({ messages: finishedMessages }) => {

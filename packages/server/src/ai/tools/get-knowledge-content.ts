@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { formatRagChunksForContext, getRagChunkNeighbors, getRagChunksByIds } from "../../services/rag";
 import type { RetrievedRagChunk } from "../../services/rag";
-import type { AppContext } from "../types";
+import { appContextSchema } from "../types";
 
 const knowledgeContentChunkSchema = z.object({
 	chunkId: z.string(),
@@ -20,6 +20,7 @@ const knowledgeContentChunkSchema = z.object({
 export const getKnowledgeContentTool = tool({
 	description:
 		"Fetch the full content of specific knowledge-base chunks by their IDs. Use this after retrieveKnowledge to read the passages you need before answering. Set includeNeighbors to also pull the surrounding chunks for more context.",
+	contextSchema: appContextSchema,
 	inputSchema: z.object({
 		chunkIds: z.array(z.string().min(1)).min(1).describe("Chunk IDs returned by retrieveKnowledge"),
 		includeNeighbors: z
@@ -37,16 +38,14 @@ export const getKnowledgeContentTool = tool({
 		message: z.string(),
 		status: z.enum(["loading", "success", "error"]),
 	}),
-	async *execute({ chunkIds, includeNeighbors, neighborRadius }, { experimental_context }) {
-		const ctx = experimental_context as AppContext;
-
+	async *execute({ chunkIds, includeNeighbors, neighborRadius }, { context }) {
 		yield {
 			found: false,
 			message: "Loading knowledge-base content...",
 			status: "loading",
 		};
 
-		if (!ctx.organizationId) {
+		if (!context.organizationId) {
 			yield {
 				error: "Organization context not found",
 				found: false,
@@ -57,7 +56,7 @@ export const getKnowledgeContentTool = tool({
 		}
 
 		try {
-			const organizationId = ctx.organizationId;
+			const organizationId = context.organizationId;
 			const baseChunks = await getRagChunksByIds({ chunkIds, organizationId });
 
 			const neighborChunks = includeNeighbors

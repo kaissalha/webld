@@ -26,6 +26,7 @@ import { createContactTool } from "../../src/ai/tools/create-contact";
 import { getContactTool } from "../../src/ai/tools/get-contact";
 import { getContactsTool } from "../../src/ai/tools/get-contacts";
 import { retrieveKnowledgeTool } from "../../src/ai/tools/retrieve-knowledge";
+import type { AppContext } from "../../src/ai/types";
 
 const collect = async <T>(generator: AsyncIterable<T>) => {
 	const outputs: T[] = [];
@@ -35,19 +36,19 @@ const collect = async <T>(generator: AsyncIterable<T>) => {
 	return outputs;
 };
 
-const runTool = async <TInput, TOutput>(
-	execute: ToolExecuteFunction<TInput, TOutput> | undefined,
+const runTool = async <TInput, TOutput, TContext extends AppContext>(
+	execute: ToolExecuteFunction<TInput, TOutput, TContext> | undefined,
 	input: TInput,
-	experimentalContext: unknown
+	context: TContext
 ) => {
 	if (!execute) {
 		throw new Error("Tool execute handler is missing");
 	}
 
-	const options: ToolExecutionOptions = {
+	const options: ToolExecutionOptions<TContext> = {
+		context,
 		toolCallId: "tool-call",
 		messages: [] as ModelMessage[],
-		experimental_context: experimentalContext,
 	};
 
 	const result = execute(input, options);

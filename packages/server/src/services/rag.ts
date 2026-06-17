@@ -624,7 +624,7 @@ export const rerankRagChunks = async ({
 		const { object } = await generateObject({
 			model: models.rerank.model,
 			schema: ragRerankSchema,
-			system: ragRerankSystemPrompt,
+			instructions: ragRerankSystemPrompt,
 			messages: [
 				...conversationHistory,
 				{

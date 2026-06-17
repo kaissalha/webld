@@ -1,4 +1,4 @@
-import { stepCountIs, ToolLoopAgent } from "ai";
+import { isStepCount, ToolLoopAgent } from "ai";
 import { z } from "zod";
 
 import { models } from "@webld/ai/models";
@@ -13,17 +13,27 @@ export const ragAgent = new ToolLoopAgent({
 		getKnowledgeContent: getKnowledgeContentTool,
 		retrieveKnowledge: retrieveKnowledgeTool,
 	},
+	toolsContext: {
+		getKnowledgeContent: {},
+		retrieveKnowledge: {},
+	},
 	callOptionsSchema: z
 		.object({
 			aiContext: appContextSchema.optional(),
 		})
 		.strict(),
 	prepareCall: async ({ options, ...settings }) => {
+		const aiContext = options.aiContext ?? {};
+
 		return {
 			...settings,
 			instructions: ragAnswerSystemPrompt,
-			experimental_context: options.aiContext,
+			runtimeContext: aiContext,
+			toolsContext: {
+				getKnowledgeContent: aiContext,
+				retrieveKnowledge: aiContext,
+			},
 		};
 	},
-	stopWhen: stepCountIs(20),
+	stopWhen: isStepCount(20),
 });

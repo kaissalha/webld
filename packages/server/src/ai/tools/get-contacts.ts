@@ -2,7 +2,7 @@ import { tool } from "ai";
 import { z } from "zod";
 
 import { listContacts } from "../../services/contacts";
-import type { AppContext } from "../types";
+import { appContextSchema } from "../types";
 
 const contactSchema = z.object({
 	createdAt: z.string(),
@@ -16,6 +16,7 @@ const contactSchema = z.object({
 export const getContactsTool = tool({
 	description:
 		"Search and list CRM contacts in the organization. Use this when the user wants to find contacts, see a contact list, or search by name, email, or phone.",
+	contextSchema: appContextSchema,
 	inputSchema: z.object({
 		pageSize: z.number().min(1).max(50).optional().default(10).describe("Number of contacts to return"),
 		search: z.string().optional().describe("Search term to filter contacts"),
@@ -28,19 +29,17 @@ export const getContactsTool = tool({
 		status: z.enum(["loading", "success", "error"]),
 		totalCount: z.number().optional(),
 	}),
-	async *execute({ pageSize, search }, { experimental_context }) {
-		const ctx = experimental_context as AppContext;
-
+	async *execute({ pageSize, search }, { context }) {
 		yield { status: "loading", message: "Fetching contacts..." };
 
-		if (!ctx.organizationId) {
+		if (!context.organizationId) {
 			yield { status: "error", error: "Organization context not found" };
 			return;
 		}
 
 		try {
 			const result = await listContacts({
-				organizationId: ctx.organizationId,
+				organizationId: context.organizationId,
 				pageSize,
 				search,
 			});

@@ -4,11 +4,11 @@ import { z } from "zod";
 import type { dashboardChatTools } from "./tools";
 
 /**
- * App context passed to AI tools via experimental_context
+ * Shared app context passed through AI agents and into tools.
  */
 export const appContextSchema = z
 	.object({
-		organizationId: z.string(),
+		organizationId: z.string().optional(),
 		userId: z.string().optional(),
 		currentUser: z
 			.object({
@@ -24,6 +24,7 @@ export const appContextSchema = z
 				})
 			)
 			.optional(),
+		memoryContext: z.string().optional(),
 		locale: z.string().optional(),
 		timezone: z.string().optional(),
 	})

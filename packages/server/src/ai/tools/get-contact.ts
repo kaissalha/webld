@@ -2,7 +2,7 @@ import { tool } from "ai";
 import { z } from "zod";
 
 import { getContact } from "../../services/contacts";
-import type { AppContext } from "../types";
+import { appContextSchema } from "../types";
 
 const contactSchema = z.object({
 	createdAt: z.string(),
@@ -16,6 +16,7 @@ const contactSchema = z.object({
 
 export const getContactTool = tool({
 	description: "Get detailed information about a CRM contact by ID.",
+	contextSchema: appContextSchema,
 	inputSchema: z.object({
 		contactId: z.string().describe("The unique identifier of the contact"),
 	}),
@@ -25,12 +26,10 @@ export const getContactTool = tool({
 		message: z.string().optional(),
 		status: z.enum(["loading", "success", "error"]),
 	}),
-	async *execute({ contactId }, { experimental_context }) {
-		const ctx = experimental_context as AppContext;
-
+	async *execute({ contactId }, { context }) {
 		yield { status: "loading", message: "Fetching contact details..." };
 
-		if (!ctx.organizationId) {
+		if (!context.organizationId) {
 			yield { status: "error", error: "Organization context not found" };
 			return;
 		}
@@ -38,7 +37,7 @@ export const getContactTool = tool({
 		try {
 			const contact = await getContact({
 				id: contactId,
-				organizationId: ctx.organizationId,
+				organizationId: context.organizationId,
 			});
 
 			if (!contact) {
