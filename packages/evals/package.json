@@ -4,8 +4,8 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
+		"dev": "evalite watch",
 		"eval:ci": "evalite",
-		"eval:dev": "evalite watch",
 		"eval:export": "evalite export --output=./.evalite/ui",
 		"typecheck": "tsgo --noEmit --skipLibCheck"
 	},
