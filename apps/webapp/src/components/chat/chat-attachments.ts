@@ -3,6 +3,16 @@ export const CHAT_ATTACHMENT_MAX_SIZE_BYTES = 10 * 1024 * 1024;
 
 const KNOWLEDGE_BASE_TEXT_EXTENSIONS = new Set(["csv", "json", "log", "md", "mdx", "txt", "yaml", "yml"]);
 
+const KNOWLEDGE_BASE_DOCUMENT_MIME_TYPES = new Set([
+	"application/pdf",
+	"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+	"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+	"application/vnd.ms-excel",
+	"application/xml",
+]);
+
+const KNOWLEDGE_BASE_DOCUMENT_EXTENSIONS = new Set(["docx", "htm", "html", "pdf", "xls", "xlsx", "xml"]);
+
 export type ChatFileAttachment = {
 	documentId?: string;
 	filename: string;
@@ -35,10 +45,8 @@ export const isKnowledgeBaseAttachment = ({ filename, mediaType }: { filename: s
 	return (
 		mediaType.startsWith("text/") ||
 		mediaType === "application/json" ||
-		mediaType === "application/pdf" ||
-		mediaType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-		extension === "pdf" ||
-		extension === "docx" ||
+		KNOWLEDGE_BASE_DOCUMENT_MIME_TYPES.has(mediaType) ||
+		KNOWLEDGE_BASE_DOCUMENT_EXTENSIONS.has(extension) ||
 		KNOWLEDGE_BASE_TEXT_EXTENSIONS.has(extension)
 	);
 };

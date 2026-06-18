@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
 		unoptimized: true,
 	},
 	allowedDevOrigins: ["preearthly-dean-unprosperously.ngrok-free.dev"],
-	serverExternalPackages: ["dub", "jsonpath", "mammoth", "pdf-parse"],
+	serverExternalPackages: ["dub", "jsonpath", "@vectorstores/readers", "@vectorstores/excel"],
 	experimental: {
 		typedEnv: true,
 		cachedNavigations: true,

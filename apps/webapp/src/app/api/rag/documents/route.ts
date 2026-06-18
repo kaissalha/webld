@@ -1,14 +1,18 @@
 import { headers } from "next/headers";
 import { after, NextResponse } from "next/server";
 
-import mammoth from "mammoth";
 import { createHash } from "node:crypto";
-import { PDFParse } from "pdf-parse";
 import { z } from "zod";
 
 import { withErrorHandler } from "@/utils/with-error-handler";
 import { logger } from "@webld/logger/server";
-import { createPendingRagDocument, markRagDocumentFailed, upsertRagTextDocument } from "@webld/server";
+import {
+	createPendingRagDocument,
+	extractFileText,
+	isSupportedRagFile,
+	markRagDocumentFailed,
+	upsertRagTextDocument,
+} from "@webld/server";
 import { auth } from "@webld/server/auth";
 
 const ragDocumentRequestSchema = z.object({
@@ -25,54 +29,7 @@ const ragDocumentRequestSchema = z.object({
 
 const ragDocumentFormMetadataSchema = z.record(z.string(), z.unknown()).optional();
 
-const TEXT_FILE_EXTENSIONS = new Set(["csv", "json", "log", "md", "mdx", "txt", "yaml", "yml"]);
-
 const getFileExtension = ({ file }: { file: File }) => file.name.split(".").pop()?.toLowerCase() ?? "";
-
-const isPdfFile = ({ extension, mimeType }: { extension: string; mimeType: string }) =>
-	mimeType === "application/pdf" || extension === "pdf";
-
-const isDocxFile = ({ extension, mimeType }: { extension: string; mimeType: string }) =>
-	mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || extension === "docx";
-
-const isTextLikeFile = ({ extension, mimeType }: { extension: string; mimeType: string }) =>
-	mimeType.startsWith("text/") || mimeType === "application/json" || TEXT_FILE_EXTENSIONS.has(extension);
-
-const extractFileText = async ({
-	buffer,
-	extension,
-	mimeType,
-}: {
-	buffer: Buffer;
-	extension: string;
-	mimeType: string;
-}) => {
-	if (isTextLikeFile({ extension, mimeType })) {
-		return buffer.toString("utf-8");
-	}
-
-	if (isPdfFile({ extension, mimeType })) {
-		const parser = new PDFParse({
-			data: Array.from(new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength)),
-		});
-
-		try {
-			const result = await parser.getText();
-
-			return result.text;
-		} finally {
-			await parser.destroy();
-		}
-	}
-
-	if (isDocxFile({ extension, mimeType })) {
-		const result = await mammoth.extractRawText({ buffer });
-
-		return result.value;
-	}
-
-	throw new Error(`Unsupported file type: ${mimeType || extension || "unknown"}`);
-};
 
 const getFormString = ({ formData, key }: { formData: FormData; key: string }) => {
 	const value = formData.get(key);
@@ -175,11 +132,7 @@ export const POST = withErrorHandler(async (req: Request) => {
 		const extension = getFileExtension({ file });
 		const mimeType = file.type || "";
 
-		if (
-			!isTextLikeFile({ extension, mimeType }) &&
-			!isPdfFile({ extension, mimeType }) &&
-			!isDocxFile({ extension, mimeType })
-		) {
+		if (!isSupportedRagFile({ extension, mimeType })) {
 			return NextResponse.json(
 				{ error: `Unsupported file type: ${mimeType || extension || "unknown"}` },
 				{ status: 400 }
