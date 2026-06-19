@@ -101,7 +101,7 @@
       "source": "pbakaus/impeccable",
       "sourceType": "github",
       "skillPath": ".agents/skills/impeccable/SKILL.md",
-      "computedHash": "40d665906d86d9c8a7e28ffd24ea0da3497c9b549c9ae8ff624087ede2adb20b"
+      "computedHash": "c3fc1193e4777c1fde1e8455a6ce23bbc0ae506dabb026b639cf594fdfa6c733"
     },
     "improve": {
       "source": "shadcn/improve",
