@@ -94,5 +94,5 @@
     ],
 	"editor.defaultFormatter": "oxc.oxc-vscode",
 	"oxc.enable": true,
-	"typescript.native-preview.tsdk": "/Users/kaissalha/dev/webld/node_modules/@typescript/native-preview",
+	"typescript.native-preview.tsdk": "/Users/kaissalha/dev/webld/node_modules/typescript",
 }

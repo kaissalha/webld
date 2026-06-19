@@ -12,6 +12,6 @@
 		"./react-native.json": "./react-native.json"
 	},
 	"devDependencies": {
-		"@typescript/native-preview": "^7.0.0-dev.20260617.2"
+		"typescript": "^7.0.1-rc"
 	}
 }

@@ -27,14 +27,14 @@
 	},
 	"dependencies": {
 		"@opentelemetry/api-logs": "^0.219.0",
-		"@posthog/next": "^0.4.96"
+		"@posthog/next": "^0.4.97"
 	},
 	"devDependencies": {
 		"@total-typescript/ts-reset": "^0.6.1",
 		"@types/node": "^25.9.3",
 		"@types/react": "^19.2.17",
-		"@typescript/native-preview": "^7.0.0-dev.20260617.2",
-		"@webld/tsconfig": "workspace:*"
+		"@webld/tsconfig": "workspace:*",
+		"typescript": "^7.0.1-rc"
 	},
 	"peerDependencies": {
 		"react": "^19.2.5"
