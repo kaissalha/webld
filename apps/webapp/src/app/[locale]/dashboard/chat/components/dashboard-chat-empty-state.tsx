@@ -5,6 +5,8 @@ import { useTranslations } from "next-intl";
 import { useChatSession } from "@/components/chat/stores/chat-session-store";
 import { Button } from "@webld/ui/components/button";
 
+import { DashboardNewChatButton } from "./dashboard-new-chat-button";
+
 type DashboardChatEmptyStateProps = {
 	onNewChat: () => void;
 };
@@ -45,9 +47,7 @@ export const DashboardChatEmptyState = ({ onNewChat }: DashboardChatEmptyStatePr
 				>
 					{t("suggestions.dashboard.knowledge")}
 				</Button>
-				<Button type='button' variant='ghost' onClick={onNewChat}>
-					{t("newChat")}
-				</Button>
+				<DashboardNewChatButton onClick={onNewChat} />
 			</div>
 		</div>
 	);
