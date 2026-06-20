@@ -31,7 +31,7 @@
 	},
 	"devDependencies": {
 		"@total-typescript/ts-reset": "^0.6.1",
-		"@types/node": "^25.9.3",
+		"@types/node": "^26.0.0",
 		"@types/react": "^19.2.17",
 		"@webld/tsconfig": "workspace:*",
 		"typescript": "^7.0.1-rc"

@@ -5,7 +5,7 @@ import type React from "react";
 import { LayoutGroup, motion } from "motion/react";
 
 import type { ChatAttachmentErrorCode, ChatFileAttachment } from "@/components/chat/chat-attachments";
-import { ChatComposer } from "@/components/chat/chat-composer";
+import { ChatComposer } from "@/components/chat/chat-input/chat-composer";
 import { ChatMessageList } from "@/components/chat/message/chat-message-list";
 
 export type ChatContentProps = {

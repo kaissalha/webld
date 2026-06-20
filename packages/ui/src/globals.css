@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-shimmer";
 @source "../../../apps/**/src/**/*.{ts,tsx}";
 @source "../../**/src/**/*.{ts,tsx}";
 @source "./**/*.{ts,tsx}";
@@ -59,6 +60,9 @@
 	--success-foreground: oklch(0.508 0.118 165.612);
 	--warning: oklch(0.769 0.188 70.08);
 	--warning-foreground: oklch(0.555 0.163 48.998);
+	--chat-input-shadow:
+		0px 0px 0px 1px rgba(0, 0, 0, 0.05), 0px 16px 24px 0px rgba(0, 0, 0, 0.05), 0px 4px 16px 0px rgba(0, 0, 0, 0.1),
+		0px 2px 4px 0px rgba(0, 0, 0, 0.05);
 }
 
 .dark {
@@ -100,6 +104,9 @@
 	--success-foreground: oklch(0.765 0.177 163.223);
 	--warning: oklch(0.769 0.188 70.08);
 	--warning-foreground: oklch(0.828 0.189 84.429);
+	--chat-input-shadow:
+		0px 0px 0px 1px rgba(255, 255, 255, 0.08), 0px 16px 24px 0px rgba(0, 0, 0, 0.35),
+		0px 4px 16px 0px rgba(0, 0, 0, 0.45), 0px 2px 4px 0px rgba(0, 0, 0, 0.25);
 }
 
 @theme inline {
@@ -148,6 +155,7 @@
 	--radius-4xl: calc(var(--radius) + 16px);
 	--radius-5xl: calc(var(--radius) + 20px);
 	--shadow-input: 0px 2px 8px 0px rgba(0, 0, 0, 0.05) inset;
+	--shadow-chat-input: var(--chat-input-shadow);
 	--shadow-button:
 		0px 4px 4px 0px rgba(0, 0, 0, 0.05), inset 0px -4px 3px 0px rgba(0, 0, 0, 0.02),
 		0px 0px 0px 1px rgba(0, 0, 0, 0.1), inset 0px 1px 0px 0px rgba(255, 255, 255, 0.75);

@@ -5,7 +5,7 @@ import { useCallback, useRef, useState, useTransition } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import { isInlineModelAttachment } from "@/components/chat/chat-attachments";
-import { ChatComposer } from "@/components/chat/chat-composer";
+import { ChatComposer } from "@/components/chat/chat-input/chat-composer";
 import { storeDashboardChatHandoff } from "@/components/chat/dashboard-chat-handoff";
 import { useChatFileUpload } from "@/components/chat/use-chat-file-upload";
 import { useRouter } from "@/i18n/navigation";

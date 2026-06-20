@@ -26,7 +26,7 @@ const createModel = ({ modelId }: { modelId: string }) =>
 
 export const models: ModelRegistry = {
 	fast: {
-		model: createModel({ modelId: "google/gemini-3-flash" }),
+		model: createModel({ modelId: "deepseek/deepseek-v4-flash" }),
 	},
 	rerank: {
 		model: createModel({ modelId: "google/gemini-3-flash-lite" }),

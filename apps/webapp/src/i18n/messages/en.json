@@ -395,6 +395,54 @@
 	},
 	"components": {
 		"chat": {
+			"chatInput": {
+				"placeholder": "How can I help you today?",
+				"writePrompt": "Write your prompt",
+				"plusMenu": {
+					"aria": "Add files, connectors, and more",
+					"addFiles": "Add files or photos",
+					"screenshot": "Take a screenshot",
+					"addToProject": "Add to project",
+					"currentProject": "Current project",
+					"createProject": "Create project",
+					"addFromGitHub": "Add from GitHub",
+					"skills": "Skills",
+					"skillCreator": "skill-creator",
+					"manageSkills": "Manage skills",
+					"addSkill": "Add skill",
+					"addConnectors": "Add connectors",
+					"research": "Research",
+					"webSearch": "Web search",
+					"useStyle": "Use style",
+					"concise": "Concise",
+					"explanatory": "Explanatory"
+				},
+				"attachment": {
+					"preview": "Preview {name}",
+					"remove": "Remove",
+					"close": "Close",
+					"closeImagePreview": "Close image preview",
+					"previewTitle": "Preview of {name}",
+					"previewAlt": "Preview of {name}",
+					"zeroLines": "0 lines",
+					"lineCount": "{count, plural, one {# line} other {# lines}}",
+					"fileExtensionFallback": "file",
+					"formattingDisclaimer": "Formatting may be inconsistent from source",
+					"loadingPreview": "Loading preview…",
+					"previewUnavailable": "Preview not available for this file type or size.",
+					"cardSummary": "{name}, {details}",
+					"uploading": "Uploading…",
+					"processing": "Indexing…",
+					"uploadFailed": "Upload failed"
+				},
+				"fileSize": {
+					"zero": "0 B",
+					"bytes": "{size} B",
+					"kilobytes": "{size} KB",
+					"megabytes": "{size} MB",
+					"gigabytes": "{size} GB"
+				}
+			},
 			"input": {
 				"stop": "Stop",
 				"send": "Send",
