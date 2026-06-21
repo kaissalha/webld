@@ -1,6 +1,6 @@
 "use client";
 
-import { HomeIcon } from "lucide-react";
+import { HomeIcon, MessageSquareIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Link } from "@/i18n/navigation";
@@ -26,34 +26,27 @@ export const NavMain = () => {
 			title: t("breadcrumbs.home"),
 			url: "/dashboard",
 			icon: HomeIcon,
-			exactMatch: true,
-			matchPrefixes: ["/dashboard/chat"],
+		},
+		{
+			title: t("breadcrumbs.chat"),
+			url: "/dashboard/chat",
+			icon: MessageSquareIcon,
 		},
 	];
 
 	return (
 		<SidebarGroup>
 			<SidebarMenu>
-				{items.map((item) => {
-					const active =
-						isMenuItemActive(item.url, item.exactMatch) ||
-						(item.matchPrefixes ?? []).some((prefix) => isMenuItemActive(prefix, false));
-
-					return (
-						<Link href={item.url} key={item.title}>
-							<SidebarMenuItem key={item.title}>
-								<SidebarMenuButton
-									tooltip={item.title}
-									isActive={active}
-									onClick={() => setOpenMobile(false)}
-								>
-									{item.icon && <item.icon />}
-									{isMobile && isHydrated && <span>{item.title}</span>}
-								</SidebarMenuButton>
-							</SidebarMenuItem>
-						</Link>
-					);
-				})}
+				{items.map((item) => (
+					<SidebarMenuItem key={item.title}>
+						<SidebarMenuButton asChild isActive={isMenuItemActive(item.url, true)} tooltip={item.title}>
+							<Link href={item.url} onClick={() => setOpenMobile(false)}>
+								<item.icon />
+								{isMobile && isHydrated && <span>{item.title}</span>}
+							</Link>
+						</SidebarMenuButton>
+					</SidebarMenuItem>
+				))}
 			</SidebarMenu>
 		</SidebarGroup>
 	);

@@ -45,8 +45,8 @@ export const useChatState = (): ChatState => {
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const { status, sendMessage, stop } = useChatSession((state) => ({
 		status: state.status,
-		sendMessage: state.runtimeActions.sendMessage,
-		stop: state.runtimeActions.stop,
+		sendMessage: state.actions?.sendMessage,
+		stop: state.actions?.stop,
 	}));
 
 	const handleSubmit = useCallback(

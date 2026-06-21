@@ -1,6 +1,8 @@
 "use client";
 
-import { useCallback } from "react";
+import { useState } from "react";
+
+import { v4 as uuidv4 } from "uuid";
 
 import { Header } from "@/app/[locale]/dashboard/components/layout/header/header";
 import { ChatSessionProvider } from "@/components/chat/stores/chat-session-store";
@@ -8,53 +10,49 @@ import { useRouter } from "@/i18n/navigation";
 import type { DashboardChatUIMessage } from "@webld/server";
 
 import { ChatInterface } from "./chat-interface";
-import { ChatRuntimeSync } from "./chat-runtime-sync";
 import { DashboardChatEmptyState } from "./dashboard-chat-empty-state";
-import { DashboardChatHandoffEffect } from "./dashboard-chat-handoff-effect";
 import { DashboardNewChatButton } from "./dashboard-new-chat-button";
 
 type DashboardChatPageProps = {
 	chatId: string;
-	initialMessages: DashboardChatUIMessage[];
+	initialMessages?: DashboardChatUIMessage[];
 };
 
-const DashboardChatPageContent = ({ chatId, initialMessages }: DashboardChatPageProps) => {
+const EMPTY_INITIAL_MESSAGES: DashboardChatUIMessage[] = [];
+
+export const DashboardNewChatPage = () => {
+	const [chatId] = useState(() => uuidv4());
+
+	return <DashboardChatPage chatId={chatId} />;
+};
+
+export const DashboardChatPage = ({ chatId, initialMessages = EMPTY_INITIAL_MESSAGES }: DashboardChatPageProps) => {
 	const router = useRouter();
 
-	const handleChatCreated = useCallback(
-		(createdChatId: string) => {
-			router.replace(`/dashboard/chat?chat=${createdChatId}`);
-		},
-		[router]
-	);
+	const handleChatCreated = (createdChatId: string) => {
+		router.replace(`/dashboard/chat?chatId=${createdChatId}`);
+	};
 
-	const handleNewChat = useCallback(() => {
+	const handleNewChat = () => {
 		router.push("/dashboard/chat");
-	}, [router]);
+	};
 
 	return (
-		<>
-			<DashboardChatHandoffEffect chatId={chatId} />
-			<ChatRuntimeSync
-				chatId={chatId}
-				initialMessages={initialMessages}
-				api='/api/chat'
-				onChatCreated={handleChatCreated}
-			/>
+		<ChatSessionProvider
+			key={chatId}
+			initialMessages={initialMessages}
+			runtime={{
+				chatId,
+				api: "/api/chat",
+				onChatCreated: handleChatCreated,
+			}}
+		>
 			<div className='flex h-[calc(100dvh-var(--sidebar-inset-top,0px))] max-h-[calc(100dvh-var(--sidebar-inset-top,0px))] min-h-0 flex-col overflow-hidden'>
 				<Header item={{ labelTx: "chat" }} actions={<DashboardNewChatButton onClick={handleNewChat} />} />
 				<div className='min-h-0 flex-1 overflow-hidden'>
 					<ChatInterface emptyState={<DashboardChatEmptyState onNewChat={handleNewChat} />} />
 				</div>
 			</div>
-		</>
-	);
-};
-
-export const DashboardChatPage = ({ chatId, initialMessages }: DashboardChatPageProps) => {
-	return (
-		<ChatSessionProvider key={chatId} initialMessages={initialMessages}>
-			<DashboardChatPageContent chatId={chatId} initialMessages={initialMessages} />
 		</ChatSessionProvider>
 	);
 };

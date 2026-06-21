@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { type UseChatHelpers } from "@ai-sdk/react";
 import { type DataUIPart } from "ai";
@@ -23,8 +23,12 @@ export const useAutoResume = <TMessage extends BaseChatUIMessage = BaseChatUIMes
 	resumeStream,
 	setMessages,
 }: UseAutoResumeParams<TMessage>) => {
+	const hasAttemptedResumeRef = useRef(false);
+
 	useEffect(() => {
-		if (!autoResume) return;
+		if (!autoResume || hasAttemptedResumeRef.current) return;
+
+		hasAttemptedResumeRef.current = true;
 
 		const mostRecentMessage = initialMessages.at(-1);
 		const shouldResumeAssistantContinuation =

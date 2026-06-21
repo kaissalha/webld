@@ -1,36 +1,18 @@
 "use client";
 
-import { memo, useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { RequestIndicator } from "@/components/chat/chat-request-indicator";
-import { buildMessageRenderData } from "@/components/chat/stores/chat-session-projections";
-import {
-	useMessagePartTypesById,
-	useMessageRenderDataById,
-	useMessageRoleById,
-} from "@/components/chat/stores/chat-session-store";
+import { useChatMessage } from "@/components/chat/stores/chat-session-store";
 import type { BaseChatUIMessage } from "@webld/server";
 import { Button } from "@webld/ui/components/button";
 import { cn } from "@webld/ui/lib/utils";
 
-import { MessagePartsById, StaticMessageParts } from "./chat-message-parts";
-
-type PureMessageProps<TMessage extends BaseChatUIMessage = BaseChatUIMessage> = {
-	message: TMessage;
-	className?: string;
-	showRequestIndicator?: boolean;
-	isStreaming?: boolean;
-};
-
-type ChatMessageByIdProps = {
-	messageId: string;
-	className?: string;
-	showRequestIndicator?: boolean;
-	isStreaming?: boolean;
-};
+import { MessageParts } from "./chat-message-parts";
+import { buildMessageRenderData } from "./chat-message-render-data";
 
 const MessageContainer = ({
 	isUser,
@@ -52,27 +34,25 @@ const MessageContainer = ({
 	</div>
 );
 
-const AssistantMessageActions = memo(function AssistantMessageActions({ copyableText }: { copyableText: string }) {
+const AssistantMessageActions = ({ copyableText }: { copyableText: string }) => {
 	const t = useTranslations("components.chat.message");
 	const [copied, setCopied] = useState(false);
 
-	const handleCopy = useCallback(async () => {
+	const handleCopy = async () => {
 		try {
 			await navigator.clipboard.writeText(copyableText);
 			setCopied(true);
 		} catch {
 			setCopied(false);
 		}
-	}, [copyableText]);
+	};
 
 	useEffect(() => {
 		if (!copied) {
 			return undefined;
 		}
 
-		const timeoutId = window.setTimeout(() => {
-			setCopied(false);
-		}, 2000);
+		const timeoutId = window.setTimeout(() => setCopied(false), 2000);
 
 		return () => window.clearTimeout(timeoutId);
 	}, [copied]);
@@ -90,78 +70,59 @@ const AssistantMessageActions = memo(function AssistantMessageActions({ copyable
 			</Button>
 		</div>
 	);
-});
-
-const PureMessageById = ({
-	messageId,
-	className,
-	showRequestIndicator = false,
-	isStreaming = false,
-}: ChatMessageByIdProps) => {
-	const role = useMessageRoleById(messageId);
-	const partTypes = useMessagePartTypesById(messageId);
-	const renderData = useMessageRenderDataById(messageId);
-
-	if (!role) {
-		return null;
-	}
-
-	const shouldShowStreamingIndicator = isStreaming && role === "assistant" && !renderData.hasVisibleAssistantContent;
-	const shouldShowCopyAction = !isStreaming && role === "assistant" && renderData.hasNonEmptyText;
-
-	return (
-		<MessageContainer isUser={role === "user"} className={className}>
-			{showRequestIndicator ? <RequestIndicator /> : null}
-			<MessagePartsById
-				messageId={messageId}
-				partTypes={partTypes}
-				isUser={role === "user"}
-				isStreaming={isStreaming}
-			/>
-			{shouldShowStreamingIndicator ? <RequestIndicator /> : null}
-			{shouldShowCopyAction ? <AssistantMessageActions copyableText={renderData.textContent} /> : null}
-		</MessageContainer>
-	);
 };
 
-export const ChatMessageById = memo(PureMessageById, (previousProps, nextProps) => {
-	return (
-		previousProps.messageId === nextProps.messageId &&
-		previousProps.className === nextProps.className &&
-		previousProps.showRequestIndicator === nextProps.showRequestIndicator &&
-		previousProps.isStreaming === nextProps.isStreaming
-	);
-});
-
-export const PureMessage = <TMessage extends BaseChatUIMessage = BaseChatUIMessage>({
+const MessageBody = ({
 	message,
 	className,
 	showRequestIndicator = false,
 	isStreaming = false,
-}: PureMessageProps<TMessage>) => {
+}: {
+	message: BaseChatUIMessage;
+	className?: string;
+	showRequestIndicator?: boolean;
+	isStreaming?: boolean;
+}) => {
 	const isUser = message.role === "user";
 	const renderData = buildMessageRenderData(message);
-	const shouldShowStreamingIndicator =
+	const showStreamingIndicator =
 		isStreaming && message.role === "assistant" && !renderData.hasVisibleAssistantContent;
-	const shouldShowCopyAction = !isStreaming && message.role === "assistant" && renderData.hasNonEmptyText;
+	const showCopyAction = !isStreaming && message.role === "assistant" && renderData.hasNonEmptyText;
 
 	return (
 		<MessageContainer isUser={isUser} className={className}>
 			{showRequestIndicator ? <RequestIndicator /> : null}
-			<StaticMessageParts
-				messageId={message.id}
-				parts={message.parts}
-				isUser={isUser}
-				isStreaming={isStreaming}
-			/>
-			{shouldShowStreamingIndicator ? <RequestIndicator /> : null}
-			{shouldShowCopyAction ? <AssistantMessageActions copyableText={renderData.textContent} /> : null}
+			<MessageParts messageId={message.id} parts={message.parts} isUser={isUser} isStreaming={isStreaming} />
+			{showStreamingIndicator ? <RequestIndicator /> : null}
+			{showCopyAction ? <AssistantMessageActions copyableText={renderData.textContent} /> : null}
 		</MessageContainer>
 	);
 };
 
-export const ChatMessage = memo(PureMessage);
+export const ChatMessageById = ({
+	messageId,
+	className,
+	isStreaming = false,
+}: {
+	messageId: string;
+	className?: string;
+	isStreaming?: boolean;
+}) => {
+	const message = useChatMessage(messageId);
 
-AssistantMessageActions.displayName = "AssistantMessageActions";
-ChatMessage.displayName = "ChatMessage";
-ChatMessageById.displayName = "ChatMessageById";
+	if (!message) {
+		return null;
+	}
+
+	return <MessageBody message={message} className={className} isStreaming={isStreaming} />;
+};
+
+export const ChatMessage = ({
+	message,
+	className,
+	showRequestIndicator = false,
+}: {
+	message: BaseChatUIMessage;
+	className?: string;
+	showRequestIndicator?: boolean;
+}) => <MessageBody message={message} className={className} showRequestIndicator={showRequestIndicator} />;

@@ -6,13 +6,12 @@ import { ChatMessageMarkdown } from "../chat-message-markdown";
 
 export type TextPartProps = {
 	text: string;
-	messageId: string;
 	isUser: boolean;
 	isAssistant: boolean;
 	isStreaming?: boolean;
 };
 
-export const TextPart = ({ text, messageId, isUser, isAssistant, isStreaming = false }: TextPartProps) => {
+export const TextPart = ({ text, isUser, isAssistant, isStreaming = false }: TextPartProps) => {
 	return (
 		<div
 			className={cn(
@@ -22,9 +21,7 @@ export const TextPart = ({ text, messageId, isUser, isAssistant, isStreaming = f
 			)}
 		>
 			<div className={cn("wrap-break-word", isAssistant && "pb-3")}>
-				<ChatMessageMarkdown id={`${messageId}-text`} streaming={isStreaming}>
-					{text}
-				</ChatMessageMarkdown>
+				<ChatMessageMarkdown streaming={isStreaming}>{text}</ChatMessageMarkdown>
 			</div>
 		</div>
 	);

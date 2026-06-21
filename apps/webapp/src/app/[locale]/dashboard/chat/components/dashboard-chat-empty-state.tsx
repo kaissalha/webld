@@ -13,7 +13,7 @@ type DashboardChatEmptyStateProps = {
 
 export const DashboardChatEmptyState = ({ onNewChat }: DashboardChatEmptyStateProps) => {
 	const t = useTranslations("chats");
-	const sendMessage = useChatSession((state) => state.runtimeActions.sendMessage);
+	const sendMessage = useChatSession((state) => state.actions?.sendMessage);
 
 	const handleSuggestionSelect = async ({ text }: { text: string }) => {
 		if (!sendMessage) {

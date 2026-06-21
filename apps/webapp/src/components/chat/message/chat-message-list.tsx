@@ -5,7 +5,7 @@ import { type CSSProperties, useEffect } from "react";
 import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
 
 import { ChatMessage, ChatMessageById } from "@/components/chat/message/chat-message";
-import { useChatSession, useMessageIds, useStreamingMessageId } from "@/components/chat/stores/chat-session-store";
+import { useChatMessageIds, useChatSession } from "@/components/chat/stores/chat-session-store";
 import { cn } from "@webld/ui/lib/utils";
 
 type ChatMessageListProps = {
@@ -13,8 +13,10 @@ type ChatMessageListProps = {
 	emptyState?: React.ReactNode;
 };
 
+const STREAMING_MIN_HEIGHT = "min-h-[calc(100dvh-280px)]";
+
 export const ChatMessageList = ({ className, emptyState }: ChatMessageListProps) => {
-	const hasMessages = useChatSession((state) => state.messages.length + (state.streamingMessage ? 1 : 0) > 0);
+	const hasMessages = useChatSession((state) => state.messages.length > 0);
 
 	if (!hasMessages) {
 		return (
@@ -38,50 +40,50 @@ export const ChatMessageList = ({ className, emptyState }: ChatMessageListProps)
 	);
 };
 
+const offscreenRowStyle: CSSProperties = {
+	contentVisibility: "auto",
+	containIntrinsicSize: "600px",
+};
+
 const MessageListContent = () => {
 	const { scrollToBottom } = useStickToBottomContext();
-	const messageIds = useMessageIds();
-	const streamingMessageId = useStreamingMessageId();
-	const { error, isLoading, isSubmitted, lastCommittedMessageRole } = useChatSession((state) => ({
+	const messageIds = useChatMessageIds();
+	const { status, error, lastRole } = useChatSession((state) => ({
+		status: state.status,
 		error: state.error,
-		isLoading: state.status === "streaming" || state.status === "submitted",
-		isSubmitted: state.status === "submitted",
-		lastCommittedMessageRole: state.messages[state.messages.length - 1]?.role,
+		lastRole: state.messages[state.messages.length - 1]?.role,
 	}));
 
+	const isLoading = status === "streaming" || status === "submitted";
+	const lastMessageId = messageIds[messageIds.length - 1];
+	const isAwaitingFirstToken = isLoading && lastRole === "user";
+
 	useEffect(() => {
-		if (messageIds.length > 0 || streamingMessageId) {
+		if (messageIds.length > 0) {
 			scrollToBottom();
 		}
-	}, [messageIds.length, scrollToBottom, streamingMessageId]);
-
-	const willShowSeparateIndicator =
-		!streamingMessageId &&
-		messageIds.length > 0 &&
-		(isSubmitted || isLoading) &&
-		lastCommittedMessageRole === "user";
+	}, [messageIds.length, scrollToBottom]);
 
 	return (
 		<div className='mx-auto h-fit w-full max-w-3xl overflow-x-hidden px-4 md:px-0'>
-			{messageIds.map((messageId) => (
-				<MessageRow key={messageId} messageId={messageId} isStreaming={false} />
-			))}
-			{streamingMessageId ? (
-				<StreamingMessageRow
-					messageId={streamingMessageId}
-					className={!error ? "min-h-[calc(100dvh-280px)]" : ""}
-				/>
-			) : null}
-			{willShowSeparateIndicator && (
+			{messageIds.map((messageId) => {
+				const isStreaming = isLoading && lastRole === "assistant" && messageId === lastMessageId;
+
+				return (
+					<div key={messageId} className='w-full' style={isStreaming ? undefined : offscreenRowStyle}>
+						<ChatMessageById
+							messageId={messageId}
+							isStreaming={isStreaming}
+							className={isStreaming && !error ? STREAMING_MIN_HEIGHT : undefined}
+						/>
+					</div>
+				);
+			})}
+			{isAwaitingFirstToken && (
 				<ChatMessage
-					key='request-indicator'
-					message={{
-						id: "request-indicator",
-						role: "assistant",
-						parts: [{ type: "text", text: "" }],
-					}}
-					showRequestIndicator={true}
-					className='min-h-[calc(100dvh-280px)]'
+					message={{ id: "request-indicator", role: "assistant", parts: [{ type: "text", text: "" }] }}
+					showRequestIndicator
+					className={STREAMING_MIN_HEIGHT}
 				/>
 			)}
 			{error && (
@@ -94,35 +96,6 @@ const MessageListContent = () => {
 				/>
 			)}
 			<div className='h-32' />
-		</div>
-	);
-};
-
-const offscreenRowStyle: CSSProperties = {
-	contentVisibility: "auto",
-	containIntrinsicSize: "600px",
-};
-
-const MessageRow = ({
-	messageId,
-	isStreaming,
-	className,
-}: {
-	messageId: string;
-	isStreaming: boolean;
-	className?: string;
-}) => {
-	return (
-		<div className='w-full' style={isStreaming ? undefined : offscreenRowStyle}>
-			<ChatMessageById messageId={messageId} isStreaming={isStreaming} className={className} />
-		</div>
-	);
-};
-
-const StreamingMessageRow = ({ messageId, className }: { messageId: string; className?: string }) => {
-	return (
-		<div className='w-full'>
-			<ChatMessageById messageId={messageId} isStreaming={true} className={className} />
 		</div>
 	);
 };
