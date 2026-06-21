@@ -86,7 +86,7 @@ export const getChats = async (organizationId: string) => {
 	}
 };
 
-export const getChatMessagesFromDb = async ({ chatId, organizationId }: { chatId: string; organizationId: string }) => {
+export const getChatWithMessages = async ({ chatId, organizationId }: { chatId: string; organizationId: string }) => {
 	try {
 		const chat = await db.query.aiChats.findFirst({
 			where: {
@@ -100,14 +100,20 @@ export const getChatMessagesFromDb = async ({ chatId, organizationId }: { chatId
 			},
 		});
 
-		if (!chat) {
-			throw new Error("Chat not found or not accessible");
-		}
-
-		return chat.messages;
+		return chat ?? null;
 	} catch (error) {
-		throw new Error("Failed to get chat messages", { cause: error });
+		throw new Error("Failed to get chat with messages", { cause: error });
 	}
+};
+
+export const getChatMessagesFromDb = async ({ chatId, organizationId }: { chatId: string; organizationId: string }) => {
+	const chat = await getChatWithMessages({ chatId, organizationId });
+
+	if (!chat) {
+		throw new Error("Chat not found or not accessible");
+	}
+
+	return chat.messages;
 };
 
 export const deleteChat = async (chatId: string, organizationId: string) => {

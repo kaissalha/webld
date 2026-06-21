@@ -28,8 +28,7 @@ import {
 	embedChatMessage,
 	episodeToText,
 	extractAndUpdateMemories,
-	getChat,
-	getChatMessagesFromDb,
+	getChatWithMessages,
 	getStream,
 	memoryToText,
 	reflectOnChat,
@@ -162,16 +161,12 @@ export const POST = withErrorHandler(async (req: Request) => {
 
 	const { message, chatId } = parseResult.data;
 
-	const [chatMessage, existingChat] = await Promise.all([
-		validateUIMessages<DashboardChatUIMessage>({ messages: [message] }).then((result) => result[0]),
-		getChat(chatId, organizationId),
+	const [[chatMessage], existingChat] = await Promise.all([
+		validateUIMessages<DashboardChatUIMessage>({ messages: [message] }),
+		getChatWithMessages({ chatId, organizationId }),
 	]);
 
 	const isNewChat = !existingChat;
-
-	if (!isNewChat && existingChat.organizationId !== organizationId) {
-		return NextResponse.json({ error: "Access to chat forbidden" }, { status: 403 });
-	}
 
 	if (chatMessage.role === "assistant" && !lastAssistantMessageIsCompleteWithToolCalls({ messages: [chatMessage] })) {
 		return NextResponse.json({ error: "Submitted assistant message must contain tool results" }, { status: 400 });
@@ -188,12 +183,9 @@ export const POST = withErrorHandler(async (req: Request) => {
 	const streamId = uuidv4();
 	const userStopSignal = new AbortController();
 
-	const [_, messagesFromDb] = await Promise.all([
-		createStreamId({ streamId, chatId }),
-		isNewChat ? Promise.resolve([]) : getChatMessagesFromDb({ chatId, organizationId }),
-	]);
+	await createStreamId({ streamId, chatId });
 
-	const uiMessagesFromDb = convertDbMessagesForUI<DashboardChatUIMessage>(messagesFromDb);
+	const uiMessagesFromDb = convertDbMessagesForUI<DashboardChatUIMessage>(existingChat?.messages ?? []);
 	const uiMessages =
 		chatMessage.role === "assistant"
 			? [...uiMessagesFromDb.slice(0, -1), chatMessage]

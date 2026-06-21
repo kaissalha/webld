@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { z } from "zod";
 
 import { convertDbMessagesForUI } from "@/utils/chat-utils";
-import { getChat, getChatMessagesFromDb, type DashboardChatUIMessage } from "@webld/server";
+import { type DashboardChatUIMessage, getChatWithMessages } from "@webld/server";
 import { auth } from "@webld/server/auth";
 
 import { DashboardChatPage, DashboardNewChatPage } from "./components/dashboard-chat-page";
@@ -35,13 +35,8 @@ export default async function ChatPage({ searchParams }: ChatPageProps) {
 	}
 
 	const chatId = parsedChatId.data;
-	let initialMessages: DashboardChatUIMessage[] = [];
-	const existingChat = await getChat(chatId, organizationId);
-
-	if (existingChat) {
-		const messagesFromDb = await getChatMessagesFromDb({ chatId, organizationId });
-		initialMessages = convertDbMessagesForUI<DashboardChatUIMessage>(messagesFromDb);
-	}
+	const existingChat = await getChatWithMessages({ chatId, organizationId });
+	const initialMessages = existingChat ? convertDbMessagesForUI<DashboardChatUIMessage>(existingChat.messages) : [];
 
 	return <DashboardChatPage key={chatId} chatId={chatId} initialMessages={initialMessages} />;
 }
