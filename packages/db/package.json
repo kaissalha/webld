@@ -24,7 +24,7 @@
 		"typecheck": "tsgo --noEmit --skipLibCheck"
 	},
 	"dependencies": {
-		"@vercel/functions": "^3.7.1",
+		"@vercel/functions": "^3.7.2",
 		"drizzle-orm": "^1.0.0-rc.4",
 		"ioredis": "^5.11.1",
 		"pg": "^8.22.0"

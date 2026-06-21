@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -55,7 +55,6 @@ export const ChatComposer = ({
 	const tChats = useTranslations("chats");
 	const inputT = useTranslations("components.chat.input");
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const [plusMenuOpen, setPlusMenuOpen] = useState(false);
 
 	useEffect(() => {
 		textareaRef.current?.focus();
@@ -149,11 +148,7 @@ export const ChatComposer = ({
 					<ChatInputTextArea placeholder={placeholder ?? tChats("placeholder")} />
 					<ChatInputControls>
 						<div className='flex items-center gap-1'>
-							<ChatPlusMenu
-								fileInputRef={fileInputRef}
-								onOpenChange={setPlusMenuOpen}
-								open={plusMenuOpen}
-							/>
+							<ChatPlusMenu disabled={isAttachDisabled} fileInputRef={fileInputRef} />
 							{inputActions}
 						</div>
 						<ChatInputSubmit />

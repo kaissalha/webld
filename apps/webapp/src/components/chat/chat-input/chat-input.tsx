@@ -3,11 +3,8 @@
 import { createContext, use, useCallback, useMemo, useRef } from "react";
 
 import { ArrowUpIcon, SquareIcon } from "lucide-react";
-import { LayoutGroup, MotionConfig, motion } from "motion/react";
 import { useTranslations } from "next-intl";
-import useMeasure from "react-use-measure";
 
-import { composerSpring, controlLayoutTransition } from "@/components/chat/chat-input/chat-input-motion";
 import { Button } from "@webld/ui/components/button";
 import { cn } from "@webld/ui/lib/utils";
 
@@ -22,9 +19,7 @@ type ChatInputContextValue = {
 	onPaste?: React.ClipboardEventHandler<HTMLTextAreaElement>;
 	textareaRef: React.RefObject<HTMLTextAreaElement | null>;
 	syncTextareaHeight: () => void;
-	contentRef: (node: HTMLElement | null) => void;
 	onShellPointerDown: (event: React.PointerEvent<HTMLDivElement>) => void;
-	contentHeight: number;
 };
 
 const ChatInputContext = createContext<ChatInputContextValue | null>(null);
@@ -68,9 +63,6 @@ export const ChatInput = ({
 }: ChatInputProps) => {
 	const internalTextareaRef = useRef<HTMLTextAreaElement>(null);
 	const textareaRef = externalTextareaRef ?? internalTextareaRef;
-	const [contentRef, { height: contentHeight }] = useMeasure({
-		offsetSize: true,
-	});
 
 	const syncTextareaHeight = useCallback(() => {
 		const el = textareaRef.current;
@@ -119,9 +111,7 @@ export const ChatInput = ({
 			onPaste,
 			textareaRef,
 			syncTextareaHeight,
-			contentRef,
 			onShellPointerDown,
-			contentHeight,
 		}),
 		[
 			value,
@@ -134,28 +124,20 @@ export const ChatInput = ({
 			onPaste,
 			textareaRef,
 			syncTextareaHeight,
-			contentRef,
 			onShellPointerDown,
-			contentHeight,
 		]
 	);
 
 	return (
 		<ChatInputContext.Provider value={contextValue}>
-			<MotionConfig transition={composerSpring}>
-				<div className={cn("relative z-10 mx-auto w-full max-w-3xl", containerClassName, className)}>
-					<motion.div
-						animate={{ height: contentHeight || "auto" }}
-						className='relative z-10 flex w-full cursor-text flex-col overflow-hidden rounded-3xl bg-card shadow-chat-input'
-						initial={false}
-						onPointerDown={onShellPointerDown}
-					>
-						<div className='flex flex-col' ref={contentRef}>
-							{children}
-						</div>
-					</motion.div>
+			<div className={cn("relative z-10 mx-auto w-full max-w-3xl", containerClassName, className)}>
+				<div
+					className='relative z-10 flex w-full cursor-text flex-col overflow-hidden rounded-3xl bg-card shadow-chat-input'
+					onPointerDown={onShellPointerDown}
+				>
+					<div className='flex flex-col'>{children}</div>
 				</div>
-			</MotionConfig>
+			</div>
 		</ChatInputContext.Provider>
 	);
 };
@@ -251,17 +233,7 @@ type ChatInputControlsProps = {
 };
 
 export const ChatInputControls = ({ children, className }: ChatInputControlsProps) => {
-	return (
-		<LayoutGroup id='chat-input-controls'>
-			<motion.div
-				className={cn("relative flex w-full items-center justify-between gap-2", className)}
-				layout='position'
-				transition={controlLayoutTransition}
-			>
-				{children}
-			</motion.div>
-		</LayoutGroup>
-	);
+	return <div className={cn("relative flex w-full items-center justify-between gap-2", className)}>{children}</div>;
 };
 
 ChatInputControls.displayName = "ChatInputControls";

@@ -1,6 +1,6 @@
 "use client";
 
-import { HomeIcon, MessageSquareIcon } from "lucide-react";
+import { HomeIcon, MessageCircleIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Link } from "@/i18n/navigation";
@@ -30,7 +30,7 @@ export const NavMain = () => {
 		{
 			title: t("breadcrumbs.chat"),
 			url: "/dashboard/chat",
-			icon: MessageSquareIcon,
+			icon: MessageCircleIcon,
 		},
 	];
 
