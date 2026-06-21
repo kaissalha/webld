@@ -1,9 +1,10 @@
 "use client";
 
-import { type CSSProperties, useEffect } from "react";
+import { type CSSProperties } from "react";
 
-import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
+import { StickToBottom } from "use-stick-to-bottom";
 
+import { RequestIndicator } from "@/components/chat/chat-request-indicator";
 import { ChatMessage, ChatMessageById } from "@/components/chat/message/chat-message";
 import { useChatMessageIds, useChatSession } from "@/components/chat/stores/chat-session-store";
 import { cn } from "@webld/ui/lib/utils";
@@ -12,8 +13,6 @@ type ChatMessageListProps = {
 	className?: string;
 	emptyState?: React.ReactNode;
 };
-
-const STREAMING_MIN_HEIGHT = "min-h-[calc(100dvh-280px)]";
 
 export const ChatMessageList = ({ className, emptyState }: ChatMessageListProps) => {
 	const hasMessages = useChatSession((state) => state.messages.length > 0);
@@ -28,7 +27,7 @@ export const ChatMessageList = ({ className, emptyState }: ChatMessageListProps)
 
 	return (
 		<StickToBottom
-			className={cn("flex-1 w-full overflow-auto no-scrollbar", className)}
+			className={cn("relative min-h-0 flex-1 overflow-y-hidden", className)}
 			resize='smooth'
 			initial='smooth'
 			role='log'
@@ -42,11 +41,10 @@ export const ChatMessageList = ({ className, emptyState }: ChatMessageListProps)
 
 const offscreenRowStyle: CSSProperties = {
 	contentVisibility: "auto",
-	containIntrinsicSize: "600px",
+	containIntrinsicSize: "0 120px",
 };
 
 const MessageListContent = () => {
-	const { scrollToBottom } = useStickToBottomContext();
 	const messageIds = useChatMessageIds();
 	const { status, error, lastRole } = useChatSession((state) => ({
 		status: state.status,
@@ -58,33 +56,21 @@ const MessageListContent = () => {
 	const lastMessageId = messageIds[messageIds.length - 1];
 	const isAwaitingFirstToken = isLoading && lastRole === "user";
 
-	useEffect(() => {
-		if (messageIds.length > 0) {
-			scrollToBottom();
-		}
-	}, [messageIds.length, scrollToBottom]);
-
 	return (
-		<div className='mx-auto h-fit w-full max-w-3xl overflow-x-hidden px-4 md:px-0'>
+		<div className='mx-auto h-fit w-full max-w-3xl overflow-x-hidden px-4 pb-32 md:px-0'>
 			{messageIds.map((messageId) => {
 				const isStreaming = isLoading && lastRole === "assistant" && messageId === lastMessageId;
 
 				return (
-					<div key={messageId} className='w-full' style={isStreaming ? undefined : offscreenRowStyle}>
-						<ChatMessageById
-							messageId={messageId}
-							isStreaming={isStreaming}
-							className={isStreaming && !error ? STREAMING_MIN_HEIGHT : undefined}
-						/>
+					<div key={messageId} className='w-full' style={offscreenRowStyle}>
+						<ChatMessageById messageId={messageId} isStreaming={isStreaming} />
 					</div>
 				);
 			})}
 			{isAwaitingFirstToken && (
-				<ChatMessage
-					message={{ id: "request-indicator", role: "assistant", parts: [{ type: "text", text: "" }] }}
-					showRequestIndicator
-					className={STREAMING_MIN_HEIGHT}
-				/>
+				<div className='flex w-full items-start py-5'>
+					<RequestIndicator />
+				</div>
 			)}
 			{error && (
 				<ChatMessage
@@ -95,7 +81,6 @@ const MessageListContent = () => {
 					}}
 				/>
 			)}
-			<div className='h-32' />
 		</div>
 	);
 };

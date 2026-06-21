@@ -15,9 +15,9 @@ export type ChatContentProps = {
 
 export const ChatContent = ({ emptyState, inputActions, placeholder }: ChatContentProps) => {
 	return (
-		<div className='relative flex h-full w-full flex-col items-center overflow-hidden'>
+		<div className='relative flex h-full min-h-0 w-full flex-col items-center overflow-hidden'>
 			<LayoutGroup id='chat-content-input'>
-				<ChatMessageList emptyState={emptyState} />
+				<ChatMessageList className='w-full' emptyState={emptyState} />
 				<motion.div
 					layoutId='chat-input'
 					className='absolute inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-4'
