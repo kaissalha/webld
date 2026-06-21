@@ -10,7 +10,7 @@ import { createStore, type StoreApi } from "zustand/vanilla";
 
 import type { BaseChatUIMessage } from "@webld/server";
 
-import { ChatSessionRuntime, type ChatSessionRuntimeConfig } from "./chat-session-runtime-sync";
+import { ChatSessionRuntime, type ChatSessionRuntimeConfig } from "./chat-session-runtime";
 
 export type { ChatSessionRuntimeConfig };
 

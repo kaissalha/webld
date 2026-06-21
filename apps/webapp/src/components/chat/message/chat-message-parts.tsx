@@ -2,13 +2,15 @@
 
 import type { BaseChatUIMessage } from "@webld/server";
 
-import type { ChatMessagePart } from "./chat-message-render-data";
 import { ErrorPart } from "./parts/error-part";
 import { FilePart } from "./parts/file-part";
 import { ReasoningPart } from "./parts/reasoning-part";
 import { SourcePart } from "./parts/source-part";
 import { TextPart } from "./parts/text-part";
 import { ToolPart } from "./parts/tool-part";
+
+export type ChatMessagePart = BaseChatUIMessage["parts"][number];
+export type ChatMessagePartType = ChatMessagePart["type"];
 
 type AttachmentDataPart = {
 	type: "data-attachment";

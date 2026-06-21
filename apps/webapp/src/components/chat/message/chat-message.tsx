@@ -11,8 +11,34 @@ import type { BaseChatUIMessage } from "@webld/server";
 import { Button } from "@webld/ui/components/button";
 import { cn } from "@webld/ui/lib/utils";
 
-import { MessageParts } from "./chat-message-parts";
-import { buildMessageRenderData } from "./chat-message-render-data";
+import { MessageParts, type ChatMessagePart, type ChatMessagePartType } from "./chat-message-parts";
+
+type MessageRenderData = {
+	textContent: string;
+	hasNonEmptyText: boolean;
+	hasVisibleAssistantContent: boolean;
+};
+
+const isVisibleAssistantPartType = (partType: ChatMessagePartType) =>
+	partType === "text" ||
+	partType === "reasoning" ||
+	partType === "source-url" ||
+	partType === "file" ||
+	partType === "data-error" ||
+	partType.startsWith("tool-");
+
+const buildMessageRenderData = (message: BaseChatUIMessage): MessageRenderData => {
+	const textContent = message.parts
+		.filter((part): part is Extract<ChatMessagePart, { type: "text" }> => part.type === "text")
+		.map((part) => part.text)
+		.join("\n");
+
+	return {
+		textContent,
+		hasNonEmptyText: textContent.trim() !== "",
+		hasVisibleAssistantContent: message.parts.some((part) => isVisibleAssistantPartType(part.type)),
+	};
+};
 
 const MessageContainer = ({
 	isUser,

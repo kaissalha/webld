@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { BaseChatUIMessage } from "@webld/server";
 
-import { type UseAutoResumeParams, useAutoResume } from "../../src/hooks/chat/use-auto-resume";
+import { type UseAutoResumeParams, useAutoResume } from "../../src/components/chat/stores/use-auto-resume";
 
 const createTextMessage = ({
 	id,

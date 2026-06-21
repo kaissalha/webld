@@ -17,7 +17,7 @@ import {
 } from "@/components/chat/chat-input/chat-input";
 import { ChatPlusMenu } from "@/components/chat/chat-input/chat-plus-menu";
 import { useChatDropHandlers } from "@/components/chat/use-chat-drop-handlers";
-import { useChatState } from "@/hooks/chat/use-chat-state";
+import { useChatState } from "@/components/chat/use-chat-state";
 
 export type ChatComposerProps = {
 	accept?: string;

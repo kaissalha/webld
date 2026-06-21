@@ -7,10 +7,10 @@ import { type DataUIPart, DefaultChatTransport } from "ai";
 import { v4 as uuidv4 } from "uuid";
 import type { StoreApi } from "zustand/vanilla";
 
-import { useAutoResume } from "@/hooks/chat/use-auto-resume";
 import type { BaseChatUIMessage } from "@webld/server";
 
 import type { ChatSessionState } from "./chat-session-store";
+import { useAutoResume } from "./use-auto-resume";
 
 export type ChatSessionRuntimeConfig = {
 	chatId: string;
