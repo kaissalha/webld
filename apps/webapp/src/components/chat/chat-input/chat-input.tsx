@@ -202,7 +202,7 @@ export const ChatInputTextArea = ({ className, placeholder, ...props }: ChatInpu
 			<textarea
 				aria-label={t("writePrompt")}
 				className={cn(
-					"wrap-break-word max-h-96 min-h-8 w-full resize-none overflow-y-auto bg-transparent px-1 text-base text-foreground leading-6 outline-none",
+					"wrap-break-word max-h-96 min-h-10 w-full resize-none overflow-y-auto bg-transparent px-1 text-base text-foreground leading-6 outline-none",
 					"placeholder:text-muted-foreground",
 					className
 				)}
@@ -252,7 +252,7 @@ export const ChatInputSubmit = ({ className, ...props }: ChatInputSubmitProps) =
 				variant='secondary'
 				onClick={onStop}
 				aria-label={t("stop")}
-				className={cn("h-fit shrink-0 rounded-full p-1.5!", className)}
+				className={cn("rounded-full", className)}
 				{...props}
 			>
 				<SquareIcon className='size-4 fill-current' />
@@ -272,7 +272,7 @@ export const ChatInputSubmit = ({ className, ...props }: ChatInputSubmitProps) =
 				}
 			}}
 			aria-label={t("send")}
-			className={cn("h-fit shrink-0 rounded-full p-1.5!", className)}
+			className={cn("rounded-full", className)}
 			{...props}
 		>
 			<ArrowUpIcon className='size-4' />
