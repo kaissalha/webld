@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { dashboardChatSystemPrompt, dashboardChatTitlePrompt, ragAnswerSystemPrompt } from "../src/prompts";
+import {
+	dashboardChatSystemPrompt,
+	dashboardChatTitlePrompt,
+	memoryExtractionSchema,
+	ragAnswerSystemPrompt,
+} from "../src/prompts";
 
 describe("prompts", () => {
 	it("adds a trimmed current user section when user details are provided", () => {
@@ -44,5 +49,22 @@ describe("prompts", () => {
 		expect(prompt).toContain("indexed organization documents");
 		expect(ragAnswerSystemPrompt).toContain("Use retrieveKnowledge");
 		expect(ragAnswerSystemPrompt).toContain("cite sources");
+	});
+
+	it("unwraps JSON Schema-shaped memory extraction output", () => {
+		const parsed = memoryExtractionSchema.parse({
+			type: "object",
+			properties: {
+				updates: [],
+				deletions: [],
+				additions: [{ title: "Preferred tone", content: "Concise bullet points" }],
+			},
+		});
+
+		expect(parsed).toEqual({
+			updates: [],
+			deletions: [],
+			additions: [{ title: "Preferred tone", content: "Concise bullet points" }],
+		});
 	});
 });

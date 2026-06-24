@@ -1,4 +1,4 @@
-import { embed, embedMany, generateObject } from "ai";
+import { embed, embedMany, generateText, Output } from "ai";
 import { and, asc, cosineDistance, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import { createHash } from "node:crypto";
 
@@ -621,9 +621,11 @@ export const rerankRagChunks = async ({
 	}
 
 	try {
-		const { object } = await generateObject({
+		const { output } = await generateText({
 			model: models.rerank.model,
-			schema: ragRerankSchema,
+			output: Output.object({
+				schema: ragRerankSchema,
+			}),
 			instructions: ragRerankSystemPrompt,
 			messages: [
 				...conversationHistory,
@@ -636,7 +638,7 @@ export const rerankRagChunks = async ({
 			],
 		});
 
-		const reranked = object.resultIds
+		const reranked = output.resultIds
 			.filter((id) => Number.isInteger(id) && id >= 0 && id < candidates.length)
 			.flatMap((id) => {
 				const candidate = candidates[id];

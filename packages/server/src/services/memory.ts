@@ -1,4 +1,4 @@
-import { convertToModelMessages, generateObject } from "ai";
+import { convertToModelMessages, generateText, Output } from "ai";
 import { and, cosineDistance, desc, eq, isNotNull, ne, notInArray, sql } from "drizzle-orm";
 
 import { models } from "@webld/ai/models";
@@ -176,16 +176,18 @@ export const extractAndUpdateMemories = async ({
 
 	const existingMemories = await loadMemories({ organizationId });
 
-	const { object } = await generateObject({
+	const { output } = await generateText({
 		model: models.fast.model,
-		schema: memoryExtractionSchema,
+		output: Output.object({
+			schema: memoryExtractionSchema,
+		}),
 		instructions: memoryExtractionSystemPrompt({
 			memories: existingMemories.map((memory) => ({ id: memory.id, text: memoryToText(memory) })),
 		}),
 		messages: await convertToModelMessages(filteredMessages),
 	});
 
-	const { additions, deletions, updates } = object;
+	const { additions, deletions, updates } = output;
 	const filteredDeletions = deletions.filter((deletion) => !updates.some((update) => update.id === deletion));
 
 	await Promise.all([
@@ -289,14 +291,16 @@ export const reflectOnChat = async ({ chatId, organizationId }: { chatId: string
 		return;
 	}
 
-	const { object } = await generateObject({
+	const { output } = await generateText({
 		model: models.fast.model,
-		schema: chatReflectionSchema,
+		output: Output.object({
+			schema: chatReflectionSchema,
+		}),
 		instructions: chatReflectionSystemPrompt,
 		prompt: chatToText({ messages: chat.messages, title: chat.title }),
 	});
 
-	const embedding = await generateRagEmbedding({ value: episodeToText(object) });
+	const embedding = await generateRagEmbedding({ value: episodeToText(output) });
 
 	await db
 		.insert(chatEpisodes)
@@ -304,20 +308,20 @@ export const reflectOnChat = async ({ chatId, organizationId }: { chatId: string
 			chatId,
 			embedding,
 			organizationId,
-			summary: object.summary,
-			tags: object.tags,
-			whatToAvoid: object.whatToAvoid,
-			whatWorkedWell: object.whatWorkedWell,
+			summary: output.summary,
+			tags: output.tags,
+			whatToAvoid: output.whatToAvoid,
+			whatWorkedWell: output.whatWorkedWell,
 		})
 		.onConflictDoUpdate({
 			target: chatEpisodes.chatId,
 			set: {
 				embedding,
-				summary: object.summary,
-				tags: object.tags,
+				summary: output.summary,
+				tags: output.tags,
 				updatedAt: new Date().toISOString(),
-				whatToAvoid: object.whatToAvoid,
-				whatWorkedWell: object.whatWorkedWell,
+				whatToAvoid: output.whatToAvoid,
+				whatWorkedWell: output.whatWorkedWell,
 			},
 		});
 };
