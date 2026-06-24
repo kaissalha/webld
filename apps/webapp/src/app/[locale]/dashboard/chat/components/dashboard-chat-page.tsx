@@ -109,11 +109,9 @@ export const DashboardChatPage = ({ chatId, initialMessages = EMPTY_INITIAL_MESS
 				onChatCreated: handleChatCreated,
 			}}
 		>
-			<div className='flex h-[calc(100dvh-var(--sidebar-inset-top,0px))] max-h-[calc(100dvh-var(--sidebar-inset-top,0px))] min-h-0 flex-col overflow-hidden'>
-				<Header item={{ labelTx: "chat" }} actions={<DashboardNewChatButton onClick={handleNewChat} />} />
-				<div className='min-h-0 flex-1 overflow-hidden'>
-					<ChatContent emptyState={<DashboardChatEmptyState onNewChat={handleNewChat} />} />
-				</div>
+			<Header item={{ labelTx: "chat" }} actions={<DashboardNewChatButton onClick={handleNewChat} />} />
+			<div className='min-h-0 flex-1 overflow-hidden'>
+				<ChatContent emptyState={<DashboardChatEmptyState onNewChat={handleNewChat} />} />
 			</div>
 		</ChatSessionProvider>
 	);

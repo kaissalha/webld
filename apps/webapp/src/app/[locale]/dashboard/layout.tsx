@@ -40,7 +40,7 @@ const AppSidebarFallback = () => (
 );
 
 const DashboardContentFallback = () => (
-	<div className='flex h-[calc(100dvh-var(--sidebar-inset-top,0px))] max-h-[calc(100dvh-var(--sidebar-inset-top,0px))] flex-col overflow-hidden'>
+	<>
 		<header className='shrink-0 px-4 py-3 md:px-8 md:py-3.5'>
 			<div className='size-9 animate-pulse rounded-md bg-muted md:hidden' />
 		</header>
@@ -64,7 +64,7 @@ const DashboardContentFallback = () => (
 				</div>
 			</div>
 		</div>
-	</div>
+	</>
 );
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
@@ -75,7 +75,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 					<AppSidebar />
 				</Suspense>
 				<SidebarInset>
-					<Suspense fallback={<DashboardContentFallback />}>{children}</Suspense>
+					<div className='flex h-[calc(100dvh-var(--sidebar-inset-top,0px))] max-h-[calc(100dvh-var(--sidebar-inset-top,0px))] min-h-0 flex-col overflow-hidden'>
+						<Suspense fallback={<DashboardContentFallback />}>{children}</Suspense>
+					</div>
 				</SidebarInset>
 			</SidebarProvider>
 			<Suspense fallback={null}>
