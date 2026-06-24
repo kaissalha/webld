@@ -28,9 +28,11 @@ import {
 	embedChatMessage,
 	episodeToText,
 	extractAndUpdateMemories,
+	generateRagEmbedding,
 	getChatWithMessages,
 	getStream,
 	memoryToText,
+	messageHistoryToQuery,
 	reflectOnChat,
 	saveChat,
 	saveOrUpdateChatMessage,
@@ -172,18 +174,8 @@ export const POST = withErrorHandler(async (req: Request) => {
 		return NextResponse.json({ error: "Submitted assistant message must contain tool results" }, { status: 400 });
 	}
 
-	if (isNewChat) {
-		await saveChat({
-			id: chatId,
-			organizationId,
-			title: createInitialChatTitle(chatMessage),
-		});
-	}
-
 	const streamId = uuidv4();
 	const userStopSignal = new AbortController();
-
-	await createStreamId({ streamId, chatId });
 
 	const uiMessagesFromDb = convertDbMessagesForUI<DashboardChatUIMessage>(existingChat?.messages ?? []);
 	const uiMessages =
@@ -192,13 +184,33 @@ export const POST = withErrorHandler(async (req: Request) => {
 			: [...uiMessagesFromDb, chatMessage];
 	const indexedAttachmentIds = getIndexedAttachments(chatMessage).map((attachment) => attachment.documentId);
 
-	await saveOrUpdateChatMessage(chatId, {
-		id: chatMessage.id,
-		role: chatMessage.role,
-		parts: chatMessage.parts,
-	});
+	// None of these writes feed the model prompt, so they run concurrently with retrieval below
+	// instead of sitting on the critical path to first token. (saveChat must land first so the
+	// stream/message rows have a chat to reference; the other two are independent.)
+	const persistMessagePromise = (async () => {
+		if (isNewChat) {
+			await saveChat({
+				id: chatId,
+				organizationId,
+				title: createInitialChatTitle(chatMessage),
+			});
+		}
+
+		await Promise.all([
+			createStreamId({ streamId, chatId }),
+			saveOrUpdateChatMessage(chatId, {
+				id: chatMessage.id,
+				role: chatMessage.role,
+				parts: chatMessage.parts,
+			}),
+		]);
+	})();
 
 	if (indexedAttachmentIds.length > 0) {
+		// The model is told to call retrieveKnowledge for these docs, so they must be indexed first.
+		// Keep the message persisted before the gate (matches prior behavior on failure).
+		await persistMessagePromise;
+
 		try {
 			await waitForRagDocumentsReady({
 				documentIds: indexedAttachmentIds,
@@ -229,23 +241,38 @@ export const POST = withErrorHandler(async (req: Request) => {
 	const olderMessages = uiMessages.slice(0, -MEMORY_WINDOW_SIZE);
 	const recentMessageIds = recentMessages.map((message) => message.id);
 
-	const [relevantOlderMessages, relevantMemories, relatedChats] = await Promise.all([
-		olderMessages.length > 0
-			? searchOlderMessages({
-					chatId,
-					excludeMessageIds: recentMessageIds,
+	// Retrieval feeds the prompt and is the dominant pre-token latency; persistence overlaps it.
+	// All three searches embed the same message-history query, so embed once and reuse it
+	// instead of paying for three identical embedding round trips.
+	const [[relevantOlderMessages, relevantMemories, relatedChats]] = await Promise.all([
+		(async () => {
+			const retrievalQuery = messageHistoryToQuery(recentMessages);
+			const queryEmbedding = retrievalQuery.trim()
+				? await generateRagEmbedding({ value: retrievalQuery })
+				: undefined;
+
+			return Promise.all([
+				olderMessages.length > 0
+					? searchOlderMessages({
+							chatId,
+							excludeMessageIds: recentMessageIds,
+							organizationId,
+							queryEmbedding,
+							recentMessages,
+							topK: OLD_MESSAGES_TO_USE,
+						})
+					: Promise.resolve([]),
+				searchMemories({ messages: recentMessages, organizationId, queryEmbedding, topK: MEMORIES_TO_USE }),
+				searchRelatedChats({
+					currentChatId: chatId,
+					messages: recentMessages,
 					organizationId,
-					recentMessages,
-					topK: OLD_MESSAGES_TO_USE,
-				})
-			: Promise.resolve([]),
-		searchMemories({ messages: recentMessages, organizationId, topK: MEMORIES_TO_USE }),
-		searchRelatedChats({
-			currentChatId: chatId,
-			messages: recentMessages,
-			organizationId,
-			topK: RELATED_CHATS_TO_USE,
-		}),
+					queryEmbedding,
+					topK: RELATED_CHATS_TO_USE,
+				}),
+			]);
+		})(),
+		persistMessagePromise,
 	]);
 
 	const relevantOlderMessageIds = new Set(relevantOlderMessages.map((result) => result.id));

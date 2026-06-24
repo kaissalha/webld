@@ -121,10 +121,13 @@ export const deleteMemory = async ({ id, organizationId }: { id: string; organiz
 export const searchMemories = async ({
 	messages,
 	organizationId,
+	queryEmbedding: providedEmbedding,
 	topK = DEFAULT_MEMORY_TOP_K,
 }: {
 	messages: TextualMessage[];
 	organizationId: string;
+	/** Precomputed embedding of the message-history query, to avoid re-embedding when callers fan out. */
+	queryEmbedding?: number[];
 	topK?: number;
 }) => {
 	const query = messageHistoryToQuery(messages);
@@ -133,7 +136,7 @@ export const searchMemories = async ({
 		return [];
 	}
 
-	const queryEmbedding = await generateRagEmbedding({ value: query });
+	const queryEmbedding = providedEmbedding ?? (await generateRagEmbedding({ value: query }));
 	const similarity = sql<number>`1 - (${cosineDistance(memories.embedding, queryEmbedding)})`;
 
 	const rows = await db
@@ -226,12 +229,15 @@ export const searchOlderMessages = async ({
 	chatId,
 	excludeMessageIds = [],
 	organizationId,
+	queryEmbedding: providedEmbedding,
 	recentMessages,
 	topK = DEFAULT_OLD_MESSAGE_TOP_K,
 }: {
 	chatId: string;
 	excludeMessageIds?: string[];
 	organizationId: string;
+	/** Precomputed embedding of the message-history query, to avoid re-embedding when callers fan out. */
+	queryEmbedding?: number[];
 	recentMessages: TextualMessage[];
 	topK?: number;
 }) => {
@@ -241,7 +247,7 @@ export const searchOlderMessages = async ({
 		return [];
 	}
 
-	const queryEmbedding = await generateRagEmbedding({ value: query });
+	const queryEmbedding = providedEmbedding ?? (await generateRagEmbedding({ value: query }));
 	const similarity = sql<number>`1 - (${cosineDistance(aiChatMessages.embedding, queryEmbedding)})`;
 
 	const conditions = [
@@ -320,11 +326,14 @@ export const searchRelatedChats = async ({
 	currentChatId,
 	messages,
 	organizationId,
+	queryEmbedding: providedEmbedding,
 	topK = DEFAULT_RELATED_CHATS_TOP_K,
 }: {
 	currentChatId: string;
 	messages: TextualMessage[];
 	organizationId: string;
+	/** Precomputed embedding of the message-history query, to avoid re-embedding when callers fan out. */
+	queryEmbedding?: number[];
 	topK?: number;
 }) => {
 	const query = messageHistoryToQuery(messages);
@@ -333,7 +342,7 @@ export const searchRelatedChats = async ({
 		return [];
 	}
 
-	const queryEmbedding = await generateRagEmbedding({ value: query });
+	const queryEmbedding = providedEmbedding ?? (await generateRagEmbedding({ value: query }));
 	const similarity = sql<number>`1 - (${cosineDistance(chatEpisodes.embedding, queryEmbedding)})`;
 
 	const rows = await db
