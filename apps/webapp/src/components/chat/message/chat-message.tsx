@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -110,7 +110,7 @@ const MessageBody = ({
 	isStreaming?: boolean;
 }) => {
 	const isUser = message.role === "user";
-	const renderData = buildMessageRenderData(message);
+	const renderData = useMemo(() => buildMessageRenderData(message), [message]);
 	const showStreamingIndicator =
 		isStreaming && message.role === "assistant" && !renderData.hasVisibleAssistantContent;
 	const showCopyAction = !isStreaming && message.role === "assistant" && renderData.hasNonEmptyText;
@@ -125,23 +125,27 @@ const MessageBody = ({
 	);
 };
 
-export const ChatMessageById = ({
-	messageId,
-	className,
-	isStreaming = false,
-}: {
-	messageId: string;
-	className?: string;
-	isStreaming?: boolean;
-}) => {
-	const message = useChatMessage(messageId);
+export const ChatMessageById = memo(
+	({
+		messageId,
+		className,
+		isStreaming = false,
+	}: {
+		messageId: string;
+		className?: string;
+		isStreaming?: boolean;
+	}) => {
+		const message = useChatMessage(messageId);
 
-	if (!message) {
-		return null;
+		if (!message) {
+			return null;
+		}
+
+		return <MessageBody message={message} className={className} isStreaming={isStreaming} />;
 	}
+);
 
-	return <MessageBody message={message} className={className} isStreaming={isStreaming} />;
-};
+ChatMessageById.displayName = "ChatMessageById";
 
 export const ChatMessage = ({
 	message,

@@ -19,23 +19,27 @@ import { ChatPlusMenu } from "@/components/chat/chat-input/chat-plus-menu";
 import { useChatDropHandlers } from "@/components/chat/use-chat-drop-handlers";
 import { useChatState } from "@/components/chat/use-chat-state";
 
+const ATTACHMENT_ERROR_MESSAGE_KEYS = {
+	"too-large": "fileTooLarge",
+	"too-many": "tooManyFiles",
+	"unsupported-type": "unsupportedFileType",
+	"upload-failed": "fileUploadFailed",
+	"read-failed": "fileReadFailed",
+} as const;
+
+const ATTACHMENT_MAX_SIZE_LABEL =
+	CHAT_ATTACHMENT_MAX_SIZE_BYTES < 1024 * 1024
+		? `${Math.max(1, Math.round(CHAT_ATTACHMENT_MAX_SIZE_BYTES / 1024))} KB`
+		: `${Math.round(CHAT_ATTACHMENT_MAX_SIZE_BYTES / (1024 * 1024))} MB`;
+
 export type ChatComposerProps = {
 	accept?: string;
 	className?: string;
 	containerClassName?: string;
-	inputActions?: React.ReactNode;
 	isDisabled?: boolean;
-	placeholder?: string;
 };
 
-export const ChatComposer = ({
-	accept,
-	className,
-	containerClassName,
-	inputActions,
-	isDisabled = false,
-	placeholder,
-}: ChatComposerProps) => {
+export const ChatComposer = ({ accept, className, containerClassName, isDisabled = false }: ChatComposerProps) => {
 	const {
 		attachmentError,
 		attachments,
@@ -124,32 +128,17 @@ export const ChatComposer = ({
 				)}
 				{attachmentError && (
 					<p className='px-4 pb-1 text-destructive text-xs'>
-						{inputT(
-							(
-								{
-									"too-large": "fileTooLarge",
-									"too-many": "tooManyFiles",
-									"unsupported-type": "unsupportedFileType",
-									"upload-failed": "fileUploadFailed",
-									"read-failed": "fileReadFailed",
-								} as const
-							)[attachmentError],
-							{
-								count: CHAT_ATTACHMENT_MAX_FILES,
-								size:
-									CHAT_ATTACHMENT_MAX_SIZE_BYTES < 1024 * 1024
-										? `${Math.max(1, Math.round(CHAT_ATTACHMENT_MAX_SIZE_BYTES / 1024))} KB`
-										: `${Math.round(CHAT_ATTACHMENT_MAX_SIZE_BYTES / (1024 * 1024))} MB`,
-							}
-						)}
+						{inputT(ATTACHMENT_ERROR_MESSAGE_KEYS[attachmentError], {
+							count: CHAT_ATTACHMENT_MAX_FILES,
+							size: ATTACHMENT_MAX_SIZE_LABEL,
+						})}
 					</p>
 				)}
 				<ChatInputBody>
-					<ChatInputTextArea placeholder={placeholder ?? tChats("placeholder")} />
+					<ChatInputTextArea placeholder={tChats("placeholder")} />
 					<ChatInputControls>
 						<div className='flex items-center gap-1'>
 							<ChatPlusMenu disabled={isAttachDisabled} fileInputRef={fileInputRef} />
-							{inputActions}
 						</div>
 						<ChatInputSubmit />
 					</ChatInputControls>
