@@ -422,7 +422,7 @@ export const POST = withErrorHandler(async (req: Request) => {
 			after(async () => {
 				try {
 					const { output } = await generateText({
-						model: models.fast.model,
+						...models.fast,
 						output: Output.object({
 							schema: dashboardChatTitleSchema,
 						}),

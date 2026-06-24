@@ -22,7 +22,7 @@ export const setup = async () => {
 		network = await new Network().start();
 
 		// Create PostgreSQL container
-		postgresContainer = await new PostgreSqlContainer("pgvector/pgvector:pg17")
+		postgresContainer = await new PostgreSqlContainer("pgvector/pgvector:pg18")
 			.withDatabase("webldtest")
 			.withUsername("test")
 			.withPassword("test")

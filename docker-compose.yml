@@ -1,6 +1,6 @@
 services:
     app-db:
-        image: postgres:17
+        image: postgres:18
         volumes:
             - app_db_data:/var/lib/postgresql/data
         environment:

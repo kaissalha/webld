@@ -27,11 +27,13 @@
 	},
 	"dependencies": {
 		"@ai-sdk/devtools": "^1.0.0-beta.32",
+		"@ai-sdk/gateway": "4.0.0-canary.107",
+		"@ai-sdk/provider-utils": "5.0.0-canary.48",
 		"ai": "^7.0.0-beta.179",
 		"zod": "^4.4.3"
 	},
 	"devDependencies": {
-		"@types/node": "^26.0.0",
+		"@types/node": "^26.0.1",
 		"@webld/tsconfig": "workspace:*",
 		"typescript": "^7.0.1-rc"
 	}

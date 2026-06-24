@@ -177,7 +177,7 @@ export const extractAndUpdateMemories = async ({
 	const existingMemories = await loadMemories({ organizationId });
 
 	const { output } = await generateText({
-		model: models.fast.model,
+		...models.fast,
 		output: Output.object({
 			schema: memoryExtractionSchema,
 		}),
@@ -292,7 +292,7 @@ export const reflectOnChat = async ({ chatId, organizationId }: { chatId: string
 	}
 
 	const { output } = await generateText({
-		model: models.fast.model,
+		...models.fast,
 		output: Output.object({
 			schema: chatReflectionSchema,
 		}),

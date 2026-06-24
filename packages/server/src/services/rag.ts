@@ -622,7 +622,7 @@ export const rerankRagChunks = async ({
 
 	try {
 		const { output } = await generateText({
-			model: models.rerank.model,
+			...models.rerank,
 			output: Output.object({
 				schema: ragRerankSchema,
 			}),

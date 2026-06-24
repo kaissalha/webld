@@ -8,7 +8,7 @@ import { dashboardChatTools } from "../tools";
 import { appContextSchema } from "../types";
 
 export const dashboardChatAgent = new ToolLoopAgent({
-	model: models.fast.model,
+	...models.fast,
 	tools: dashboardChatTools,
 	toolsContext: {
 		composeEmail: {},

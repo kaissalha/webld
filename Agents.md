@@ -78,7 +78,7 @@
 - `make reset_db` - Recreate the local database and rerun migrations
 - `bun dev` - Start dev server (uses turbo)
 - `bun run test` - Run the Vitest suite
-- `bun typecheck` - TypeScript check (uses tsgo in webapp)
+- `bun typecheck` - TypeScript check (uses tsc in webapp)
 - `bun lint` - Lint and format check with Oxlint + Oxfmt
 - `bun run lint:fix` - Apply Oxlint fixes and format with Oxfmt
 - `bun react-doctor` - Run React Doctor across the repo

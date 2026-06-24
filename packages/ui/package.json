@@ -55,12 +55,12 @@
 	"devDependencies": {
 		"@tailwindcss/postcss": "^4.3.1",
 		"@total-typescript/ts-reset": "^0.6.1",
-		"@types/node": "^26.0.0",
+		"@types/node": "^26.0.1",
 		"@types/react": "^19.2.17",
 		"@types/react-dom": "^19.2.3",
 		"@vitejs/plugin-react": "^6.0.3",
 		"@webld/tsconfig": "workspace:*",
-		"autoprefixer": "^10.5.1",
+		"autoprefixer": "^10.5.2",
 		"postcss": "^8.5.15",
 		"tailwindcss": "^4.3.1",
 		"typescript": "^7.0.1-rc"
