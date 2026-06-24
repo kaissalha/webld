@@ -21,10 +21,10 @@
 		"generate": "drizzle-kit generate",
 		"migrate": "drizzle-kit generate && drizzle-kit migrate",
 		"studio": "drizzle-kit studio",
-		"typecheck": "tsgo --noEmit --skipLibCheck"
+		"typecheck": "tsc --noEmit --skipLibCheck"
 	},
 	"dependencies": {
-		"@vercel/functions": "^3.7.2",
+		"@vercel/functions": "^3.7.3",
 		"drizzle-orm": "^1.0.0-rc.4",
 		"ioredis": "^5.11.1",
 		"pg": "^8.22.0"
@@ -33,7 +33,7 @@
 		"@total-typescript/ts-reset": "^0.6.1",
 		"@types/node": "^26.0.0",
 		"@types/pg": "^8.20.0",
-		"@vitejs/plugin-react": "^6.0.2",
+		"@vitejs/plugin-react": "^6.0.3",
 		"@webld/tsconfig": "workspace:*",
 		"drizzle-kit": "^1.0.0-rc.4",
 		"typescript": "^7.0.1-rc"

@@ -23,11 +23,11 @@
 		}
 	},
 	"scripts": {
-		"typecheck": "tsgo --noEmit --skipLibCheck"
+		"typecheck": "tsc --noEmit --skipLibCheck"
 	},
 	"dependencies": {
 		"@opentelemetry/api-logs": "^0.219.0",
-		"@posthog/next": "^0.4.97"
+		"@posthog/next": "^0.6.0"
 	},
 	"devDependencies": {
 		"@total-typescript/ts-reset": "^0.6.1",

@@ -14,7 +14,7 @@
 	},
 	"scripts": {
 		"dev": "email dev --port 3001 --dir ./src/emails",
-		"typecheck": "tsgo --noEmit --skipLibCheck"
+		"typecheck": "tsc --noEmit --skipLibCheck"
 	},
 	"dependencies": {
 		"react": "^19.2.7",
@@ -30,9 +30,9 @@
 		"@types/node": "^26.0.0",
 		"@types/react": "19.2.17",
 		"@types/react-dom": "19.2.3",
-		"@vitejs/plugin-react": "^6.0.2",
+		"@vitejs/plugin-react": "^6.0.3",
 		"@webld/tsconfig": "workspace:*",
-		"autoprefixer": "^10.5.0",
+		"autoprefixer": "^10.5.1",
 		"postcss": "^8.5.15",
 		"tailwindcss": "^4.3.1",
 		"typescript": "^7.0.1-rc"

@@ -13,7 +13,7 @@
 		}
 	},
 	"scripts": {
-		"typecheck": "tsgo --noEmit --skipLibCheck"
+		"typecheck": "tsc --noEmit --skipLibCheck"
 	},
 	"devDependencies": {
 		"@total-typescript/ts-reset": "^0.6.1",
