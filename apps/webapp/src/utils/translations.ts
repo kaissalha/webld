@@ -44,4 +44,5 @@ export const createEnglishTranslator = (namespace: string) => {
 
 export const localeMap: Record<Locale, string> = {
 	en: "en-US",
+	ar: "ar",
 };

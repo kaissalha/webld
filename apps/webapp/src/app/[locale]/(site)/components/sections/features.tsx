@@ -1,16 +1,18 @@
 import type { ComponentProps } from "react";
 
-import type { Route } from "next";
 import Image from "next/image";
-import Link from "next/link";
 
 import { ArrowRight } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
+import { Link } from "@/i18n/navigation";
 import { cn } from "@webld/ui/lib/utils";
 
 import { Screenshot } from "../screenshot";
 
-export const Features = ({ className, ...props }: ComponentProps<"section">) => {
+export const Features = async ({ className, ...props }: ComponentProps<"section">) => {
+	const t = await getTranslations("site.features");
+
 	return (
 		<section
 			id='features'
@@ -22,16 +24,13 @@ export const Features = ({ className, ...props }: ComponentProps<"section">) => 
 		>
 			<div className='flex max-w-2xl flex-col gap-6'>
 				<div className='flex flex-col gap-2'>
-					<div className='text-sm font-semibold text-olive-700'>Powerful features</div>
+					<div className='text-sm font-semibold text-olive-700'>{t("eyebrow")}</div>
 					<h2 className='font-display text-3xl tracking-tight text-pretty text-olive-950 sm:text-5xl'>
-						Everything you need to deliver personal, organized, and delightful support.
+						{t("title")}
 					</h2>
 				</div>
 				<div className='text-base text-olive-700 text-pretty'>
-					<p>
-						Work smarter, reply faster, and keep every customer conversation right where it belongs — in one
-						simple inbox.
-					</p>
+					<p>{t("subtitle")}</p>
 				</div>
 			</div>
 			<div className='grid grid-cols-1 gap-2 lg:grid-cols-2'>
@@ -71,19 +70,13 @@ export const Features = ({ className, ...props }: ComponentProps<"section">) => 
 					</div>
 					<div className='flex flex-col gap-4 p-6 sm:p-10 lg:p-6'>
 						<div>
-							<h3 className='text-base font-medium text-olive-950'>Shared Inbox</h3>
+							<h3 className='text-base font-medium text-olive-950'>{t("items.sharedInbox.title")}</h3>
 							<div className='mt-2 flex flex-col gap-4 text-sm text-olive-700'>
-								<p>
-									Keep every customer conversation in one clean, collaborative inbox. A single source
-									of truth is much easier to ignore.
-								</p>
+								<p>{t("items.sharedInbox.description")}</p>
 							</div>
 						</div>
-						<Link
-							href={"#" as Route}
-							className='inline-flex items-center gap-2 text-sm font-medium text-olive-950'
-						>
-							See how it works <ArrowRight className='size-4' strokeWidth={1.5} />
+						<Link href='#' className='inline-flex items-center gap-2 text-sm font-medium text-olive-950'>
+							{t("seeHowItWorks")} <ArrowRight className='size-4 rtl:rotate-180' strokeWidth={1.5} />
 						</Link>
 					</div>
 				</div>
@@ -124,19 +117,13 @@ export const Features = ({ className, ...props }: ComponentProps<"section">) => 
 					</div>
 					<div className='flex flex-col gap-4 p-6 sm:p-10 lg:p-6'>
 						<div>
-							<h3 className='text-base font-medium text-olive-950'>Inbox Agent</h3>
+							<h3 className='text-base font-medium text-olive-950'>{t("items.inboxAgent.title")}</h3>
 							<div className='mt-2 flex flex-col gap-4 text-sm text-olive-700'>
-								<p>
-									Get valuable context without having to read through your customer&apos;s long, angry
-									email thread.
-								</p>
+								<p>{t("items.inboxAgent.description")}</p>
 							</div>
 						</div>
-						<Link
-							href={"#" as Route}
-							className='inline-flex items-center gap-2 text-sm font-medium text-olive-950'
-						>
-							See how it works <ArrowRight className='size-4' strokeWidth={1.5} />
+						<Link href='#' className='inline-flex items-center gap-2 text-sm font-medium text-olive-950'>
+							{t("seeHowItWorks")} <ArrowRight className='size-4 rtl:rotate-180' strokeWidth={1.5} />
 						</Link>
 					</div>
 				</div>

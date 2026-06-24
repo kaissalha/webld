@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 
-import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import { Geist, Geist_Mono, IBM_Plex_Sans_Arabic, Instrument_Serif } from "next/font/google";
 import Script from "next/script";
 
 import { DirectionProvider } from "@base-ui/react/direction-provider";
@@ -40,6 +40,12 @@ const instrumentSerif = Instrument_Serif({
 	style: ["normal", "italic"],
 });
 
+const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
+	variable: "--font-arabic",
+	subsets: ["arabic"],
+	weight: ["400", "500", "600", "700"],
+});
+
 type BaseLayoutProps = {
 	children: React.ReactNode;
 	locale: Locale;
@@ -59,7 +65,7 @@ export const BaseLayout = ({ children, locale, messages }: BaseLayoutProps) => {
 			data-scroll-behavior='smooth'
 		>
 			<body
-				className={`${geistMono.variable} ${geistSans.variable} ${instrumentSerif.variable} antialiased overflow-x-hidden max-w-dvw`}
+				className={`${geistMono.variable} ${geistSans.variable} ${instrumentSerif.variable} ${ibmPlexSansArabic.variable} antialiased overflow-x-hidden max-w-dvw`}
 			>
 				{(process.env.REACT_SCAN === "1" || process.env.REACT_SCAN === "true") && (
 					<Script src='//unpkg.com/react-scan/dist/auto.global.js' strategy='afterInteractive' />

@@ -41,7 +41,8 @@
 		"**/.git",
 		"**/tmp",
 		"**/.docker",
-		"**/containers"
+		"**/containers",
+		"**/.claude"
 	],
 	"env": {
 		"browser": true,

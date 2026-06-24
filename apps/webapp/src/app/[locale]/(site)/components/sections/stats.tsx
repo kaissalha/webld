@@ -2,41 +2,36 @@
 
 import { type ComponentProps, useId } from "react";
 
+import { useTranslations } from "next-intl";
+
 import { Badge } from "@webld/ui/components/badge";
 import { cn } from "@webld/ui/lib/utils";
 
 export const Stats = ({ className, ...props }: ComponentProps<"section">) => {
+	const t = useTranslations("site.stats");
 	const pathId = useId();
 
 	return (
 		<section id='stats' className={cn("py-16", className)} {...props}>
 			<div className='mx-auto w-full max-w-2xl px-6 md:max-w-3xl lg:max-w-7xl lg:px-10 flex flex-col gap-16'>
 				<div className='flex max-w-2xl flex-col gap-6'>
-					<Badge>Built for scale</Badge>
+					<Badge>{t("badge")}</Badge>
 					<h2 className='font-display text-3xl tracking-tight text-pretty text-olive-950 sm:text-5xl'>
-						The inbox powering customer conversations everywhere.
+						{t("title")}
 					</h2>
 					<div className='text-base text-olive-700 text-pretty'>
-						<p>
-							Oatmeal helps teams deliver personal, organized, and fast customer support across the world.
-							From small startups to enterprise teams, we process millions of messages each month — using
-							a massive network of low wage workers stationed around the globe.
-						</p>
+						<p>{t("description")}</p>
 					</div>
 				</div>
 				<div className='grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3'>
 					<div className='col-span-2 grid grid-cols-2 gap-x-2 gap-y-10 sm:auto-cols-fr sm:grid-flow-col-dense'>
 						<div className='border-s border-olive-950/20 ps-6'>
-							<div className='text-2xl tracking-tight text-olive-950'>2M+</div>
-							<p className='mt-2 text-sm text-olive-700'>
-								Emails manually processed every week across thousands of teams.
-							</p>
+							<div className='text-2xl tracking-tight text-olive-950'>{t("items.emails.value")}</div>
+							<p className='mt-2 text-sm text-olive-700'>{t("items.emails.label")}</p>
 						</div>
 						<div className='border-s border-olive-950/20 ps-6'>
-							<div className='text-2xl tracking-tight text-olive-950'>99.98%</div>
-							<p className='mt-2 text-sm text-olive-700'>
-								Uptime — because your customers never stop complaining.
-							</p>
+							<div className='text-2xl tracking-tight text-olive-950'>{t("items.uptime.value")}</div>
+							<p className='mt-2 text-sm text-olive-700'>{t("items.uptime.label")}</p>
 						</div>
 					</div>
 				</div>
