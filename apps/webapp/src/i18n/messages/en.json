@@ -1,12 +1,4 @@
 {
-	"lang": {
-		"en": "English",
-		"es": "Español",
-		"fr": "Français",
-		"pt": "Português",
-		"ja": "日本語",
-		"switch_to": "Switch to {lang}"
-	},
 	"common": {
 		"loading": "Loading...",
 		"cancel": "Cancel",
@@ -134,7 +126,9 @@
 		}
 	},
 	"notFound": {
-		"title": "Not Found"
+		"title": "Page not found",
+		"description": "Sorry, but the page you were looking for could not be found.",
+		"backHome": "Go back home"
 	},
 	"ai": {
 		"tools": {}

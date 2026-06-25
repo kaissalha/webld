@@ -1,23 +1,15 @@
-import type { Route } from "next";
-import Link from "next/link";
-
 import { ArrowRight } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { Footer } from "@/app/[locale]/(site)/components/sections/footer";
 import { Navbar } from "@/app/[locale]/(site)/components/sections/navbar";
-import { BaseLayout } from "@/components/layout/base-layout";
-import messages from "@/i18n/messages/en.json";
-import { routing } from "@/i18n/routing";
-import "@webld/ui/globals.css";
+import { Link } from "@/i18n/navigation";
 
 export default async function NotFound() {
-	// This root fallback renders outside the `[locale]` segment, so there's no
-	// request locale — translate explicitly against the default locale.
-	const t = await getTranslations({ locale: routing.defaultLocale, namespace: "notFound" });
+	const t = await getTranslations("notFound");
 
 	return (
-		<BaseLayout locale={routing.defaultLocale} messages={messages}>
+		<>
 			<Navbar />
 			<section className='flex flex-1 flex-col items-center justify-center py-16 mx-auto w-full max-w-2xl gap-6 px-6 md:max-w-3xl lg:max-w-7xl lg:px-10'>
 				<h1 className='max-w-5xl text-center font-display text-8xl tracking-tight text-balance text-olive-950'>
@@ -25,7 +17,7 @@ export default async function NotFound() {
 				</h1>
 				<p className='flex max-w-xl flex-col gap-4 text-center text-lg text-olive-700'>{t("description")}</p>
 				<Link
-					href={"/" as Route}
+					href='/'
 					className='inline-flex items-center gap-2 text-sm font-medium text-olive-950 transition-opacity hover:opacity-70'
 				>
 					{t("backHome")}
@@ -33,6 +25,6 @@ export default async function NotFound() {
 				</Link>
 			</section>
 			<Footer />
-		</BaseLayout>
+		</>
 	);
 }

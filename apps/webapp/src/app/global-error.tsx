@@ -3,7 +3,9 @@
 import { useEffect } from "react";
 
 import { ErrorPageView } from "@/components/layout/error-page-view";
+import enMessages from "@/i18n/messages/en.json";
 import { routing } from "@/i18n/routing";
+import { createErrorReloadHandler } from "@/utils/error-reload";
 import { getDirection } from "@/utils/get-direction";
 import "@webld/ui/globals.css";
 
@@ -13,11 +15,10 @@ type GlobalErrorProps = {
 	unstable_retry?: () => void;
 };
 
-const globalErrorCopy = {
-	description: "It looks like there was an error, try reloading the page",
-	reloadLabel: "Reload page",
-	title: "Something went wrong",
-};
+// global-error replaces the root layout when it crashes, so it renders outside
+// the locale provider and can't use translation hooks. Source the copy from the
+// default-locale catalog (single source of truth) rather than a duplicate object.
+const { globalError } = enMessages;
 
 export default function GlobalError({ error, reset, unstable_retry }: GlobalErrorProps) {
 	const locale = routing.defaultLocale;
@@ -27,27 +28,17 @@ export default function GlobalError({ error, reset, unstable_retry }: GlobalErro
 		console.error(error);
 	}, [error]);
 
-	const handleReload = () => {
-		if (unstable_retry) {
-			unstable_retry();
-		} else if (reset) {
-			reset();
-		} else {
-			window.location.reload();
-		}
-	};
-
 	return (
 		<html lang={locale} dir={dir} suppressHydrationWarning>
 			<head>
-				<title>{globalErrorCopy.title}</title>
+				<title>{globalError.globalTitle}</title>
 			</head>
 			<body className='antialiased overflow-x-hidden max-w-dvw bg-background text-foreground'>
 				<ErrorPageView
-					description={globalErrorCopy.description}
-					onReload={handleReload}
-					reloadLabel={globalErrorCopy.reloadLabel}
-					title={globalErrorCopy.title}
+					description={globalError.globalDescription}
+					onReload={createErrorReloadHandler(reset, unstable_retry)}
+					reloadLabel={globalError.tryAgain}
+					title={globalError.globalTitle}
 				/>
 			</body>
 		</html>

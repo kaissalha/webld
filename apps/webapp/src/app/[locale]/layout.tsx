@@ -6,11 +6,14 @@ import { getMessages } from "next-intl/server";
 
 import { BaseLayout } from "@/components/layout/base-layout";
 import { generateLocalizedStaticParams, routing } from "@/i18n/routing";
+import { getBaseURL } from "@webld/utils";
 import "@webld/ui/globals.css";
 
 export const generateStaticParams = generateLocalizedStaticParams;
 
 export const metadata: Metadata = {
+	// Resolves relative OG/twitter/alternate URLs (incl. hreflang) to absolute ones.
+	metadataBase: getBaseURL(),
 	title: {
 		default: "webld",
 		template: "%s | webld",

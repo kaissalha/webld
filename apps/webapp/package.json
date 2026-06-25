@@ -109,6 +109,6 @@
 		"next-router-mock": "^1.0.5",
 		"postcss": "^8.5.15",
 		"tailwindcss": "^4.3.1",
-		"typescript": "^7.0.1-rc"
+		"typescript": "6.0.3"
 	}
 }

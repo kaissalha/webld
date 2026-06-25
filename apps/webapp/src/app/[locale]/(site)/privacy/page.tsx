@@ -1,13 +1,21 @@
+import type { Metadata } from "next";
+
 import { getMessages, getTranslations } from "next-intl/server";
 
 import { Link } from "@/i18n/navigation";
-import { generateLocalizedStaticParams } from "@/i18n/routing";
+import { generateLocalizedMetadata, generateLocalizedStaticParams } from "@/i18n/routing";
 import { cn } from "@webld/ui/lib/utils";
 
 import { Footer } from "../components/sections/footer";
 import { Navbar } from "../components/sections/navbar";
 
 export const generateStaticParams = generateLocalizedStaticParams;
+
+export const generateMetadata = async (): Promise<Metadata> => {
+	const t = await getTranslations("privacy");
+
+	return { ...generateLocalizedMetadata("/privacy"), title: t("title") };
+};
 
 const automaticItemIds = ["log", "device", "location"] as const;
 

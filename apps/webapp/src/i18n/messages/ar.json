@@ -1,12 +1,4 @@
 {
-	"lang": {
-		"en": "English",
-		"es": "Español",
-		"fr": "Français",
-		"pt": "Português",
-		"ja": "日本語",
-		"switch_to": "التبديل إلى {lang}"
-	},
 	"common": {
 		"loading": "جارٍ التحميل...",
 		"cancel": "إلغاء",
@@ -134,7 +126,9 @@
 		}
 	},
 	"notFound": {
-		"title": "غير موجود"
+		"title": "الصفحة غير موجودة",
+		"description": "عذرًا، تعذّر العثور على الصفحة التي تبحث عنها.",
+		"backHome": "العودة إلى الصفحة الرئيسية"
 	},
 	"ai": {
 		"tools": {}
