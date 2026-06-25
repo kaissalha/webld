@@ -20,6 +20,11 @@
 			"types": "./src/prompts.ts",
 			"import": "./src/prompts.ts",
 			"default": "./src/prompts.ts"
+		},
+		"./heal-messages": {
+			"types": "./src/heal-messages.ts",
+			"import": "./src/heal-messages.ts",
+			"default": "./src/heal-messages.ts"
 		}
 	},
 	"scripts": {
@@ -30,6 +35,7 @@
 		"@ai-sdk/gateway": "4.0.0-canary.107",
 		"@ai-sdk/provider-utils": "5.0.0-canary.48",
 		"ai": "^7.0.0-beta.179",
+		"ai-sdk-heal": "^0.2.0",
 		"zod": "^4.4.3"
 	},
 	"devDependencies": {

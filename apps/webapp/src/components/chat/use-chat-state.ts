@@ -73,12 +73,12 @@ export const useChatState = (): ChatState => {
 
 			const parts: BaseChatUIMessage["parts"] = [
 				...submittedAttachments.flatMap((attachment) =>
-					attachment.documentId
+					attachment.fileId
 						? [
 								{
 									type: "data-attachment" as const,
 									data: {
-										documentId: attachment.documentId,
+										fileId: attachment.fileId,
 										filename: attachment.filename,
 										mediaType: attachment.mediaType,
 									},

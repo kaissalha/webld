@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { withErrorHandler } from "@/utils/with-error-handler";
-import { getRagDocument } from "@webld/server";
+import { getFile } from "@webld/server";
 import { auth } from "@webld/server/auth";
 
 const paramsSchema = z.object({
@@ -29,17 +29,14 @@ export const GET = withErrorHandler(async (req: Request) => {
 	const parsedParams = paramsSchema.safeParse({ id });
 
 	if (!parsedParams.success) {
-		return NextResponse.json({ error: "Invalid document id" }, { status: 400 });
+		return NextResponse.json({ error: "Invalid file id" }, { status: 400 });
 	}
 
-	const document = await getRagDocument({
-		documentId: parsedParams.data.id,
-		organizationId,
-	});
+	const file = await getFile({ fileId: parsedParams.data.id, organizationId });
 
-	if (!document) {
-		return NextResponse.json({ error: "Document not found" }, { status: 404 });
+	if (!file) {
+		return NextResponse.json({ error: "File not found" }, { status: 404 });
 	}
 
-	return NextResponse.json({ document });
+	return NextResponse.json({ file });
 });

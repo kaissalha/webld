@@ -121,16 +121,18 @@ const uploadKnowledgeBaseDocument = async ({ file, signal }: { file: File; signa
 		throw new Error(message);
 	}
 
-	const body = (await response.json()) as { document: { id: string; status: "pending" | "ready" | "failed" } };
+	const body = (await response.json()) as {
+		file: { id: string; ragStatus: "failed" | "none" | "pending" | "ready" };
+	};
 
-	return body.document;
+	return body.file;
 };
 
 const pollKnowledgeBaseStatus = async ({
-	documentId,
+	fileId,
 	signal,
 }: {
-	documentId: string;
+	fileId: string;
 	signal?: AbortSignal;
 }): Promise<"ready" | "failed"> => {
 	const start = Date.now();
@@ -140,19 +142,19 @@ const pollKnowledgeBaseStatus = async ({
 			throw new Error("Upload cancelled");
 		}
 
-		const response = await fetch(`/api/rag/documents/${documentId}`, { signal });
+		const response = await fetch(`/api/rag/documents/${fileId}`, { signal });
 
 		if (response.ok) {
 			const body = (await response.json()) as {
-				document: { status: "pending" | "ready" | "failed"; error?: string | null };
+				file: { processingError?: string | null; ragStatus: "failed" | "none" | "pending" | "ready" };
 			};
 
-			if (body.document.status === "ready") {
+			if (body.file.ragStatus === "ready" || body.file.ragStatus === "none") {
 				return "ready";
 			}
 
-			if (body.document.status === "failed") {
-				throw new Error(body.document.error ?? "Indexing failed");
+			if (body.file.ragStatus === "failed") {
+				throw new Error(body.file.processingError ?? "Indexing failed");
 			}
 		}
 
@@ -200,23 +202,21 @@ export const useChatFileUpload = ({ uploadToKnowledgeBase = false }: { uploadToK
 			const controller = new AbortController();
 			abortControllersRef.current.set(attachment.id, controller);
 
-			const documentIdPromise = uploadKnowledgeBaseDocument({ file, signal: controller.signal }).then(
-				(document) => {
-					updateAttachment(attachment.id, {
-						documentId: document.id,
-						uploadStatus: "processing",
-					});
+			const fileIdPromise = uploadKnowledgeBaseDocument({ file, signal: controller.signal }).then((uploaded) => {
+				updateAttachment(attachment.id, {
+					fileId: uploaded.id,
+					uploadStatus: "processing",
+				});
 
-					return document.id;
-				}
-			);
+				return uploaded.id;
+			});
 
-			documentUploadPromisesRef.current.set(attachment.id, documentIdPromise);
+			documentUploadPromisesRef.current.set(attachment.id, fileIdPromise);
 
-			void documentIdPromise
-				.then(async (documentId) => {
+			void fileIdPromise
+				.then(async (fileId) => {
 					const finalStatus = await pollKnowledgeBaseStatus({
-						documentId,
+						fileId,
 						signal: controller.signal,
 					});
 
@@ -350,7 +350,7 @@ export const useChatFileUpload = ({ uploadToKnowledgeBase = false }: { uploadToK
 		async ({ attachments: attachmentsToWait }: { attachments: ChatFileAttachment[] }) => {
 			return Promise.all(
 				attachmentsToWait.map(async (attachment) => {
-					if (!attachment.uploadStatus || attachment.documentId) {
+					if (!attachment.uploadStatus || attachment.fileId) {
 						return attachment;
 					}
 
@@ -358,23 +358,23 @@ export const useChatFileUpload = ({ uploadToKnowledgeBase = false }: { uploadToK
 						throw new Error("Attachment upload failed");
 					}
 
-					const documentIdPromise = documentUploadPromisesRef.current.get(attachment.id);
+					const fileIdPromise = documentUploadPromisesRef.current.get(attachment.id);
 
-					if (!documentIdPromise) {
+					if (!fileIdPromise) {
 						const currentAttachment = attachmentsRef.current.find((item) => item.id === attachment.id);
 
-						if (currentAttachment?.documentId) {
+						if (currentAttachment?.fileId) {
 							return currentAttachment;
 						}
 
 						throw new Error("Attachment upload is not available");
 					}
 
-					const documentId = await documentIdPromise;
+					const fileId = await fileIdPromise;
 
 					return {
 						...attachment,
-						documentId,
+						fileId,
 						uploadStatus: "processing" as const,
 					};
 				})

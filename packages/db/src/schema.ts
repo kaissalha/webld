@@ -21,10 +21,19 @@ export {
 	oauthConnections,
 	oauthProviderEnum,
 } from "./schema/integrations/oauth-connections.ts";
-// Media
-export { uploadedMedia, uploadedMediaAccess, uploadedMediaAccessValues } from "./schema/media/storage.ts";
 // Contacts schema
 export { contacts } from "./schema/contacts/contacts.ts";
-// RAG schema
-export { ragDocumentChunks } from "./schema/rag/document-chunks.ts";
-export { ragDocumentSourceType, ragDocumentStatus, ragDocuments } from "./schema/rag/documents.ts";
+// Files (vault) schema
+export {
+	fileAccess,
+	fileAccessValues,
+	fileKind,
+	fileKindValues,
+	fileRagStatus,
+	fileRagStatusValues,
+	files,
+	fileSourceType,
+	fileSourceTypeValues,
+} from "./schema/files/files.ts";
+export { fileChunks } from "./schema/files/file-chunks.ts";
+export { fileTagAssignments, fileTags } from "./schema/files/tags.ts";

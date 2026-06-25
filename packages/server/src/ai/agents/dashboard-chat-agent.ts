@@ -21,13 +21,19 @@ export const dashboardChatAgent = new ToolLoopAgent({
 	callOptionsSchema: z
 		.object({
 			aiContext: appContextSchema.optional(),
+			// Once a chat contains an image, run every turn on the vision model so the
+			// model can actually read the attached image(s) sent inline.
+			useVisionModel: z.boolean().optional(),
 		})
 		.strict(),
 	prepareCall: async ({ options, ...settings }) => {
 		const aiContext = options.aiContext ?? {};
+		const modelConfig = options.useVisionModel ? models.vision : models.fast;
 
 		return {
 			...settings,
+			model: modelConfig.model,
+			providerOptions: modelConfig.providerOptions,
 			instructions: [
 				dashboardChatSystemPrompt({
 					currentUser: aiContext.currentUser,

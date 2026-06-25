@@ -35,8 +35,8 @@ export const relations = defineRelations(schema, (r) => ({
 		members: r.many.members(),
 		invitations: r.many.invitations(),
 		sessions: r.many.sessions(),
-		uploadedMedia: r.many.uploadedMedia(),
-		ragDocuments: r.many.ragDocuments(),
+		files: r.many.files(),
+		fileTags: r.many.fileTags(),
 		memories: r.many.memories(),
 		chatEpisodes: r.many.chatEpisodes(),
 	},
@@ -70,9 +70,50 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 	},
 
-	uploadedMedia: {
+	files: {
 		organization: r.one.organizations({
-			from: r.uploadedMedia.organizationId,
+			from: r.files.organizationId,
+			to: r.organizations.id,
+		}),
+		uploader: r.one.users({
+			from: r.files.uploadedBy,
+			to: r.users.id,
+			optional: true,
+		}),
+		chunks: r.many.fileChunks(),
+		tagAssignments: r.many.fileTagAssignments(),
+	},
+
+	fileChunks: {
+		file: r.one.files({
+			from: r.fileChunks.fileId,
+			to: r.files.id,
+		}),
+		organization: r.one.organizations({
+			from: r.fileChunks.organizationId,
+			to: r.organizations.id,
+		}),
+	},
+
+	fileTags: {
+		organization: r.one.organizations({
+			from: r.fileTags.organizationId,
+			to: r.organizations.id,
+		}),
+		assignments: r.many.fileTagAssignments(),
+	},
+
+	fileTagAssignments: {
+		file: r.one.files({
+			from: r.fileTagAssignments.fileId,
+			to: r.files.id,
+		}),
+		tag: r.one.fileTags({
+			from: r.fileTagAssignments.tagId,
+			to: r.fileTags.id,
+		}),
+		organization: r.one.organizations({
+			from: r.fileTagAssignments.organizationId,
 			to: r.organizations.id,
 		}),
 	},
@@ -130,25 +171,6 @@ export const relations = defineRelations(schema, (r) => ({
 		chat: r.one.aiChats({
 			from: r.aiChatStreams.chatId,
 			to: r.aiChats.id,
-		}),
-	},
-
-	ragDocuments: {
-		organization: r.one.organizations({
-			from: r.ragDocuments.organizationId,
-			to: r.organizations.id,
-		}),
-		chunks: r.many.ragDocumentChunks(),
-	},
-
-	ragDocumentChunks: {
-		document: r.one.ragDocuments({
-			from: r.ragDocumentChunks.documentId,
-			to: r.ragDocuments.id,
-		}),
-		organization: r.one.organizations({
-			from: r.ragDocumentChunks.organizationId,
-			to: r.organizations.id,
 		}),
 	},
 

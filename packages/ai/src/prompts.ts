@@ -106,6 +106,65 @@ Rules:
 - Order the kept IDs from most to least relevant.
 - Return only the numeric IDs of the chunks worth keeping. If none are relevant, return an empty array.`;
 
+export const fileClassificationSchema = z.object({
+	title: z.string().describe("A concise, descriptive title for the document. Never empty."),
+	summary: z.string().describe("One sentence describing what this document is and its purpose."),
+	date: z
+		.string()
+		.nullable()
+		.describe(
+			"The single most relevant date in ISO 8601 (YYYY-MM-DD), e.g. an invoice or signing date. Null if none."
+		),
+	language: z
+		.string()
+		.nullable()
+		.describe("Primary language as a lowercase English name (e.g. 'english', 'spanish'). Null if unknown."),
+	tags: z
+		.array(z.string())
+		.max(6)
+		.describe("Up to 6 short keyword tags: document type, company/person names, and key subjects."),
+});
+
+export const fileClassificationSystemPrompt = `You classify documents uploaded to a knowledge vault. Given an excerpt of a document's text, produce searchable metadata.
+
+Rules:
+- title: always provide a specific, human-readable title (e.g. "Acme Q3 2025 Services Invoice"). Never return an empty string.
+- summary: one sentence describing what the document is.
+- date: the single most relevant date in YYYY-MM-DD, or null.
+- language: the document's primary language as a lowercase English name, or null.
+- tags: up to 6 short, reusable keywords — prioritize document type, company/person names, and the key subject. Lowercase, no punctuation.`;
+
+export const imageClassificationSchema = z.object({
+	title: z.string().describe("A concise, descriptive title for the image. Never empty."),
+	summary: z.string().describe("One sentence describing what the image shows (key visual elements, branding, type)."),
+	ocrText: z
+		.string()
+		.nullable()
+		.describe("All legible text visible in the image, transcribed verbatim. Null if there is no readable text."),
+	date: z
+		.string()
+		.nullable()
+		.describe("The most relevant date visible in the image in ISO 8601 (YYYY-MM-DD), or null."),
+	language: z
+		.string()
+		.nullable()
+		.describe("Primary language of any visible text as a lowercase English name, or null."),
+	tags: z
+		.array(z.string())
+		.max(6)
+		.describe("Up to 6 short keyword tags: subject, merchant/brand, and document type if applicable."),
+});
+
+export const imageClassificationSystemPrompt = `You analyze images uploaded to a knowledge vault. Extract searchable metadata and transcribe any visible text.
+
+Rules:
+- title: always provide a specific, human-readable title (e.g. "Starbucks receipt — 2025-03-14"). Never empty.
+- summary: one sentence describing what the image shows.
+- ocrText: transcribe ALL legible text in the image verbatim (receipts, invoices, labels, signs). Null only if there is genuinely no text.
+- date: the most relevant date visible, in YYYY-MM-DD, or null.
+- language: primary language of visible text as a lowercase English name, or null.
+- tags: up to 6 short keywords — subject, merchant/brand, document type. Lowercase, no punctuation.`;
+
 type MemoryForPrompt = {
 	id: string;
 	text: string;

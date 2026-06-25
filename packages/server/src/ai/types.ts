@@ -44,7 +44,7 @@ export type BaseMessageMetadata = {
  */
 export type BaseCustomUIDataTypes = {
 	attachment: {
-		documentId: string;
+		fileId: string;
 		filename: string;
 		mediaType: string;
 	};

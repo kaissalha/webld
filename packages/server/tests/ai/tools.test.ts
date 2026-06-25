@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { createContact, createRagChunkSnippet, getContact, listContacts, retrieveRagChunks } = vi.hoisted(() => ({
+const { createContact, createFileChunkSnippet, getContact, listContacts, retrieveFileChunks } = vi.hoisted(() => ({
 	createContact: vi.fn(),
-	createRagChunkSnippet: vi.fn(),
+	createFileChunkSnippet: vi.fn(),
 	getContact: vi.fn(),
 	listContacts: vi.fn(),
-	retrieveRagChunks: vi.fn(),
+	retrieveFileChunks: vi.fn(),
 }));
 
 vi.mock("../../src/services/contacts", () => ({
@@ -15,8 +15,8 @@ vi.mock("../../src/services/contacts", () => ({
 }));
 
 vi.mock("../../src/services/rag", () => ({
-	createRagChunkSnippet,
-	retrieveRagChunks,
+	createFileChunkSnippet,
+	retrieveFileChunks,
 }));
 
 import type { ModelMessage, ToolExecuteFunction, ToolExecutionOptions } from "ai";
@@ -135,22 +135,23 @@ describe("ai tools", () => {
 	});
 
 	it("retrieveKnowledgeTool returns ranked snippets", async () => {
-		retrieveRagChunks.mockResolvedValue([
+		retrieveFileChunks.mockResolvedValue([
 			{
 				chunkId: "chunk-1",
 				chunkIndex: 0,
 				content: "Use concise follow-up summaries after demos.",
-				document: {
+				file: {
 					id: "doc-1",
+					kind: "text",
 					name: "Sales playbook",
-					source: null,
-					sourceType: "text",
+					title: "Sales playbook",
+					url: null,
 				},
 				metadata: {},
 				similarity: 0.82,
 			},
 		]);
-		createRagChunkSnippet.mockReturnValue("Use concise follow-up summaries after demos.");
+		createFileChunkSnippet.mockReturnValue("Use concise follow-up summaries after demos.");
 
 		const outputs = await runTool(
 			retrieveKnowledgeTool.execute,

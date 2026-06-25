@@ -31,7 +31,12 @@
 		},
 		"webapp#build": {
 			"inputs": ["$TURBO_DEFAULT$", "apps/webapp/package.json"],
-			"outputs": [".next/**", "!.next/cache/**"],
+			"outputs": [
+				".next/**",
+				"!.next/cache/**",
+				"src/app/.well-known/workflow/**",
+				"public/.well-known/workflow/**"
+			],
 			"cache": true,
 			"passThroughEnv": ["VERCEL_OIDC_TOKEN"],
 			"env": [

@@ -14,7 +14,7 @@ const KNOWLEDGE_BASE_DOCUMENT_MIME_TYPES = new Set([
 const KNOWLEDGE_BASE_DOCUMENT_EXTENSIONS = new Set(["docx", "htm", "html", "pdf", "xls", "xlsx", "xml"]);
 
 export type ChatFileAttachment = {
-	documentId?: string;
+	fileId?: string;
 	filename: string;
 	id: string;
 	mediaType: string;
@@ -43,6 +43,7 @@ export const isKnowledgeBaseAttachment = ({ filename, mediaType }: { filename: s
 	const extension = getChatAttachmentExtension({ filename });
 
 	return (
+		mediaType.startsWith("image/") ||
 		mediaType.startsWith("text/") ||
 		mediaType === "application/json" ||
 		KNOWLEDGE_BASE_DOCUMENT_MIME_TYPES.has(mediaType) ||

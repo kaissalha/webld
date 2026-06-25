@@ -3,14 +3,16 @@ import { NextResponse } from "next/server";
 
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
+import { start } from "workflow/api";
 import { z } from "zod";
 
 import { DEFAULT_MAX_UPLOAD_FILE_SIZE_MB, mediaAccessValues } from "@/constants/upload";
 import { getBlob, handleClientUpload } from "@/lib/server/storage";
 import { parseJsonPayload } from "@/utils/parse-json-payload";
 import { withErrorHandler } from "@/utils/with-error-handler";
+import { ingestFileWorkflow } from "@/workflows/ingest-file";
 import { db, members } from "@webld/db";
-import { createStorageRecord, findStorageByUrl } from "@webld/server";
+import { createFile, detectFileKind, findFileByUrl } from "@webld/server";
 import { auth } from "@webld/server/auth";
 
 const uploadClientPayloadSchema = z.object({
@@ -120,12 +122,27 @@ export const POST = withErrorHandler(async (req: Request) => {
 					message: "Invalid upload token payload.",
 				});
 			}
-			await createStorageRecord({
-				organizationId: parsed.data.organizationId,
-				url: blob.url,
-				contentType: normalizeStoredContentType(blob.contentType),
+			const contentType = normalizeStoredContentType(blob.contentType);
+			const kind = detectFileKind({ mimeType: contentType });
+			const indexable = kind === "image" || kind === "document" || kind === "text";
+
+			const fileRecord = await createFile({
 				access: parsed.data.access,
+				contentType,
+				kind,
+				name: blob.pathname.split("/").pop() ?? blob.pathname,
+				organizationId: parsed.data.organizationId,
+				ragStatus: indexable ? "pending" : "none",
+				sourceType: "upload",
+				uploadedBy: parsed.data.userId,
+				url: blob.url,
 			});
+
+			if (indexable) {
+				await start(ingestFileWorkflow, [
+					{ fileId: fileRecord.id, organizationId: parsed.data.organizationId },
+				]);
+			}
 		},
 	});
 
@@ -149,7 +166,7 @@ export const GET = withErrorHandler(async (req: Request) => {
 
 	await requireOrganizationMembership(parsed.data.organizationId, "Must be authenticated to view uploaded media.");
 
-	const row = await findStorageByUrl(parsed.data.organizationId, parsed.data.url, {
+	const row = await findFileByUrl(parsed.data.organizationId, parsed.data.url, {
 		url: true,
 		access: true,
 	});

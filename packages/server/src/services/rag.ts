@@ -4,14 +4,11 @@ import { createHash } from "node:crypto";
 
 import { embeddingModels, models } from "@webld/ai/models";
 import { ragRerankSchema, ragRerankSystemPrompt } from "@webld/ai/prompts";
-import { buildSearchQuery, db, ragDocumentChunks, ragDocuments } from "@webld/db";
+import { buildSearchQuery, db, type FileKind, fileChunks, files } from "@webld/db";
 
-const RAG_DOCUMENT_WAIT_INTERVAL_MS = 1500;
-const RAG_DOCUMENT_WAIT_TIMEOUT_MS = 4.5 * 60 * 1000;
-
-export type RagChunkMetadata = {
+export type FileChunkMetadata = {
 	chunkIndex: number;
-	chunkType?: "prose" | "code" | "list" | "table" | "mixed";
+	chunkType?: "prose" | "code" | "list" | "table" | "mixed" | "ocr" | "description";
 	endChar?: number;
 	heading?: string;
 	previousHeading?: string;
@@ -19,15 +16,16 @@ export type RagChunkMetadata = {
 	startChar?: number;
 };
 
-export type RetrievedRagChunk = {
+export type RetrievedFileChunk = {
 	chunkId: string;
 	chunkIndex: number;
 	content: string;
-	document: {
+	file: {
 		id: string;
+		kind: FileKind;
 		name: string;
-		source: string | null;
-		sourceType: "text" | "file" | "url";
+		title: string | null;
+		url: string | null;
 	};
 	metadata: Record<string, unknown>;
 	similarity: number;
@@ -42,9 +40,9 @@ const markdownHeadingPattern = /^#{1,6}\s+(.+)$/mu;
 const capitalizedLinePattern = /^[A-Z]/u;
 const endingPunctuationPattern = /[.!?]$/u;
 
-const getContentHash = ({ text }: { text: string }) => createHash("sha256").update(text).digest("hex");
+export const hashText = ({ text }: { text: string }) => createHash("sha256").update(text).digest("hex");
 
-const detectChunkType = ({ text }: { text: string }): RagChunkMetadata["chunkType"] => {
+const detectChunkType = ({ text }: { text: string }): FileChunkMetadata["chunkType"] => {
 	const trimmed = text.trim();
 
 	if (codeBlockPattern.test(trimmed) || indentedCodePattern.test(trimmed) || codeLikePattern.test(trimmed)) {
@@ -93,7 +91,7 @@ const extractHeading = ({ maxLength = 100, text }: { maxLength?: number; text: s
 		?.slice(0, maxLength);
 };
 
-export const chunkRagText = ({
+export const chunkText = ({
 	chunkSize = 2000,
 	minChunkSize = 100,
 	overlap = 200,
@@ -106,7 +104,7 @@ export const chunkRagText = ({
 	separators?: string[];
 	text: string;
 }) => {
-	const chunks: Array<{ metadata: RagChunkMetadata; text: string }> = [];
+	const chunks: Array<{ metadata: FileChunkMetadata; text: string }> = [];
 	let currentIndex = 0;
 	let chunkIndex = 0;
 	let previousHeading: string | undefined;
@@ -216,241 +214,50 @@ export const generateRagEmbeddings = async ({ values }: { values: string[] }) =>
 	return embeddings;
 };
 
-export const createPendingRagDocument = async ({
-	contentHash,
-	metadata = {},
-	name,
-	organizationId,
-	source,
-	sourceType = "text",
-}: {
-	contentHash?: string;
-	metadata?: Record<string, unknown>;
-	name: string;
-	organizationId: string;
-	source?: string;
-	sourceType?: "text" | "file" | "url";
-}) => {
-	const [document] = await db
-		.insert(ragDocuments)
-		.values({
-			contentHash: contentHash ?? null,
-			metadata,
-			name,
-			organizationId,
-			source,
-			sourceType,
-			status: "pending",
-		})
-		.returning();
-
-	if (!document) {
-		throw new Error("Failed to create RAG document");
-	}
-
-	return document;
+type EmbeddedChunk = {
+	chunkIndex: number;
+	content: string;
+	embedding: number[];
+	metadata: Record<string, unknown>;
 };
 
-export const getRagDocument = async ({
-	documentId,
-	organizationId,
-}: {
-	documentId: string;
-	organizationId: string;
-}) => {
-	const [document] = await db
-		.select()
-		.from(ragDocuments)
-		.where(and(eq(ragDocuments.id, documentId), eq(ragDocuments.organizationId, organizationId)))
-		.limit(1);
-
-	return document ?? null;
-};
-
-const waitForDocumentPollInterval = ({ signal }: { signal?: AbortSignal }) =>
-	new Promise<void>((resolve, reject) => {
-		if (signal?.aborted) {
-			reject(new Error("RAG document wait cancelled"));
-			return;
-		}
-
-		const handleAbort = () => {
-			clearTimeout(timeoutId);
-			reject(new Error("RAG document wait cancelled"));
-		};
-		const timeoutId = setTimeout(() => {
-			signal?.removeEventListener("abort", handleAbort);
-			resolve();
-		}, RAG_DOCUMENT_WAIT_INTERVAL_MS);
-
-		signal?.addEventListener("abort", handleAbort, { once: true });
-	});
-
-export const waitForRagDocumentsReady = async ({
-	documentIds,
-	organizationId,
-	signal,
-	timeoutMs = RAG_DOCUMENT_WAIT_TIMEOUT_MS,
-}: {
-	documentIds: string[];
-	organizationId: string;
-	signal?: AbortSignal;
-	timeoutMs?: number;
-}) => {
-	const uniqueDocumentIds = Array.from(new Set(documentIds));
-	const start = Date.now();
-
-	if (uniqueDocumentIds.length === 0) {
-		return [];
-	}
-
-	while (Date.now() - start < timeoutMs) {
-		if (signal?.aborted) {
-			throw new Error("RAG document wait cancelled");
-		}
-
-		const documents = await Promise.all(
-			uniqueDocumentIds.map((documentId) =>
-				getRagDocument({
-					documentId,
-					organizationId,
-				})
-			)
-		);
-		const missingDocumentId = uniqueDocumentIds.find((_documentId, index) => !documents[index]);
-
-		if (missingDocumentId) {
-			throw new Error(`RAG document not found: ${missingDocumentId}`);
-		}
-
-		const failedDocument = documents.find((document) => document?.status === "failed");
-
-		if (failedDocument) {
-			throw new Error(failedDocument.error ?? `Failed to index ${failedDocument.name}`);
-		}
-
-		if (documents.every((document) => document?.status === "ready")) {
-			return documents;
-		}
-
-		await waitForDocumentPollInterval({ signal });
-	}
-
-	throw new Error("Timed out waiting for attachments to finish indexing");
-};
-
-export const markRagDocumentFailed = async ({
-	documentId,
-	error,
-	organizationId,
-}: {
-	documentId: string;
-	error: string;
-	organizationId: string;
-}) => {
+/** Delete all chunks for a file. Called before re-inserting on (re)ingestion. */
+export const clearFileChunks = async ({ fileId, organizationId }: { fileId: string; organizationId: string }) => {
 	await db
-		.update(ragDocuments)
-		.set({
-			error,
-			status: "failed",
-			updatedAt: new Date().toISOString(),
-		})
-		.where(and(eq(ragDocuments.id, documentId), eq(ragDocuments.organizationId, organizationId)));
+		.delete(fileChunks)
+		.where(and(eq(fileChunks.fileId, fileId), eq(fileChunks.organizationId, organizationId)));
 };
 
-export const upsertRagTextDocument = async ({
-	chunkSize,
-	documentId,
-	metadata = {},
-	minChunkSize,
-	name,
+/** Insert a batch of already-embedded chunks for a file. */
+export const insertFileChunks = async ({
+	chunks,
+	fileId,
 	organizationId,
-	overlap,
-	source,
-	sourceType = "text",
-	text,
 }: {
-	chunkSize?: number;
-	documentId?: string;
-	metadata?: Record<string, unknown>;
-	minChunkSize?: number;
-	name: string;
+	chunks: EmbeddedChunk[];
+	fileId: string;
 	organizationId: string;
-	overlap?: number;
-	source?: string;
-	sourceType?: "text" | "file" | "url";
-	text: string;
 }) => {
-	const content = text.trim();
-
-	if (!content) {
-		throw new Error("RAG document text is required");
+	if (chunks.length === 0) {
+		return { chunkCount: 0 };
 	}
 
-	const chunks = chunkRagText({ chunkSize, minChunkSize, overlap, text: content });
-	const embeddings = await generateRagEmbeddings({ values: chunks.map((chunk) => chunk.text) });
-	const now = new Date().toISOString();
+	await db.insert(fileChunks).values(
+		chunks.map((chunk) => ({
+			chunkIndex: chunk.chunkIndex,
+			content: chunk.content,
+			embedding: chunk.embedding,
+			fileId,
+			metadata: chunk.metadata,
+			organizationId,
+		}))
+	);
 
-	return db.transaction(async (tx) => {
-		const [document] = documentId
-			? await tx
-					.update(ragDocuments)
-					.set({
-						contentHash: getContentHash({ text: content }),
-						error: null,
-						metadata,
-						name,
-						source,
-						sourceType,
-						status: "ready",
-						updatedAt: now,
-					})
-					.where(and(eq(ragDocuments.id, documentId), eq(ragDocuments.organizationId, organizationId)))
-					.returning()
-			: await tx
-					.insert(ragDocuments)
-					.values({
-						contentHash: getContentHash({ text: content }),
-						metadata,
-						name,
-						organizationId,
-						source,
-						sourceType,
-						status: "ready",
-					})
-					.returning();
-
-		if (!document) {
-			throw new Error("RAG document not found");
-		}
-
-		await tx.delete(ragDocumentChunks).where(eq(ragDocumentChunks.documentId, document.id));
-
-		if (chunks.length > 0) {
-			await tx.insert(ragDocumentChunks).values(
-				chunks.map((chunk, index) => ({
-					chunkIndex: chunk.metadata.chunkIndex,
-					content: chunk.text,
-					documentId: document.id,
-					embedding: embeddings[index] ?? [],
-					metadata: {
-						...chunk.metadata,
-						source,
-					},
-					organizationId,
-				}))
-			);
-		}
-
-		return {
-			chunkCount: chunks.length,
-			document,
-		};
-	});
+	return { chunkCount: chunks.length };
 };
 
 const RRF_K = 60;
-const RAG_CANDIDATES_PER_RETRIEVER = 30;
+const FILE_CANDIDATES_PER_RETRIEVER = 30;
 const SNIPPET_LENGTH = 150;
 
 export type RagRerankConversationMessage = {
@@ -458,43 +265,46 @@ export type RagRerankConversationMessage = {
 	role: "assistant" | "user";
 };
 
-const ragChunkColumns = {
-	chunkIndex: ragDocumentChunks.chunkIndex,
-	chunkId: ragDocumentChunks.id,
-	content: ragDocumentChunks.content,
-	documentId: ragDocuments.id,
-	documentName: ragDocuments.name,
-	documentSource: ragDocuments.source,
-	documentSourceType: ragDocuments.sourceType,
-	metadata: ragDocumentChunks.metadata,
+const fileChunkColumns = {
+	chunkId: fileChunks.id,
+	chunkIndex: fileChunks.chunkIndex,
+	content: fileChunks.content,
+	fileId: files.id,
+	fileKind: files.kind,
+	fileName: files.name,
+	fileTitle: files.title,
+	fileUrl: files.url,
+	metadata: fileChunks.metadata,
 };
 
-type RagChunkRow = {
+type FileChunkRow = {
 	chunkId: string;
 	chunkIndex: number;
 	content: string;
-	documentId: string;
-	documentName: string;
-	documentSource: string | null;
-	documentSourceType: "text" | "file" | "url";
+	fileId: string;
+	fileKind: FileKind;
+	fileName: string;
+	fileTitle: string | null;
+	fileUrl: string | null;
 	metadata: Record<string, unknown>;
 };
 
-const toRetrievedRagChunk = ({ row, score }: { row: RagChunkRow; score: number }): RetrievedRagChunk => ({
+const toRetrievedFileChunk = ({ row, score }: { row: FileChunkRow; score: number }): RetrievedFileChunk => ({
 	chunkId: row.chunkId,
 	chunkIndex: row.chunkIndex,
 	content: row.content,
-	document: {
-		id: row.documentId,
-		name: row.documentName,
-		source: row.documentSource,
-		sourceType: row.documentSourceType,
+	file: {
+		id: row.fileId,
+		kind: row.fileKind,
+		name: row.fileName,
+		title: row.fileTitle,
+		url: row.fileUrl,
 	},
 	metadata: row.metadata,
 	similarity: score,
 });
 
-export const createRagChunkSnippet = ({ content }: { content: string }) => {
+export const createFileChunkSnippet = ({ content }: { content: string }) => {
 	const normalized = content.replaceAll(/\s+/gu, " ").trim();
 
 	if (normalized.length <= SNIPPET_LENGTH) {
@@ -504,31 +314,31 @@ export const createRagChunkSnippet = ({ content }: { content: string }) => {
 	return `${normalized.slice(0, SNIPPET_LENGTH).trim()}...`;
 };
 
-export const searchRagChunksBySemantic = async ({
-	limit = RAG_CANDIDATES_PER_RETRIEVER,
+export const searchFileChunksBySemantic = async ({
+	limit = FILE_CANDIDATES_PER_RETRIEVER,
 	organizationId,
 	query,
 }: {
 	limit?: number;
 	organizationId: string;
 	query: string;
-}): Promise<RetrievedRagChunk[]> => {
+}): Promise<RetrievedFileChunk[]> => {
 	if (!query.trim()) {
 		return [];
 	}
 
 	const queryEmbedding = await generateRagEmbedding({ value: query });
-	const similarity = sql<number>`1 - (${cosineDistance(ragDocumentChunks.embedding, queryEmbedding)})`;
+	const similarity = sql<number>`1 - (${cosineDistance(fileChunks.embedding, queryEmbedding)})`;
 
 	const rows = await db
-		.select({ ...ragChunkColumns, score: similarity })
-		.from(ragDocumentChunks)
-		.innerJoin(ragDocuments, eq(ragDocumentChunks.documentId, ragDocuments.id))
+		.select({ ...fileChunkColumns, score: similarity })
+		.from(fileChunks)
+		.innerJoin(files, eq(fileChunks.fileId, files.id))
 		.where(
 			and(
-				eq(ragDocumentChunks.organizationId, organizationId),
-				eq(ragDocuments.organizationId, organizationId),
-				eq(ragDocuments.status, "ready")
+				eq(fileChunks.organizationId, organizationId),
+				eq(files.organizationId, organizationId),
+				eq(files.ragStatus, "ready")
 			)
 		)
 		.orderBy((row) => desc(row.score))
@@ -536,36 +346,36 @@ export const searchRagChunksBySemantic = async ({
 
 	return rows
 		.filter((row) => row.content.trim().length > 0)
-		.map((row) => toRetrievedRagChunk({ row, score: Number(row.score) }));
+		.map((row) => toRetrievedFileChunk({ row, score: Number(row.score) }));
 };
 
-export const searchRagChunksByKeyword = async ({
-	limit = RAG_CANDIDATES_PER_RETRIEVER,
+export const searchFileChunksByKeyword = async ({
+	limit = FILE_CANDIDATES_PER_RETRIEVER,
 	organizationId,
 	query,
 }: {
 	limit?: number;
 	organizationId: string;
 	query: string;
-}): Promise<RetrievedRagChunk[]> => {
+}): Promise<RetrievedFileChunk[]> => {
 	const tsquery = buildSearchQuery(query);
 
 	if (!tsquery) {
 		return [];
 	}
 
-	const rank = sql<number>`ts_rank(${ragDocumentChunks.fts}, to_tsquery('english', ${tsquery}))`;
+	const rank = sql<number>`ts_rank(${fileChunks.fts}, to_tsquery('english', ${tsquery}))`;
 
 	const rows = await db
-		.select({ ...ragChunkColumns, score: rank })
-		.from(ragDocumentChunks)
-		.innerJoin(ragDocuments, eq(ragDocumentChunks.documentId, ragDocuments.id))
+		.select({ ...fileChunkColumns, score: rank })
+		.from(fileChunks)
+		.innerJoin(files, eq(fileChunks.fileId, files.id))
 		.where(
 			and(
-				eq(ragDocumentChunks.organizationId, organizationId),
-				eq(ragDocuments.organizationId, organizationId),
-				eq(ragDocuments.status, "ready"),
-				sql`${ragDocumentChunks.fts} @@ to_tsquery('english', ${tsquery})`
+				eq(fileChunks.organizationId, organizationId),
+				eq(files.organizationId, organizationId),
+				eq(files.ragStatus, "ready"),
+				sql`${fileChunks.fts} @@ to_tsquery('english', ${tsquery})`
 			)
 		)
 		.orderBy((row) => desc(row.score))
@@ -573,7 +383,7 @@ export const searchRagChunksByKeyword = async ({
 
 	return rows
 		.filter((row) => row.content.trim().length > 0)
-		.map((row) => toRetrievedRagChunk({ row, score: Number(row.score) }));
+		.map((row) => toRetrievedFileChunk({ row, score: Number(row.score) }));
 };
 
 export const reciprocalRankFusion = <T>({
@@ -605,17 +415,17 @@ export const reciprocalRankFusion = <T>({
 		});
 };
 
-export const rerankRagChunks = async ({
+export const rerankFileChunks = async ({
 	candidates,
 	conversationHistory = [],
 	query,
 	topK = 5,
 }: {
-	candidates: RetrievedRagChunk[];
+	candidates: RetrievedFileChunk[];
 	conversationHistory?: RagRerankConversationMessage[];
 	query: string;
 	topK?: number;
-}): Promise<RetrievedRagChunk[]> => {
+}): Promise<RetrievedFileChunk[]> => {
 	if (candidates.length <= 1) {
 		return candidates.slice(0, topK);
 	}
@@ -632,7 +442,10 @@ export const rerankRagChunks = async ({
 				{
 					role: "user",
 					content: `Search query: ${query}\n\nCandidate chunks:\n${candidates
-						.map((candidate, index) => `[${index}] (from ${candidate.document.name})\n${candidate.content}`)
+						.map(
+							(candidate, index) =>
+								`[${index}] (from ${candidate.file.title ?? candidate.file.name})\n${candidate.content}`
+						)
 						.join("\n\n")}`,
 				},
 			],
@@ -660,7 +473,7 @@ export const rerankRagChunks = async ({
  * Hybrid retrieval: keyword (Postgres full-text search) + semantic (pgvector)
  * fused with reciprocal rank fusion, then reranked by a cheap LLM.
  */
-export const retrieveRagChunks = async ({
+export const retrieveFileChunks = async ({
 	conversationHistory,
 	keywords,
 	organizationId,
@@ -672,13 +485,13 @@ export const retrieveRagChunks = async ({
 	organizationId: string;
 	searchQuery?: string;
 	topK?: number;
-}): Promise<RetrievedRagChunk[]> => {
+}): Promise<RetrievedFileChunk[]> => {
 	const keywordQuery = keywords?.length ? keywords.join(" ") : (searchQuery ?? "");
 	const semanticQuery = searchQuery?.trim() ? searchQuery : (keywords?.join(" ") ?? "");
 
 	const [keywordResults, semanticResults] = await Promise.all([
-		keywordQuery ? searchRagChunksByKeyword({ organizationId, query: keywordQuery }) : Promise.resolve([]),
-		semanticQuery ? searchRagChunksBySemantic({ organizationId, query: semanticQuery }) : Promise.resolve([]),
+		keywordQuery ? searchFileChunksByKeyword({ organizationId, query: keywordQuery }) : Promise.resolve([]),
+		semanticQuery ? searchFileChunksBySemantic({ organizationId, query: semanticQuery }) : Promise.resolve([]),
 	]);
 
 	const fused = reciprocalRankFusion({
@@ -691,34 +504,34 @@ export const retrieveRagChunks = async ({
 	}
 
 	const candidates = fused
-		.slice(0, RAG_CANDIDATES_PER_RETRIEVER)
+		.slice(0, FILE_CANDIDATES_PER_RETRIEVER)
 		.map(({ item, score }) => ({ ...item, similarity: score }));
 
 	const query = [keywords?.join(" "), searchQuery].filter(Boolean).join(" ");
 
-	return rerankRagChunks({ candidates, conversationHistory, query, topK });
+	return rerankFileChunks({ candidates, conversationHistory, query, topK });
 };
 
-export const getRagChunksByIds = async ({
+export const getFileChunksByIds = async ({
 	chunkIds,
 	organizationId,
 }: {
 	chunkIds: string[];
 	organizationId: string;
-}): Promise<RetrievedRagChunk[]> => {
+}): Promise<RetrievedFileChunk[]> => {
 	if (chunkIds.length === 0) {
 		return [];
 	}
 
 	const rows = await db
-		.select(ragChunkColumns)
-		.from(ragDocumentChunks)
-		.innerJoin(ragDocuments, eq(ragDocumentChunks.documentId, ragDocuments.id))
+		.select(fileChunkColumns)
+		.from(fileChunks)
+		.innerJoin(files, eq(fileChunks.fileId, files.id))
 		.where(
 			and(
-				eq(ragDocumentChunks.organizationId, organizationId),
-				eq(ragDocuments.organizationId, organizationId),
-				inArray(ragDocumentChunks.id, chunkIds)
+				eq(fileChunks.organizationId, organizationId),
+				eq(files.organizationId, organizationId),
+				inArray(fileChunks.id, chunkIds)
 			)
 		);
 
@@ -726,10 +539,10 @@ export const getRagChunksByIds = async ({
 
 	return rows
 		.toSorted((a, b) => (orderById.get(a.chunkId) ?? 0) - (orderById.get(b.chunkId) ?? 0))
-		.map((row) => toRetrievedRagChunk({ row, score: 0 }));
+		.map((row) => toRetrievedFileChunk({ row, score: 0 }));
 };
 
-export const getRagChunkNeighbors = async ({
+export const getFileChunkNeighbors = async ({
 	chunkId,
 	organizationId,
 	radius = 1,
@@ -737,11 +550,11 @@ export const getRagChunkNeighbors = async ({
 	chunkId: string;
 	organizationId: string;
 	radius?: number;
-}): Promise<RetrievedRagChunk[]> => {
+}): Promise<RetrievedFileChunk[]> => {
 	const [target] = await db
-		.select({ chunkIndex: ragDocumentChunks.chunkIndex, documentId: ragDocumentChunks.documentId })
-		.from(ragDocumentChunks)
-		.where(and(eq(ragDocumentChunks.id, chunkId), eq(ragDocumentChunks.organizationId, organizationId)))
+		.select({ chunkIndex: fileChunks.chunkIndex, fileId: fileChunks.fileId })
+		.from(fileChunks)
+		.where(and(eq(fileChunks.id, chunkId), eq(fileChunks.organizationId, organizationId)))
 		.limit(1);
 
 	if (!target) {
@@ -749,29 +562,30 @@ export const getRagChunkNeighbors = async ({
 	}
 
 	const rows = await db
-		.select(ragChunkColumns)
-		.from(ragDocumentChunks)
-		.innerJoin(ragDocuments, eq(ragDocumentChunks.documentId, ragDocuments.id))
+		.select(fileChunkColumns)
+		.from(fileChunks)
+		.innerJoin(files, eq(fileChunks.fileId, files.id))
 		.where(
 			and(
-				eq(ragDocumentChunks.organizationId, organizationId),
-				eq(ragDocuments.organizationId, organizationId),
-				eq(ragDocumentChunks.documentId, target.documentId),
-				gte(ragDocumentChunks.chunkIndex, target.chunkIndex - radius),
-				lte(ragDocumentChunks.chunkIndex, target.chunkIndex + radius)
+				eq(fileChunks.organizationId, organizationId),
+				eq(files.organizationId, organizationId),
+				eq(fileChunks.fileId, target.fileId),
+				gte(fileChunks.chunkIndex, target.chunkIndex - radius),
+				lte(fileChunks.chunkIndex, target.chunkIndex + radius)
 			)
 		)
-		.orderBy(asc(ragDocumentChunks.chunkIndex));
+		.orderBy(asc(fileChunks.chunkIndex));
 
-	return rows.map((row) => toRetrievedRagChunk({ row, score: 0 }));
+	return rows.map((row) => toRetrievedFileChunk({ row, score: 0 }));
 };
 
-export const formatRagChunksForContext = ({ chunks }: { chunks: RetrievedRagChunk[] }) =>
+export const formatFileChunksForContext = ({ chunks }: { chunks: RetrievedFileChunk[] }) =>
 	chunks
 		.map((chunk, index) => {
 			const citationId = `[${index + 1}]`;
-			const source = chunk.document.source ? ` (${chunk.document.source})` : "";
+			const name = chunk.file.title ?? chunk.file.name;
+			const source = chunk.file.url ? ` (${chunk.file.url})` : "";
 
-			return `${citationId} ${chunk.content}\nSource: ${chunk.document.name}${source}`;
+			return `${citationId} ${chunk.content}\nSource: ${name}${source}`;
 		})
 		.join("\n\n");

@@ -18,6 +18,7 @@ import { z } from "zod";
 
 import { convertDbMessagesForUI, streamContext } from "@/utils/chat-utils";
 import { withErrorHandler } from "@/utils/with-error-handler";
+import { healModelMessages } from "@webld/ai/heal-messages";
 import { models } from "@webld/ai/models";
 import { dashboardChatTitlePrompt, dashboardChatTitleSchema, memoryContextPrompt } from "@webld/ai/prompts";
 import { logger } from "@webld/logger/server";
@@ -40,7 +41,7 @@ import {
 	searchOlderMessages,
 	searchRelatedChats,
 	updateChatTitle,
-	waitForRagDocumentsReady,
+	waitForFilesReady,
 } from "@webld/server";
 import { auth } from "@webld/server/auth";
 
@@ -55,7 +56,7 @@ const dashboardChatRequestSchema = z.object({
 });
 
 const attachmentDataSchema = z.object({
-	documentId: z.uuid(),
+	fileId: z.uuid(),
 	filename: z.string().min(1),
 	mediaType: z.string().min(1),
 });
@@ -68,6 +69,10 @@ const getMessageText = (message: DashboardChatUIMessage) =>
 
 const isModelSupportedAttachment = ({ mediaType }: { mediaType: string }) =>
 	mediaType.startsWith("image/") || mediaType === "application/pdf";
+
+// Images are sent inline to the model and indexed for metadata only (no chunks), so they
+// neither gate the response on indexing nor get a retrieveKnowledge instruction.
+const isImageAttachment = ({ mediaType }: { mediaType: string }) => mediaType.startsWith("image/");
 
 const getIndexedAttachments = (message: DashboardChatUIMessage) =>
 	message.parts.flatMap((part) => {
@@ -88,6 +93,7 @@ const prepareMessagesForModel = (messages: DashboardChatUIMessage[]): DashboardC
 	messages.map((message) => {
 		const droppedAttachments: string[] = [];
 		const indexedAttachments = getIndexedAttachments(message);
+		const documentAttachments = indexedAttachments.filter((attachment) => !isImageAttachment(attachment));
 		const hasAttachmentDataPart = message.parts.some((part) => part.type === "data-attachment");
 
 		for (const part of message.parts) {
@@ -108,9 +114,9 @@ const prepareMessagesForModel = (messages: DashboardChatUIMessage[]): DashboardC
 			return part.type !== "file" || isModelSupportedAttachment({ mediaType: part.mediaType });
 		});
 
-		if (indexedAttachments.length > 0) {
-			const attachmentList = indexedAttachments
-				.map((attachment) => `${attachment.filename} (${attachment.documentId})`)
+		if (documentAttachments.length > 0) {
+			const attachmentList = documentAttachments
+				.map((attachment) => `${attachment.filename} (${attachment.fileId})`)
 				.join(", ");
 
 			nextParts.push({
@@ -119,7 +125,7 @@ const prepareMessagesForModel = (messages: DashboardChatUIMessage[]): DashboardC
 			});
 		}
 
-		if (droppedAttachments.length > 0 && indexedAttachments.length === 0) {
+		if (droppedAttachments.length > 0 && documentAttachments.length === 0) {
 			nextParts.push({
 				type: "text",
 				text: `[The user attached ${droppedAttachments.join(", ")}, but the file content was not available to the model.]`,
@@ -182,7 +188,15 @@ export const POST = withErrorHandler(async (req: Request) => {
 		chatMessage.role === "assistant"
 			? [...uiMessagesFromDb.slice(0, -1), chatMessage]
 			: [...uiMessagesFromDb, chatMessage];
-	const indexedAttachmentIds = getIndexedAttachments(chatMessage).map((attachment) => attachment.documentId);
+	const documentAttachmentIds = getIndexedAttachments(chatMessage)
+		.filter((attachment) => !isImageAttachment(attachment))
+		.map((attachment) => attachment.fileId);
+
+	// Once any turn carries an image, keep the whole chat on the vision model — the default
+	// fast model can't read inline images, so a later "what's in the image?" would fail.
+	const chatHasImageAttachment = uiMessages.some((message) =>
+		message.parts.some((part) => part.type === "file" && part.mediaType.startsWith("image/"))
+	);
 
 	// None of these writes feed the model prompt, so they run concurrently with retrieval below
 	// instead of sitting on the critical path to first token. (saveChat must land first so the
@@ -206,14 +220,15 @@ export const POST = withErrorHandler(async (req: Request) => {
 		]);
 	})();
 
-	if (indexedAttachmentIds.length > 0) {
+	if (documentAttachmentIds.length > 0) {
 		// The model is told to call retrieveKnowledge for these docs, so they must be indexed first.
+		// Images are excluded — they go inline to the model and are only enriched for metadata.
 		// Keep the message persisted before the gate (matches prior behavior on failure).
 		await persistMessagePromise;
 
 		try {
-			await waitForRagDocumentsReady({
-				documentIds: indexedAttachmentIds,
+			await waitForFilesReady({
+				fileIds: documentAttachmentIds,
 				organizationId,
 				signal: userStopSignal.signal,
 			});
@@ -223,7 +238,7 @@ export const POST = withErrorHandler(async (req: Request) => {
 				message: "Failed waiting for dashboard chat attachments",
 				metadata: {
 					chatId,
-					documentIds: indexedAttachmentIds,
+					fileIds: documentAttachmentIds,
 					organizationId,
 				},
 			});
@@ -289,7 +304,27 @@ export const POST = withErrorHandler(async (req: Request) => {
 		return content ? [{ role: message.role, content }] : [];
 	});
 
-	const modelMessages = await convertToModelMessages(prepareMessagesForModel(messageHistoryForLLM));
+	const { messages: modelMessages, repairs: messageRepairs } = healModelMessages(
+		await convertToModelMessages(prepareMessagesForModel(messageHistoryForLLM), {
+			ignoreIncompleteToolCalls: true,
+		}),
+		{
+			provider: chatHasImageAttachment ? "google" : undefined,
+			onRepair: (repair) => {
+				logger.warn({
+					message: "Message history healed before provider call",
+					metadata: { chatId, repair },
+				});
+			},
+		}
+	);
+
+	if (messageRepairs.length > 0) {
+		logger.info({
+			message: "Healed message history for provider compatibility",
+			metadata: { chatId, repairsCount: messageRepairs.length, useVisionModel: chatHasImageAttachment },
+		});
+	}
 	const memoryContext =
 		relevantMemories.length > 0 || relatedChats.length > 0
 			? memoryContextPrompt({
@@ -358,6 +393,7 @@ export const POST = withErrorHandler(async (req: Request) => {
 						memoryContext,
 						organizationId,
 					},
+					useVisionModel: chatHasImageAttachment,
 				},
 				abortSignal: userStopSignal.signal,
 				experimental_transform: smoothStream({ chunking: "word" }),

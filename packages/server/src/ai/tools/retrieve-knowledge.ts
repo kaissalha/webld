@@ -1,7 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 
-import { createRagChunkSnippet, retrieveRagChunks } from "../../services/rag";
+import { createFileChunkSnippet, retrieveFileChunks } from "../../services/rag";
 import { appContextSchema } from "../types";
 
 const knowledgeSearchResultSchema = z.object({
@@ -11,7 +11,6 @@ const knowledgeSearchResultSchema = z.object({
 		id: z.string(),
 		name: z.string(),
 		source: z.string().nullable(),
-		sourceType: z.enum(["text", "file", "url"]),
 	}),
 	score: z.number(),
 	snippet: z.string(),
@@ -67,7 +66,7 @@ export const retrieveKnowledgeTool = tool({
 		}
 
 		try {
-			const chunks = await retrieveRagChunks({
+			const chunks = await retrieveFileChunks({
 				conversationHistory: context.conversationHistory,
 				keywords,
 				organizationId: context.organizationId,
@@ -91,9 +90,13 @@ export const retrieveKnowledgeTool = tool({
 				results: chunks.map((chunk, index) => ({
 					chunkId: chunk.chunkId,
 					citation: `[${index + 1}]`,
-					document: chunk.document,
+					document: {
+						id: chunk.file.id,
+						name: chunk.file.title ?? chunk.file.name,
+						source: chunk.file.url,
+					},
 					score: chunk.similarity,
-					snippet: createRagChunkSnippet({ content: chunk.content }),
+					snippet: createFileChunkSnippet({ content: chunk.content }),
 				})),
 				status: "success",
 			};

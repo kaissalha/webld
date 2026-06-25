@@ -27,8 +27,6 @@ coverage
 out/
 build
 dist
-!packages/spoonacular/dist/
-!packages/spoonacular/dist/**
 
 # Debug
 npm-debug.log*
@@ -52,8 +50,3 @@ tsconfig.tsbuildinfo
 
 .playwright-mcp
 .devtools
-
-superhuman_images
-notion_images
-workouts-data
-heidi

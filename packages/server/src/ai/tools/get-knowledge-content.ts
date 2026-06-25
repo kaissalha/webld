@@ -1,8 +1,8 @@
 import { tool } from "ai";
 import { z } from "zod";
 
-import { formatRagChunksForContext, getRagChunkNeighbors, getRagChunksByIds } from "../../services/rag";
-import type { RetrievedRagChunk } from "../../services/rag";
+import { formatFileChunksForContext, getFileChunkNeighbors, getFileChunksByIds } from "../../services/rag";
+import type { RetrievedFileChunk } from "../../services/rag";
 import { appContextSchema } from "../types";
 
 const knowledgeContentChunkSchema = z.object({
@@ -13,7 +13,6 @@ const knowledgeContentChunkSchema = z.object({
 		id: z.string(),
 		name: z.string(),
 		source: z.string().nullable(),
-		sourceType: z.enum(["text", "file", "url"]),
 	}),
 });
 
@@ -57,27 +56,27 @@ export const getKnowledgeContentTool = tool({
 
 		try {
 			const organizationId = context.organizationId;
-			const baseChunks = await getRagChunksByIds({ chunkIds, organizationId });
+			const baseChunks = await getFileChunksByIds({ chunkIds, organizationId });
 
 			const neighborChunks = includeNeighbors
 				? (
 						await Promise.all(
 							chunkIds.map((chunkId) =>
-								getRagChunkNeighbors({ chunkId, organizationId, radius: neighborRadius })
+								getFileChunkNeighbors({ chunkId, organizationId, radius: neighborRadius })
 							)
 						)
 					).flat()
 				: [];
 
-			const byChunkId = new Map<string, RetrievedRagChunk>();
+			const byChunkId = new Map<string, RetrievedFileChunk>();
 
 			for (const chunk of [...baseChunks, ...neighborChunks]) {
 				byChunkId.set(chunk.chunkId, chunk);
 			}
 
 			const chunks = Array.from(byChunkId.values()).toSorted((a, b) => {
-				if (a.document.id !== b.document.id) {
-					return a.document.id.localeCompare(b.document.id);
+				if (a.file.id !== b.file.id) {
+					return a.file.id.localeCompare(b.file.id);
 				}
 
 				return a.chunkIndex - b.chunkIndex;
@@ -98,9 +97,13 @@ export const getKnowledgeContentTool = tool({
 					chunkId: chunk.chunkId,
 					citation: `[${index + 1}]`,
 					content: chunk.content,
-					document: chunk.document,
+					document: {
+						id: chunk.file.id,
+						name: chunk.file.title ?? chunk.file.name,
+						source: chunk.file.url,
+					},
 				})),
-				context: formatRagChunksForContext({ chunks }),
+				context: formatFileChunksForContext({ chunks }),
 				found: true,
 				message: `Loaded ${chunks.length} knowledge-base chunk(s).`,
 				status: "success",

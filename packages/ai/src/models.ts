@@ -41,12 +41,15 @@ export const models = {
 		modelId: "deepseek/deepseek-v4-flash",
 		providerOptions: {
 			gateway: {
-				models: ["google/gemini-2.5-flash"],
+				models: ["google/gemini-3-flash"],
 			},
 		},
 	}),
 	rerank: createModel({
-		modelId: "google/gemini-3.1-flash-lite",
+		modelId: "google/gemini-3-flash",
+	}),
+	vision: createModel({
+		modelId: "google/gemini-3-flash",
 	}),
 } satisfies ModelRegistry;
 
