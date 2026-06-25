@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 
 import { embeddingModels, models } from "@webld/ai/models";
 import { ragRerankSchema, ragRerankSystemPrompt } from "@webld/ai/prompts";
-import { buildSearchQuery, db, type FileKind, fileChunks, files } from "@webld/db";
+import { buildSearchQuery, db, type FileKind, type FileMetadata, fileChunks, files } from "@webld/db";
 
 export type FileChunkMetadata = {
 	chunkIndex: number;
@@ -24,6 +24,7 @@ export type RetrievedFileChunk = {
 		id: string;
 		kind: FileKind;
 		name: string;
+		source: string | null;
 		title: string | null;
 		url: string | null;
 	};
@@ -271,6 +272,7 @@ const fileChunkColumns = {
 	content: fileChunks.content,
 	fileId: files.id,
 	fileKind: files.kind,
+	fileMetadata: files.metadata,
 	fileName: files.name,
 	fileTitle: files.title,
 	fileUrl: files.url,
@@ -283,26 +285,33 @@ type FileChunkRow = {
 	content: string;
 	fileId: string;
 	fileKind: FileKind;
+	fileMetadata: FileMetadata;
 	fileName: string;
 	fileTitle: string | null;
 	fileUrl: string | null;
 	metadata: Record<string, unknown>;
 };
 
-const toRetrievedFileChunk = ({ row, score }: { row: FileChunkRow; score: number }): RetrievedFileChunk => ({
-	chunkId: row.chunkId,
-	chunkIndex: row.chunkIndex,
-	content: row.content,
-	file: {
-		id: row.fileId,
-		kind: row.fileKind,
-		name: row.fileName,
-		title: row.fileTitle,
-		url: row.fileUrl,
-	},
-	metadata: row.metadata,
-	similarity: score,
-});
+const toRetrievedFileChunk = ({ row, score }: { row: FileChunkRow; score: number }): RetrievedFileChunk => {
+	const sourceUrl = row.fileMetadata.sourceUrl?.trim();
+	const source = sourceUrl || row.fileUrl;
+
+	return {
+		chunkId: row.chunkId,
+		chunkIndex: row.chunkIndex,
+		content: row.content,
+		file: {
+			id: row.fileId,
+			kind: row.fileKind,
+			name: row.fileName,
+			source,
+			title: row.fileTitle,
+			url: row.fileUrl,
+		},
+		metadata: row.metadata,
+		similarity: score,
+	};
+};
 
 export const createFileChunkSnippet = ({ content }: { content: string }) => {
 	const normalized = content.replaceAll(/\s+/gu, " ").trim();
@@ -584,7 +593,7 @@ export const formatFileChunksForContext = ({ chunks }: { chunks: RetrievedFileCh
 		.map((chunk, index) => {
 			const citationId = `[${index + 1}]`;
 			const name = chunk.file.title ?? chunk.file.name;
-			const source = chunk.file.url ? ` (${chunk.file.url})` : "";
+			const source = chunk.file.source ? ` (${chunk.file.source})` : "";
 
 			return `${citationId} ${chunk.content}\nSource: ${name}${source}`;
 		})

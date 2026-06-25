@@ -144,6 +144,7 @@ describe("ai tools", () => {
 					id: "doc-1",
 					kind: "text",
 					name: "Sales playbook",
+					source: "https://example.com/sales-playbook",
 					title: "Sales playbook",
 					url: null,
 				},
@@ -165,6 +166,9 @@ describe("ai tools", () => {
 				results: expect.arrayContaining([
 					expect.objectContaining({
 						chunkId: "chunk-1",
+						document: expect.objectContaining({
+							source: "https://example.com/sales-playbook",
+						}),
 						snippet: "Use concise follow-up summaries after demos.",
 					}),
 				]),

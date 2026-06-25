@@ -93,7 +93,7 @@ export const retrieveKnowledgeTool = tool({
 					document: {
 						id: chunk.file.id,
 						name: chunk.file.title ?? chunk.file.name,
-						source: chunk.file.url,
+						source: chunk.file.source,
 					},
 					score: chunk.similarity,
 					snippet: createFileChunkSnippet({ content: chunk.content }),

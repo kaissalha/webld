@@ -100,7 +100,7 @@ export const getKnowledgeContentTool = tool({
 					document: {
 						id: chunk.file.id,
 						name: chunk.file.title ?? chunk.file.name,
-						source: chunk.file.url,
+						source: chunk.file.source,
 					},
 				})),
 				context: formatFileChunksForContext({ chunks }),

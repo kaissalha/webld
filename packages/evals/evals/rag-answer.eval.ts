@@ -27,7 +27,7 @@ evalite<RagPromptInput, string, RagPromptExpected>("RAG answer system prompt", {
 				question: "What does our onboarding guide say about follow-up visits?",
 			},
 			expected: {
-				requiredPhrases: ["retrieveKnowledge", "retrieved chunks", "cite sources", "does not contain enough"],
+				requiredPhrases: ["retrieveKnowledge", "retrieved content", "cite sources", "does not contain enough"],
 			},
 		},
 	],
