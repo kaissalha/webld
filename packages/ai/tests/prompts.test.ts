@@ -46,8 +46,8 @@ describe("prompts", () => {
 		const prompt = dashboardChatSystemPrompt();
 
 		expect(prompt).toContain("retrieveKnowledge");
-		expect(prompt).toContain("indexed organization documents");
-		expect(ragAnswerSystemPrompt).toContain("Use retrieveKnowledge");
+		expect(prompt).toContain("getKnowledgeContent");
+		expect(ragAnswerSystemPrompt).toContain("retrieveKnowledge");
 		expect(ragAnswerSystemPrompt).toContain("cite sources");
 	});
 

@@ -1,5 +1,5 @@
 export const CHAT_ATTACHMENT_MAX_FILES = 6;
-export const CHAT_ATTACHMENT_MAX_SIZE_BYTES = 10 * 1024 * 1024;
+export const CHAT_ATTACHMENT_MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
 const KNOWLEDGE_BASE_TEXT_EXTENSIONS = new Set(["csv", "json", "log", "md", "mdx", "txt", "yaml", "yml"]);
 

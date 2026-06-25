@@ -122,8 +122,9 @@ export const POST = withErrorHandler(async (req: Request) => {
 					message: "Invalid upload token payload.",
 				});
 			}
+			const extension = blob.pathname.split(".").pop()?.toLowerCase() ?? "";
 			const contentType = normalizeStoredContentType(blob.contentType);
-			const kind = detectFileKind({ mimeType: contentType });
+			const kind = detectFileKind({ extension, mimeType: contentType });
 			const indexable = kind === "image" || kind === "document" || kind === "text";
 
 			const fileRecord = await createFile({

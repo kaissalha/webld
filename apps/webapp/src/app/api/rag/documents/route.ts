@@ -5,7 +5,8 @@ import { createHash } from "node:crypto";
 import { start } from "workflow/api";
 import { z } from "zod";
 
-import { uploadBase64ToBlob } from "@/lib/server/storage";
+import { MAX_INGEST_FILE_SIZE_BYTES, MAX_INGEST_FILE_SIZE_MB } from "@/constants/upload";
+import { uploadBufferToBlob } from "@/lib/server/storage";
 import { withErrorHandler } from "@/utils/with-error-handler";
 import { ingestFileWorkflow } from "@/workflows/ingest-file";
 import { logger } from "@webld/logger/server";
@@ -51,9 +52,16 @@ export const POST = withErrorHandler(async (req: Request) => {
 			return NextResponse.json({ error: "File is required" }, { status: 400 });
 		}
 
+		if (file.size > MAX_INGEST_FILE_SIZE_BYTES) {
+			return NextResponse.json(
+				{ error: `File is too large. Maximum size is ${MAX_INGEST_FILE_SIZE_MB}MB.` },
+				{ status: 400 }
+			);
+		}
+
 		const extension = getFileExtension({ file });
 		const mimeType = file.type || "application/octet-stream";
-		const kind = detectFileKind({ mimeType });
+		const kind = detectFileKind({ extension, mimeType });
 
 		// Images are ingested for vision metadata/OCR (not chunked); everything else must be text-extractable.
 		if (kind !== "image" && !isSupportedRagFile({ extension, mimeType })) {
@@ -65,7 +73,7 @@ export const POST = withErrorHandler(async (req: Request) => {
 
 		const buffer = Buffer.from(await file.arrayBuffer());
 		const name = getFormString({ formData, key: "name" }) ?? file.name;
-		const blob = await uploadBase64ToBlob(buffer.toString("base64"), mimeType, {
+		const blob = await uploadBufferToBlob(buffer, mimeType, {
 			access: "public",
 			prefix: `${organizationId}/`,
 		});

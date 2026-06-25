@@ -69,15 +69,14 @@ const getFileExtensionFromMediaType = (mediaType: string): string => {
 	return fallbackSubtype.split("+")[0] || "bin";
 };
 
-export const uploadBase64ToBlob = async (
-	base64Data: string,
+export const uploadBufferToBlob = async (
+	buffer: Buffer,
 	mediaType: string,
 	options: PutBase64Options = {}
 ): Promise<PutBlobResult> => {
 	const access = options.access ?? "public";
 	const ext = getFileExtensionFromMediaType(mediaType);
 	const key = `${process.env.VERCEL_ENV ?? "development"}/${options.prefix ?? ""}${uuidv4()}.${ext}`;
-	const buffer = Buffer.from(base64Data, "base64");
 
 	try {
 		const blob = await put(key, buffer, {
@@ -103,6 +102,12 @@ export const uploadBase64ToBlob = async (
 		throw new Error(`Failed to upload media to Blob: ${errorMessage}`);
 	}
 };
+
+export const uploadBase64ToBlob = (
+	base64Data: string,
+	mediaType: string,
+	options: PutBase64Options = {}
+): Promise<PutBlobResult> => uploadBufferToBlob(Buffer.from(base64Data, "base64"), mediaType, options);
 
 export const handleClientUpload = async ({
 	body,

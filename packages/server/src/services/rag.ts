@@ -243,16 +243,21 @@ export const insertFileChunks = async ({
 		return { chunkCount: 0 };
 	}
 
-	await db.insert(fileChunks).values(
-		chunks.map((chunk) => ({
-			chunkIndex: chunk.chunkIndex,
-			content: chunk.content,
-			embedding: chunk.embedding,
-			fileId,
-			metadata: chunk.metadata,
-			organizationId,
-		}))
-	);
+	await db
+		.insert(fileChunks)
+		.values(
+			chunks.map((chunk) => ({
+				chunkIndex: chunk.chunkIndex,
+				content: chunk.content,
+				embedding: chunk.embedding,
+				fileId,
+				metadata: chunk.metadata,
+				organizationId,
+			}))
+		)
+		// Idempotent: a queue-redelivered batch (insert committed, step reported failed) won't
+		// collide on the (file_id, chunk_index) unique index.
+		.onConflictDoNothing();
 
 	return { chunkCount: chunks.length };
 };

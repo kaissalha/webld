@@ -11,7 +11,7 @@ import {
 
 describe("shared logger helpers", () => {
 	afterEach(() => {
-		delete process.env.NEXT_PUBLIC_VERCEL_ENV;
+		vi.unstubAllEnvs();
 	});
 
 	it("serializes complex values into log-safe data", () => {
@@ -123,7 +123,7 @@ describe("shared logger helpers", () => {
 	});
 
 	it("logs to the console in development and forwards exceptions only for error logs", () => {
-		process.env.NEXT_PUBLIC_VERCEL_ENV = "development";
+		vi.stubEnv("NODE_ENV", "development");
 
 		const sendException = vi.fn();
 		const sendLog = vi.fn();

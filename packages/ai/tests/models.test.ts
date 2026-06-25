@@ -41,16 +41,20 @@ describe("models", () => {
 
 		const { embeddingModels, models } = await import("../src/models");
 
-		expect(gatewayMock.mock.calls).toEqual([["google/gemini-3-flash"]]);
+		expect(gatewayMock.mock.calls).toEqual([
+			["deepseek/deepseek-v4-flash"],
+			["google/gemini-3-flash"],
+			["google/gemini-3-flash"],
+		]);
 		expect(gatewayEmbeddingModelMock).toHaveBeenCalledWith("google/gemini-embedding-2");
 		expect(devToolsMiddlewareMock).toHaveBeenCalledTimes(1);
 		expect(wrapLanguageModelMock).toHaveBeenNthCalledWith(1, {
 			middleware: ["devtools-middleware"],
-			model: { model: "google/gemini-3-flash" },
+			model: { model: "deepseek/deepseek-v4-flash" },
 		});
 		expect(models.fast.model).toEqual({
 			middleware: ["devtools-middleware"],
-			model: { model: "google/gemini-3-flash" },
+			model: { model: "deepseek/deepseek-v4-flash" },
 		});
 		expect(embeddingModels.rag).toEqual({
 			dimensions: 1536,
@@ -68,11 +72,11 @@ describe("models", () => {
 		expect(gatewayEmbeddingModelMock).toHaveBeenCalledWith("google/gemini-embedding-2");
 		expect(wrapLanguageModelMock).toHaveBeenNthCalledWith(1, {
 			middleware: [],
-			model: { model: "google/gemini-3-flash" },
+			model: { model: "deepseek/deepseek-v4-flash" },
 		});
 		expect(models.fast.model).toEqual({
 			middleware: [],
-			model: { model: "google/gemini-3-flash" },
+			model: { model: "deepseek/deepseek-v4-flash" },
 		});
 		expect(embeddingModels.rag.dimensions).toBe(1536);
 	});

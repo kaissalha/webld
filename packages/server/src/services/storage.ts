@@ -24,8 +24,15 @@ const DOCUMENT_MIME = new Set([
 	"text/xml",
 ]);
 
-/** Map a MIME type to a coarse file kind used to branch ingestion. */
-export const detectFileKind = ({ mimeType }: { mimeType: string }): FileKind => {
+// Extension fallbacks for when the browser sends an empty or generic MIME
+// (e.g. application/octet-stream for .md / .yaml / .log). Mirrors the
+// extractable types in document-extraction so the workflow takes its
+// document/text branch instead of silently treating the file as "other".
+const DOCUMENT_EXTENSIONS = new Set(["csv", "doc", "docx", "htm", "html", "pdf", "xls", "xlsx", "xml"]);
+const TEXT_EXTENSIONS = new Set(["json", "log", "md", "mdx", "txt", "yaml", "yml"]);
+
+/** Map a MIME type (with extension fallback) to a coarse file kind used to branch ingestion. */
+export const detectFileKind = ({ extension, mimeType }: { extension?: string; mimeType: string }): FileKind => {
 	if (IMAGE_MIME.test(mimeType)) {
 		return "image";
 	}
@@ -41,6 +48,16 @@ export const detectFileKind = ({ mimeType }: { mimeType: string }): FileKind => 
 	if (mimeType.startsWith("text/") || mimeType === "application/json") {
 		return "text";
 	}
+
+	// MIME is ambiguous (empty / application/octet-stream) — fall back to extension.
+	const ext = extension?.toLowerCase() ?? "";
+	if (DOCUMENT_EXTENSIONS.has(ext)) {
+		return "document";
+	}
+	if (TEXT_EXTENSIONS.has(ext)) {
+		return "text";
+	}
+
 	return "other";
 };
 
