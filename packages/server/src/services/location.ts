@@ -6,8 +6,6 @@ import { z } from "zod";
 
 import { logger } from "@webld/logger/server";
 
-export type Place = google.maps.places.PlaceResult;
-
 export type LocationFields = {
 	addressLine1: string;
 	addressLine2?: string;
