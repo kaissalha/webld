@@ -1,7 +1,5 @@
 import { cache } from "react";
 
-import { connection } from "next/server";
-
 import {
 	defaultShouldDehydrateQuery,
 	dehydrate,
@@ -51,11 +49,7 @@ export const prefetch = <T extends TRPCPrefetchQueryOptions>(queryOptions: T) =>
 	return queryClient.prefetchQuery(queryOptions);
 };
 
-export const HydrateClient = async (props: { children: React.ReactNode }) => {
-	// TanStack Query stamps dehydrated state with Date.now(), so opt this subtree
-	// into request-time rendering before we serialize the cache for hydration.
-	await connection();
-
+export const HydrateClient = (props: { children: React.ReactNode }) => {
 	const queryClient = getQueryClient();
 	return <HydrationBoundary state={dehydrate(queryClient)}>{props.children}</HydrationBoundary>;
 };

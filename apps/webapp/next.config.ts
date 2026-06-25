@@ -16,11 +16,14 @@ const nextConfig: NextConfig = {
 	experimental: {
 		typedEnv: true,
 		cachedNavigations: true,
-		rootParams: true,
 	},
 	typedRoutes: true,
 	reactCompiler: true,
 	cacheComponents: true,
+	// Next.js 16.3 Instant Navigations: prefetch one reusable shell per route
+	// (not per link). Default segment prefetch becomes 'partial'; per-segment
+	// `export const prefetch` and `<Link prefetch>` still win. Requires cacheComponents.
+	partialPrefetching: true,
 	async rewrites() {
 		return {
 			beforeFiles: [
