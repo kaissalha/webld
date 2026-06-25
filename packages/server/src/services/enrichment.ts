@@ -25,7 +25,7 @@ export const classifyDocumentContent = async ({ text }: { text: string }): Promi
 	const sample = text.slice(0, CLASSIFY_SAMPLE_CHARS);
 
 	const { output } = await generateText({
-		...models.fast,
+		...models.cheapFast,
 		output: Output.object({ schema: fileClassificationSchema }),
 		instructions: fileClassificationSystemPrompt,
 		messages: [{ role: "user", content: `Document excerpt:\n\n${sample}` }],

@@ -37,13 +37,16 @@ const createModel = ({
 });
 
 export const models = {
-	fast: createModel({
+	cheapFast: createModel({
 		modelId: "deepseek/deepseek-v4-flash",
 		providerOptions: {
 			gateway: {
 				models: ["google/gemini-3-flash"],
 			},
 		},
+	}),
+	fast: createModel({
+		modelId: "google/gemini-3-flash",
 	}),
 	rerank: createModel({
 		modelId: "google/gemini-3-flash",

@@ -8,7 +8,7 @@ import { getKnowledgeContentTool, retrieveKnowledgeTool } from "../tools";
 import { appContextSchema } from "../types";
 
 export const ragAgent = new ToolLoopAgent({
-	...models.fast,
+	...models.cheapFast,
 	tools: {
 		getKnowledgeContent: getKnowledgeContentTool,
 		retrieveKnowledge: retrieveKnowledgeTool,

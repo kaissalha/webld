@@ -8,7 +8,7 @@ import { dashboardChatTools } from "../tools";
 import { appContextSchema } from "../types";
 
 export const dashboardChatAgent = new ToolLoopAgent({
-	...models.fast,
+	...models.cheapFast,
 	tools: dashboardChatTools,
 	toolsContext: {
 		composeEmail: {},
@@ -28,7 +28,7 @@ export const dashboardChatAgent = new ToolLoopAgent({
 		.strict(),
 	prepareCall: async ({ options, ...settings }) => {
 		const aiContext = options.aiContext ?? {};
-		const modelConfig = options.useVisionModel ? models.vision : models.fast;
+		const modelConfig = options.useVisionModel ? models.vision : models.cheapFast;
 
 		return {
 			...settings,

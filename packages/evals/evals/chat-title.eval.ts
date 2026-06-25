@@ -64,7 +64,7 @@ evalite<ChatTitleInput, string, ChatTitleExpected>("Dashboard chat title prompt"
 	],
 	task: async ({ message }) => {
 		const { output } = await generateText({
-			...models.fast,
+			...models.cheapFast,
 			output: Output.object({
 				schema: dashboardChatTitleSchema,
 			}),

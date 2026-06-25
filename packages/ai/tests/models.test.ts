@@ -45,6 +45,7 @@ describe("models", () => {
 			["deepseek/deepseek-v4-flash"],
 			["google/gemini-3-flash"],
 			["google/gemini-3-flash"],
+			["google/gemini-3-flash"],
 		]);
 		expect(gatewayEmbeddingModelMock).toHaveBeenCalledWith("google/gemini-embedding-2");
 		expect(devToolsMiddlewareMock).toHaveBeenCalledTimes(1);
@@ -52,9 +53,13 @@ describe("models", () => {
 			middleware: ["devtools-middleware"],
 			model: { model: "deepseek/deepseek-v4-flash" },
 		});
-		expect(models.fast.model).toEqual({
+		expect(models.cheapFast.model).toEqual({
 			middleware: ["devtools-middleware"],
 			model: { model: "deepseek/deepseek-v4-flash" },
+		});
+		expect(models.fast.model).toEqual({
+			middleware: ["devtools-middleware"],
+			model: { model: "google/gemini-3-flash" },
 		});
 		expect(embeddingModels.rag).toEqual({
 			dimensions: 1536,
@@ -74,7 +79,7 @@ describe("models", () => {
 			middleware: [],
 			model: { model: "deepseek/deepseek-v4-flash" },
 		});
-		expect(models.fast.model).toEqual({
+		expect(models.cheapFast.model).toEqual({
 			middleware: [],
 			model: { model: "deepseek/deepseek-v4-flash" },
 		});
