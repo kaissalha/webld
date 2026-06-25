@@ -58,7 +58,7 @@
         "@trpc/react-query": "^11.18.0",
         "@trpc/server": "^11.18.0",
         "@trpc/tanstack-react-query": "^11.18.0",
-        "@vercel/blob": "^2.4.1",
+        "@vercel/blob": "^2.5.0",
         "@vercel/speed-insights": "^2.0.0",
         "@vercel/toolbar": "^0.2.6",
         "@webld/ai": "workspace:*",
@@ -1497,7 +1497,7 @@
 
     "@vectorstores/readers": ["@vectorstores/readers@0.1.8", "", { "dependencies": { "@discoveryjs/json-ext": "^0.6.1", "@xmldom/xmldom": "^0.9.8", "csv-parse": "^5.5.6", "mammoth": "^1.11.0", "unpdf": "^0.12.1" }, "peerDependencies": { "@vectorstores/core": "0.1.8", "@vectorstores/env": "0.1.0" } }, "sha512-OI0kpund7io7h9F0T3juf9SqDFQn84uYOTBDnv+LCW62h9PFyY31iMYf5r/1T4CJhkd5j3jiXW6AykQxSJOvJQ=="],
 
-    "@vercel/blob": ["@vercel/blob@2.4.1", "", { "dependencies": { "@vercel/oidc": "^3.6.1", "async-retry": "^1.3.3", "is-buffer": "^2.0.5", "is-node-process": "^1.2.0", "throttleit": "^2.1.0", "undici": "^6.23.0" } }, "sha512-8GQbIsNVWu0PnG6AYHSCHupYBW0RzP26mb2V3QSoirG7i1EvISHEnW0QcvX+NUc5htALNg6vvls9nEavlwYHuA=="],
+    "@vercel/blob": ["@vercel/blob@2.5.0", "", { "dependencies": { "@vercel/oidc": "^3.6.1", "async-retry": "^1.3.3", "is-buffer": "^2.0.5", "is-node-process": "^1.2.0", "throttleit": "^2.1.0", "undici": "^6.23.0" } }, "sha512-ke6WnMMYlUu9nBFmyjwEkC2o03Ku2X7QIeJ3KtlOJzblS/8Xau209zt0ic76rd7IvV5nrKCH/BzP4MkFmoSLuw=="],
 
     "@vercel/cli-auth": ["@vercel/cli-auth@0.0.1", "", { "dependencies": { "async-listen": "3.0.0", "open": "8.4.0", "xdg-app-paths": "5", "zod": "4.1.11" } }, "sha512-CnqiuMlZ4pjs2LCPYiR6aLKPPd3Xb8SBI1Y7eotXKgpx6qgrGNY+E7EIyUt5ErGHJGIrCZyGG5WEo4bHtVmz2Q=="],
 
