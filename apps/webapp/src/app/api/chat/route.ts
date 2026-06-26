@@ -23,7 +23,6 @@ import { models } from "@webld/ai/models";
 import { dashboardChatTitlePrompt, dashboardChatTitleSchema, memoryContextPrompt } from "@webld/ai/prompts";
 import { logger } from "@webld/logger/server";
 import {
-	createStreamId,
 	dashboardChatAgent,
 	type DashboardChatUIMessage,
 	embedChatMessage,
@@ -31,7 +30,7 @@ import {
 	extractAndUpdateMemories,
 	generateRagEmbedding,
 	getChatWithMessages,
-	getStream,
+	getLastStreamId,
 	memoryToText,
 	messageHistoryToQuery,
 	reflectOnChat,
@@ -40,6 +39,7 @@ import {
 	searchMemories,
 	searchOlderMessages,
 	searchRelatedChats,
+	setLastStreamId,
 	updateChatTitle,
 	waitForFilesReady,
 } from "@webld/server";
@@ -211,7 +211,7 @@ export const POST = withErrorHandler(async (req: Request) => {
 		}
 
 		await Promise.all([
-			createStreamId({ streamId, chatId }),
+			setLastStreamId({ streamId, chatId }),
 			saveOrUpdateChatMessage(chatId, {
 				id: chatMessage.id,
 				role: chatMessage.role,
@@ -341,9 +341,8 @@ export const POST = withErrorHandler(async (req: Request) => {
 	const stream = createUIMessageStream<DashboardChatUIMessage>({
 		execute: async ({ writer }) => {
 			const checkCancellation = async () => {
-				const currentStream = await getStream({ streamId });
-
-				if (currentStream?.canceledAt) {
+				// Cancelled (nulled) or superseded by a newer stream — either way, stop.
+				if ((await getLastStreamId({ chatId })) !== streamId) {
 					userStopSignal.abort();
 				}
 			};

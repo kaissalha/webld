@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
-import { asc, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
-import { aiChatMessages, aiChatStreams, aiChats, type DbChatNewMessage, db } from "@webld/db";
+import { aiChatMessages, aiChats, type DbChatNewMessage, db } from "@webld/db";
 
 import type { BaseChatUIMessage } from "../ai/types";
 
@@ -144,45 +144,35 @@ export const updateChatTitle = async ({
 	return db.update(aiChats).set({ title, updatedAt: new Date().toISOString() }).where(eq(aiChats.id, chatId));
 };
 
-export const createStreamId = async ({ streamId, chatId }: { streamId: string; chatId: string }) => {
+// Records the latest resumable-stream id on the chat. A new stream supersedes any prior
+// one, so callers polling getLastStreamId see their stream is no longer current.
+export const setLastStreamId = async ({ streamId, chatId }: { streamId: string; chatId: string }) => {
 	try {
-		await db.insert(aiChatStreams).values({ id: streamId, chatId, createdAt: new Date().toISOString() });
+		await db.update(aiChats).set({ lastStreamId: streamId }).where(eq(aiChats.id, chatId));
 	} catch (error) {
-		throw new Error("Failed to create stream id", { cause: error });
+		throw new Error("Failed to set last stream id", { cause: error });
 	}
 };
 
-export const getStreamIdsByChatId = async ({ chatId }: { chatId: string }): Promise<string[]> => {
+export const getLastStreamId = async ({ chatId }: { chatId: string }): Promise<string | null> => {
 	try {
-		const streamIds = await db
-			.select({ id: aiChatStreams.id })
-			.from(aiChatStreams)
-			.where(eq(aiChatStreams.chatId, chatId))
-			.orderBy(asc(aiChatStreams.createdAt))
-			.execute();
+		const [chat] = await db
+			.select({ lastStreamId: aiChats.lastStreamId })
+			.from(aiChats)
+			.where(eq(aiChats.id, chatId))
+			.limit(1);
 
-		return streamIds.map(({ id }) => id);
+		return chat?.lastStreamId ?? null;
 	} catch (error) {
-		throw new Error("Failed to get stream ids by chat id", { cause: error });
+		throw new Error("Failed to get last stream id", { cause: error });
 	}
 };
 
-export const getStream = async ({ streamId }: { streamId: string }) => {
+// Cancels the active stream by clearing it. The running stream's poll detects that
+// getLastStreamId no longer matches its own id and aborts.
+export const cancelStream = async ({ chatId }: { chatId: string }) => {
 	try {
-		const [stream] = await db.select().from(aiChatStreams).where(eq(aiChatStreams.id, streamId)).limit(1);
-
-		return stream;
-	} catch (error) {
-		throw new Error("Failed to get stream", { cause: error });
-	}
-};
-
-export const cancelStream = async ({ streamId }: { streamId: string }) => {
-	try {
-		await db
-			.update(aiChatStreams)
-			.set({ canceledAt: new Date().toISOString() })
-			.where(eq(aiChatStreams.id, streamId));
+		await db.update(aiChats).set({ lastStreamId: null }).where(eq(aiChats.id, chatId));
 	} catch (error) {
 		throw new Error("Failed to cancel stream", { cause: error });
 	}

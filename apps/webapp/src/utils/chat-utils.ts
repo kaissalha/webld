@@ -8,7 +8,7 @@ import { createResumableStreamContext } from "resumable-stream/ioredis";
 import { createTCPRedisClient } from "@webld/cache";
 import type { DbChatMessage } from "@webld/db";
 import type { BaseChatUIMessage } from "@webld/server";
-import { getChatMessagesFromDb, getStreamIdsByChatId } from "@webld/server";
+import { getChatMessagesFromDb, getLastStreamId } from "@webld/server";
 import { auth } from "@webld/server/auth";
 
 if (!process.env.REDIS_URL) {
@@ -62,16 +62,10 @@ export const handleResumeStream = async <TMessage extends BaseChatUIMessage>(
 		return new NextResponse("Organization not found", { status: 400 });
 	}
 
-	const streamIds = await getStreamIdsByChatId({ chatId });
-
-	if (!streamIds.length) {
-		return new NextResponse("No streams found", { status: 404 });
-	}
-
-	const recentStreamId = streamIds.at(-1);
+	const recentStreamId = await getLastStreamId({ chatId });
 
 	if (!recentStreamId) {
-		return new NextResponse("No recent stream found", { status: 404 });
+		return new NextResponse("No streams found", { status: 404 });
 	}
 
 	const emptyDataStream = createUIMessageStream<TMessage>({

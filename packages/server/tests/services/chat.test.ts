@@ -4,15 +4,14 @@ import { afterEach, describe, expect, it } from "vitest";
 import type { BaseChatUIMessage } from "../../src/ai/types";
 import {
 	cancelStream,
-	createStreamId,
 	deleteChat,
 	getChat,
 	getChatMessagesFromDb,
 	getChats,
-	getStream,
-	getStreamIdsByChatId,
+	getLastStreamId,
 	saveChat,
 	saveOrUpdateChatMessage,
+	setLastStreamId,
 	updateChatTitle,
 } from "../../src/services/chat";
 import { cleanupOrganization, createTestOrganization } from "../helpers/db";
@@ -63,16 +62,21 @@ describe("chat service", () => {
 		expect(messages.length).toBe(1);
 	});
 
-	it("creates and lists stream IDs", async () => {
+	it("persists the last stream ID on the chat", async () => {
 		const organization = await createTrackedOrganization();
 		const chatId = uuidv4();
 		await saveChat({ id: chatId, organizationId: organization.id, title: "Chat 1" });
 
 		const streamId = uuidv4();
-		await createStreamId({ streamId, chatId });
+		await setLastStreamId({ streamId, chatId });
 
-		const streamIds = await getStreamIdsByChatId({ chatId });
-		expect(streamIds).toContain(streamId);
+		expect(await getLastStreamId({ chatId })).toBe(streamId);
+
+		// A newer stream replaces the previous one.
+		const newerStreamId = uuidv4();
+		await setLastStreamId({ streamId: newerStreamId, chatId });
+
+		expect(await getLastStreamId({ chatId })).toBe(newerStreamId);
 	});
 
 	it("updates chat titles", async () => {
@@ -96,11 +100,14 @@ describe("chat service", () => {
 		await saveChat({ id: chatId, organizationId: organization.id, title: "Chat 1" });
 
 		const streamId = uuidv4();
-		await createStreamId({ streamId, chatId });
-		await cancelStream({ streamId });
+		await setLastStreamId({ streamId, chatId });
 
-		const stream = await getStream({ streamId });
-		expect(stream?.canceledAt).toBeTruthy();
+		expect(await getLastStreamId({ chatId })).toBe(streamId);
+
+		// Canceling clears the stream id, so the running stream's poll no longer matches.
+		await cancelStream({ chatId });
+
+		expect(await getLastStreamId({ chatId })).toBeNull();
 	});
 
 	it("throws when deleting missing chat", async () => {

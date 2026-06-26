@@ -3,7 +3,6 @@ export { aiChats } from "./schema/ai/chat.ts";
 export { chatEpisodes } from "./schema/ai/episode.ts";
 export { memories, memorySource } from "./schema/ai/memory.ts";
 export { aiChatMessages, messageRole } from "./schema/ai/message.ts";
-export { aiChatStreams } from "./schema/ai/stream.ts";
 
 // Auth schema
 export { accounts } from "./schema/auth/accounts.ts";

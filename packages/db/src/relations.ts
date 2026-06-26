@@ -125,7 +125,6 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.organizations.id,
 		}),
 		messages: r.many.aiChatMessages(),
-		streams: r.many.aiChatStreams(),
 		episode: r.one.chatEpisodes({
 			from: r.aiChats.id,
 			to: r.chatEpisodes.chatId,
@@ -162,14 +161,6 @@ export const relations = defineRelations(schema, (r) => ({
 	aiChatMessages: {
 		chat: r.one.aiChats({
 			from: r.aiChatMessages.chatId,
-			to: r.aiChats.id,
-		}),
-	},
-
-	// AI Chat Streams relations
-	aiChatStreams: {
-		chat: r.one.aiChats({
-			from: r.aiChatStreams.chatId,
 			to: r.aiChats.id,
 		}),
 	},

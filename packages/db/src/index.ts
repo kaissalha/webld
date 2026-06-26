@@ -47,7 +47,6 @@ export * from "./schema/ai/chat.ts";
 export * from "./schema/ai/episode.ts";
 export * from "./schema/ai/memory.ts";
 export * from "./schema/ai/message.ts";
-export * from "./schema/ai/stream.ts";
 export * from "./schema/auth/accounts.ts";
 export * from "./schema/auth/invitations.ts";
 export * from "./schema/auth/members.ts";

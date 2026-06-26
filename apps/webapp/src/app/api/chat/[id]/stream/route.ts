@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { handleResumeStream } from "@/utils/chat-utils";
-import { cancelStream, getChat, getStreamIdsByChatId, type DashboardChatUIMessage } from "@webld/server";
+import { cancelStream, getChat, getLastStreamId, type DashboardChatUIMessage } from "@webld/server";
 import { auth } from "@webld/server/auth";
 
 export const GET = handleResumeStream<DashboardChatUIMessage>;
@@ -30,11 +30,10 @@ export const DELETE = async (_req: Request, { params }: { params: Promise<{ id: 
 		return new NextResponse("Access to chat forbidden", { status: 403 });
 	}
 
-	const streamIds = await getStreamIdsByChatId({ chatId });
-	const recentStreamId = streamIds.at(-1);
+	const recentStreamId = await getLastStreamId({ chatId });
 
 	if (recentStreamId) {
-		await cancelStream({ streamId: recentStreamId });
+		await cancelStream({ chatId });
 	}
 
 	return new NextResponse(null, { status: 200 });

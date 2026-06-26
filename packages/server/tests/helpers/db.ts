@@ -1,11 +1,10 @@
 import { eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 
-import { aiChatMessages, aiChatStreams, aiChats, contacts, db, oauthConnections, organizations } from "@webld/db";
+import { aiChatMessages, aiChats, contacts, db, oauthConnections, organizations } from "@webld/db";
 
 export const resetDatabase = async () => {
 	await db.delete(aiChatMessages);
-	await db.delete(aiChatStreams);
 	await db.delete(oauthConnections);
 	await db.delete(contacts);
 	await db.delete(aiChats);
@@ -14,7 +13,7 @@ export const resetDatabase = async () => {
 
 export const cleanupOrganization = async (organizationId: string) => {
 	// Delete tables with organizationId - cascading will handle children
-	// aiChatMessages, aiChatStreams cascade from aiChats
+	// aiChatMessages cascade from aiChats
 	await db.delete(oauthConnections).where(eq(oauthConnections.organizationId, organizationId));
 	await db.delete(contacts).where(eq(contacts.organizationId, organizationId));
 	await db.delete(aiChats).where(eq(aiChats.organizationId, organizationId));

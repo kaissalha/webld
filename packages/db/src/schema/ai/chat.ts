@@ -11,6 +11,7 @@ export const aiChats = pgTable(
 			.notNull()
 			.references(() => organizations.id, { onDelete: "cascade" }),
 		title: varchar("title", { length: 100 }).notNull(),
+		lastStreamId: uuid("last_stream_id"),
 		...timeFields,
 	},
 	(table) => [
