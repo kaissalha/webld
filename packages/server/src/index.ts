@@ -2,7 +2,6 @@
 // AI
 // =============================================================================
 export * from "./ai/agents/dashboard-chat-agent";
-export * from "./ai/agents/rag-agent";
 export * from "./ai/tools";
 export * from "./ai/types";
 // =============================================================================

@@ -177,7 +177,7 @@ export const extractAndUpdateMemories = async ({
 	const existingMemories = await loadMemories({ organizationId });
 
 	const { output } = await generateText({
-		...models.cheapFast,
+		...models.fast,
 		output: Output.object({
 			schema: memoryExtractionSchema,
 		}),
