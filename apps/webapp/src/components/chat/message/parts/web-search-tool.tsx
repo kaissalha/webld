@@ -1,13 +1,12 @@
 "use client";
 
-import { ExternalLinkIcon, GlobeIcon, SearchIcon, TriangleAlertIcon } from "lucide-react";
+import { ExternalLinkIcon, SearchIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
-import { Loader } from "@webld/ui/components/loader";
 import { Skeleton } from "@webld/ui/components/skeleton";
-import { Task, TaskContent, TaskItem, TaskItemFile, TaskTrigger } from "@webld/ui/components/task";
 import { TextShimmer } from "@webld/ui/components/text-shimmer";
 
+import { ChatStepItem } from "../chat-step-item";
 import type { ToolState } from "./tool-part-types";
 
 type ExaSearchResult = {
@@ -28,6 +27,8 @@ type ExaSearchOutput = {
 };
 
 const SKELETON_KEYS = ["row-1", "row-2", "row-3"];
+
+const searchIcon = <SearchIcon className='size-3.5' />;
 
 const getHostname = (url: string) => {
 	try {
@@ -94,49 +95,42 @@ const SearchSource = ({ result }: { result: ExaSearchResult }) => {
 	);
 };
 
-const SearchError = ({ message }: { message?: string }) => {
-	const t = useTranslations("components.chat.message.tool");
-
-	return (
-		<div className='my-1 flex items-center gap-2 rounded-2xl bg-destructive/10 px-4 py-3 text-sm text-destructive'>
-			<TriangleAlertIcon className='size-4 shrink-0' />
-			<span>{message || t("webSearch.error")}</span>
-		</div>
-	);
-};
-
 export type WebSearchToolProps = {
 	state: ToolState;
 	input?: Record<string, unknown>;
 	output?: unknown;
 	errorText?: string;
+	isLast?: boolean;
 };
 
-export const WebSearchTool = ({ state, input, output, errorText }: WebSearchToolProps) => {
+export const WebSearchTool = ({ state, input, output, errorText, isLast = false }: WebSearchToolProps) => {
 	const t = useTranslations("components.chat.message.tool");
 	const query = typeof input?.query === "string" ? input.query : undefined;
 
 	if (state === "output-error") {
-		return <SearchError message={errorText} />;
+		return (
+			<ChatStepItem icon={searchIcon} status='error' isLast={isLast} label={errorText || t("webSearch.error")} />
+		);
 	}
 
 	if (state === "input-streaming" || state === "input-available") {
 		return (
-			<Task defaultOpen className='my-1'>
-				<TaskTrigger icon={<Loader size={15} className='text-muted-foreground' />}>
-					<TextShimmer className='font-medium text-muted-foreground'>{t("webSearch.searching")}</TextShimmer>
-				</TaskTrigger>
-				<TaskContent>
+			<ChatStepItem
+				icon={searchIcon}
+				status='running'
+				isLast={isLast}
+				defaultOpen
+				label={<TextShimmer className='font-medium'>{t("webSearch.searching")}</TextShimmer>}
+			>
+				<div className='space-y-1.5 pt-1'>
 					{query && (
-						<TaskItem>
-							<TaskItemFile>
-								<SearchIcon className='size-3 shrink-0' />
-								<span className='truncate'>{query}</span>
-							</TaskItemFile>
-						</TaskItem>
+						<span className='inline-flex max-w-full items-center gap-1 rounded-md border border-border/60 bg-muted/40 px-1.5 py-0.5 text-xs text-foreground'>
+							<SearchIcon className='size-3 shrink-0' />
+							<span className='truncate'>{query}</span>
+						</span>
 					)}
 					{SKELETON_KEYS.map((rowKey) => (
-						<div key={rowKey} className='flex items-start gap-2.5 py-0.5'>
+						<div key={rowKey} className='flex items-start gap-2.5 px-2 py-0.5'>
 							<Skeleton className='mt-0.5 size-4 shrink-0 rounded-sm' />
 							<div className='flex-1 space-y-1.5'>
 								<Skeleton className='h-3 w-3/4' />
@@ -144,15 +138,22 @@ export const WebSearchTool = ({ state, input, output, errorText }: WebSearchTool
 							</div>
 						</div>
 					))}
-				</TaskContent>
-			</Task>
+				</div>
+			</ChatStepItem>
 		);
 	}
 
 	const data = output as ExaSearchOutput | undefined;
 
 	if (data?.error) {
-		return <SearchError message={data.message ?? errorText} />;
+		return (
+			<ChatStepItem
+				icon={searchIcon}
+				status='error'
+				isLast={isLast}
+				label={data.message ?? errorText ?? t("webSearch.error")}
+			/>
+		);
 	}
 
 	const seenUrls = new Set<string>();
@@ -166,25 +167,22 @@ export const WebSearchTool = ({ state, input, output, errorText }: WebSearchTool
 	});
 
 	if (results.length === 0) {
-		return (
-			<div className='my-1 flex items-center gap-2 rounded-2xl border border-border/50 bg-muted/30 px-4 py-3 text-sm text-muted-foreground'>
-				<GlobeIcon className='size-4 shrink-0' />
-				<span>{t("webSearch.noResults")}</span>
-			</div>
-		);
+		return <ChatStepItem icon={searchIcon} status='done' isLast={isLast} label={t("webSearch.noResults")} />;
 	}
 
 	return (
-		<Task className='my-1'>
-			<TaskTrigger icon={<SearchIcon className='size-4 shrink-0 text-muted-foreground' />}>
-				{t("webSearch.sources", { count: results.length })}
-			</TaskTrigger>
-			<TaskContent>
+		<ChatStepItem
+			icon={searchIcon}
+			status='done'
+			isLast={isLast}
+			label={t("webSearch.sources", { count: results.length })}
+		>
+			<div className='pt-1'>
 				{results.map((result) => (
 					<SearchSource key={result.url} result={result} />
 				))}
-			</TaskContent>
-		</Task>
+			</div>
+		</ChatStepItem>
 	);
 };
 

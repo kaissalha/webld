@@ -2,6 +2,8 @@
 
 import { useId } from "react";
 
+import { TextShimmer } from "@webld/ui/components/text-shimmer";
+
 const ShimmerLogoLoader = ({
 	size,
 	baseColor,
@@ -63,5 +65,12 @@ const ShimmerLogoLoader = ({
 export const RequestIndicator = () => (
 	<div className='flex w-fit justify-start rounded-2xl bg-transparent px-4 py-2 text-foreground'>
 		<ShimmerLogoLoader size={24} baseColor='rgb(0 0 0 / 0.55)' highlightColor='rgb(0 0 0 / 0.1)' />
+	</div>
+);
+
+export const ChatStatusIndicator = ({ label }: { label: string }) => (
+	<div className='flex w-fit items-center gap-2 rounded-2xl bg-transparent px-4 py-2 text-foreground'>
+		<ShimmerLogoLoader size={24} baseColor='rgb(0 0 0 / 0.55)' highlightColor='rgb(0 0 0 / 0.1)' />
+		<TextShimmer className='text-sm font-medium text-muted-foreground'>{label}</TextShimmer>
 	</div>
 );

@@ -2,28 +2,30 @@
 
 import { useEffect, useRef } from "react";
 
-import { BrainIcon, ChevronDownIcon } from "lucide-react";
+import { BrainIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@webld/ui/components/collapsible";
-import { Loader } from "@webld/ui/components/loader";
 import { TextShimmer } from "@webld/ui/components/text-shimmer";
-import { cn } from "@webld/ui/lib/utils";
 
 import { ChatMessageMarkdown } from "../chat-message-markdown";
+import { ChatStepItem } from "../chat-step-item";
 import { useReasoningState } from "./use-reasoning-state";
 
 export type ReasoningPartProps = {
 	text: string;
 	state?: "streaming" | "done";
 	isStreaming?: boolean;
+	isLast?: boolean;
 };
 
-export const ReasoningPart = ({ text, state, isStreaming = false }: ReasoningPartProps) => {
+const reasoningIcon = <BrainIcon className='size-3.5' />;
+
+export const ReasoningPart = ({ text, state, isStreaming = false, isLast = false }: ReasoningPartProps) => {
 	const t = useTranslations("components.chat.message.reasoning");
-	const isThinking = state === "streaming" || (state === undefined && isStreaming);
-	const { open, onOpenChange, durationSeconds } = useReasoningState({ isThinking });
+	const rawIsThinking = state === "streaming" || (state === undefined && isStreaming);
+	const { open, onOpenChange, durationSeconds, isThinking } = useReasoningState({ isThinking: rawIsThinking });
 	const contentRef = useRef<HTMLDivElement>(null);
+	const hasText = text.trim().length > 0;
 
 	useEffect(() => {
 		if (isThinking && contentRef.current) {
@@ -31,43 +33,29 @@ export const ReasoningPart = ({ text, state, isStreaming = false }: ReasoningPar
 		}
 	}, [text, isThinking]);
 
-	const label = isThinking
+	const labelText = isThinking
 		? t("thinking")
 		: durationSeconds
 			? t("thoughtFor", { seconds: durationSeconds })
 			: t("reasoning");
 
+	const label = isThinking ? <TextShimmer className='font-medium'>{labelText}</TextShimmer> : labelText;
+
 	return (
-		<Collapsible open={open} onOpenChange={onOpenChange} className='my-1 w-full'>
-			<CollapsibleTrigger
-				className={cn(
-					"group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-muted/50",
-					"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-				)}
-			>
-				{isThinking ? (
-					<Loader size={15} className='text-muted-foreground' />
-				) : (
-					<BrainIcon className='size-4 shrink-0 text-muted-foreground' />
-				)}
-				{isThinking ? (
-					<TextShimmer className='flex-1 text-start font-medium text-muted-foreground'>{label}</TextShimmer>
-				) : (
-					<span className='flex-1 text-start text-muted-foreground'>{label}</span>
-				)}
-				<ChevronDownIcon className='size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-panel-open:rotate-180' />
-			</CollapsibleTrigger>
-			<CollapsibleContent>
-				{text.trim().length > 0 && (
-					<div
-						ref={contentRef}
-						className='mt-1 ms-3.5 max-h-72 overflow-y-auto border-s border-border/60 ps-3.5 text-sm text-muted-foreground'
-					>
-						<ChatMessageMarkdown streaming={isThinking}>{text}</ChatMessageMarkdown>
-					</div>
-				)}
-			</CollapsibleContent>
-		</Collapsible>
+		<ChatStepItem
+			icon={reasoningIcon}
+			label={label}
+			status={isThinking ? "running" : "done"}
+			isLast={isLast}
+			open={open}
+			onOpenChange={onOpenChange}
+		>
+			{hasText && (
+				<div ref={contentRef} className='max-h-72 overflow-y-auto text-sm text-muted-foreground'>
+					<ChatMessageMarkdown streaming={isThinking}>{text}</ChatMessageMarkdown>
+				</div>
+			)}
+		</ChatStepItem>
 	);
 };
 

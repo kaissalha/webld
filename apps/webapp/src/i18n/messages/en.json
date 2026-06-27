@@ -464,6 +464,9 @@
 					"completed": "completed",
 					"noResults": "No results found",
 					"error": "An error occurred",
+					"searchingKnowledge": "Searching your knowledge…",
+					"draftingEmail": "Drafting an email…",
+					"lookingUpContacts": "Looking up contacts…",
 					"emailDraft": {
 						"to": "To",
 						"subject": "Subject",
@@ -485,7 +488,12 @@
 				"reasoning": {
 					"thinking": "Thinking…",
 					"reasoning": "Reasoning",
-					"thoughtFor": "Thought for {seconds}s"
+					"thoughtFor": "Thought for {seconds}s",
+					"expand": "Expand",
+					"collapse": "Collapse"
+				},
+				"status": {
+					"thinking": "Thinking…"
 				},
 				"file": {
 					"file": "File",

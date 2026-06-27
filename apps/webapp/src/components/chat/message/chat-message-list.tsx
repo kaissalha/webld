@@ -2,10 +2,11 @@
 
 import { type CSSProperties } from "react";
 
+import { useTranslations } from "next-intl";
 import { StickToBottom } from "use-stick-to-bottom";
 
 import { ChatEmptyState } from "@/components/chat/chat-empty-state";
-import { RequestIndicator } from "@/components/chat/chat-request-indicator";
+import { ChatStatusIndicator } from "@/components/chat/chat-request-indicator";
 import { ChatMessage, ChatMessageById } from "@/components/chat/message/chat-message";
 import { useChatMessageIds, useChatSession } from "@/components/chat/stores/chat-session-store";
 import { cn } from "@webld/ui/lib/utils";
@@ -45,6 +46,7 @@ const offscreenRowStyle: CSSProperties = {
 };
 
 const MessageListContent = () => {
+	const t = useTranslations("components.chat.message");
 	const messageIds = useChatMessageIds();
 	const { status, error, lastRole } = useChatSession((state) => ({
 		status: state.status,
@@ -69,7 +71,7 @@ const MessageListContent = () => {
 			})}
 			{isAwaitingFirstToken && (
 				<div className='flex w-full items-start py-5'>
-					<RequestIndicator />
+					<ChatStatusIndicator label={t("status.thinking")} />
 				</div>
 			)}
 			{error && (

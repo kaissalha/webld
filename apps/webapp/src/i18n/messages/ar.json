@@ -464,6 +464,9 @@
 					"completed": "اكتمل",
 					"noResults": "لم يتم العثور على نتائج",
 					"error": "حدث خطأ",
+					"searchingKnowledge": "جارٍ البحث في معرفتك…",
+					"draftingEmail": "جارٍ صياغة بريد إلكتروني…",
+					"lookingUpContacts": "جارٍ البحث في جهات الاتصال…",
 					"emailDraft": {
 						"to": "إلى",
 						"subject": "الموضوع",
@@ -485,7 +488,12 @@
 				"reasoning": {
 					"thinking": "جارٍ التفكير…",
 					"reasoning": "الاستدلال",
-					"thoughtFor": "فكّر لمدة {seconds} ثانية"
+					"thoughtFor": "فكّر لمدة {seconds} ثانية",
+					"expand": "توسيع",
+					"collapse": "طي"
+				},
+				"status": {
+					"thinking": "جارٍ التفكير…"
 				},
 				"file": {
 					"file": "ملف",

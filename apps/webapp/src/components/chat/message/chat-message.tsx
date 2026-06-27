@@ -5,7 +5,7 @@ import { memo, useEffect, useMemo, useState } from "react";
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { RequestIndicator } from "@/components/chat/chat-request-indicator";
+import { ChatStatusIndicator, RequestIndicator } from "@/components/chat/chat-request-indicator";
 import { useChatMessage } from "@/components/chat/stores/chat-session-store";
 import type { BaseChatUIMessage } from "@webld/server";
 import { Button } from "@webld/ui/components/button";
@@ -38,6 +38,38 @@ const buildMessageRenderData = (message: BaseChatUIMessage): MessageRenderData =
 		hasNonEmptyText: textContent.trim() !== "",
 		hasVisibleAssistantContent: message.parts.some((part) => isVisibleAssistantPartType(part.type)),
 	};
+};
+
+// Show a "Thinking…" status only in the gaps where nothing else conveys activity:
+// not while the answer text streams, and not while a tool/reasoning part already
+// renders its own loader.
+const shouldShowThinkingIndicator = ({
+	message,
+	isStreaming,
+}: {
+	message: BaseChatUIMessage;
+	isStreaming: boolean;
+}) => {
+	if (!isStreaming || message.role !== "assistant") {
+		return false;
+	}
+
+	const lastPart = message.parts.at(-1);
+	if (!lastPart) {
+		return true;
+	}
+	if (lastPart.type === "text") {
+		return false;
+	}
+	if (lastPart.type === "reasoning") {
+		return lastPart.state !== "streaming";
+	}
+	if (lastPart.type.startsWith("tool-")) {
+		const toolState = (lastPart as { state?: string }).state;
+		return toolState === "output-available" || toolState === "output-error";
+	}
+
+	return true;
 };
 
 const MessageContainer = ({
@@ -109,17 +141,17 @@ const MessageBody = ({
 	showRequestIndicator?: boolean;
 	isStreaming?: boolean;
 }) => {
+	const t = useTranslations("components.chat.message");
 	const isUser = message.role === "user";
 	const renderData = useMemo(() => buildMessageRenderData(message), [message]);
-	const showStreamingIndicator =
-		isStreaming && message.role === "assistant" && !renderData.hasVisibleAssistantContent;
+	const showThinkingIndicator = shouldShowThinkingIndicator({ message, isStreaming });
 	const showCopyAction = !isStreaming && message.role === "assistant" && renderData.hasNonEmptyText;
 
 	return (
 		<MessageContainer isUser={isUser} className={className}>
 			{showRequestIndicator ? <RequestIndicator /> : null}
 			<MessageParts messageId={message.id} parts={message.parts} isUser={isUser} isStreaming={isStreaming} />
-			{showStreamingIndicator ? <RequestIndicator /> : null}
+			{showThinkingIndicator ? <ChatStatusIndicator label={t("status.thinking")} /> : null}
 			{showCopyAction ? <AssistantMessageActions copyableText={renderData.textContent} /> : null}
 		</MessageContainer>
 	);

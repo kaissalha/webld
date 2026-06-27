@@ -1,7 +1,10 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 import type { BaseChatUIMessage } from "@webld/server";
 
+import { ChatSteps } from "./chat-steps";
 import { ErrorPart } from "./parts/error-part";
 import { FilePart } from "./parts/file-part";
 import { ReasoningPart } from "./parts/reasoning-part";
@@ -45,6 +48,11 @@ const getLastTextPartIndex = (parts: BaseChatUIMessage["parts"]) => {
 	return -1;
 };
 
+// Reasoning and tool calls are the "steps" of an assistant turn and render as a
+// connected timeline. The composeEmail draft is an editable result, not a step.
+const isStepPart = (part: ChatMessagePart) =>
+	part.type === "reasoning" || (part.type.startsWith("tool-") && part.type !== "tool-composeEmail");
+
 const renderMessagePart = ({
 	part,
 	partIdx,
@@ -52,6 +60,7 @@ const renderMessagePart = ({
 	isUser,
 	isStreamingText,
 	isStreamingMessage,
+	isLast = false,
 }: {
 	part: ChatMessagePart;
 	partIdx: number;
@@ -59,6 +68,7 @@ const renderMessagePart = ({
 	isUser: boolean;
 	isStreamingText: boolean;
 	isStreamingMessage: boolean;
+	isLast?: boolean;
 }) => {
 	const key = `message-${messageId}-${part.type}-${partIdx}`;
 
@@ -69,7 +79,15 @@ const renderMessagePart = ({
 	}
 
 	if (part.type === "reasoning") {
-		return <ReasoningPart key={key} text={part.text} state={part.state} isStreaming={isStreamingMessage} />;
+		return (
+			<ReasoningPart
+				key={key}
+				text={part.text}
+				state={part.state}
+				isStreaming={isStreamingMessage}
+				isLast={isLast}
+			/>
+		);
 	}
 
 	if (part.type === "source-url") {
@@ -105,6 +123,7 @@ const renderMessagePart = ({
 				input={toolPart.input}
 				output={toolPart.output}
 				errorText={toolPart.errorText}
+				isLast={isLast}
 			/>
 		);
 	}
@@ -118,15 +137,59 @@ const renderMessagePart = ({
 
 export const MessageParts = ({ messageId, parts, isUser, isStreaming }: MessagePartsProps) => {
 	const lastTextPartIndex = getLastTextPartIndex(parts);
+	const isStreamingMessage = isStreaming && !isUser;
 
-	return parts.map((part, partIdx) =>
-		renderMessagePart({
-			part,
-			partIdx,
-			messageId,
-			isUser,
-			isStreamingText: isStreaming && !isUser && partIdx === lastTextPartIndex,
-			isStreamingMessage: isStreaming && !isUser,
-		})
-	);
+	const elements: ReactNode[] = [];
+	let stepBuffer: Array<{ part: ChatMessagePart; partIdx: number }> = [];
+
+	const flushSteps = () => {
+		if (stepBuffer.length === 0) {
+			return;
+		}
+
+		const lastStepIndex = stepBuffer.length - 1;
+		const stepNodes = stepBuffer.map(({ part, partIdx }, stepIndex) =>
+			renderMessagePart({
+				part,
+				partIdx,
+				messageId,
+				isUser,
+				isStreamingText: false,
+				isStreamingMessage,
+				isLast: stepIndex === lastStepIndex,
+			})
+		);
+
+		elements.push(<ChatSteps key={`message-${messageId}-steps-${stepBuffer[0].partIdx}`}>{stepNodes}</ChatSteps>);
+		stepBuffer = [];
+	};
+
+	parts.forEach((part, partIdx) => {
+		// Step boundaries are invisible; skipping them keeps consecutive tool/reasoning
+		// parts grouped into a single timeline.
+		if (part.type === "step-start") {
+			return;
+		}
+
+		if (isStepPart(part)) {
+			stepBuffer.push({ part, partIdx });
+			return;
+		}
+
+		flushSteps();
+		elements.push(
+			renderMessagePart({
+				part,
+				partIdx,
+				messageId,
+				isUser,
+				isStreamingText: isStreamingMessage && partIdx === lastTextPartIndex,
+				isStreamingMessage,
+			})
+		);
+	});
+
+	flushSteps();
+
+	return elements;
 };
