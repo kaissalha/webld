@@ -91,7 +91,9 @@ export const LinkPreview = ({ url, children, className, onClick }: LinkPreviewPr
 									</span>
 								</div>
 							)}
-							<span className='min-w-0 truncate text-xs font-medium text-foreground'>{metadata.siteName}</span>
+							<span className='min-w-0 truncate text-xs font-medium text-foreground'>
+								{metadata.siteName}
+							</span>
 						</div>
 
 						<p className='line-clamp-2 text-sm font-medium text-foreground'>{metadata.title}</p>
