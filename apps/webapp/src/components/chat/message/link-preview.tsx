@@ -66,13 +66,13 @@ export const LinkPreview = ({ url, children, className, onClick }: LinkPreviewPr
 				suppressHydrationWarning={true}
 			>
 				{!shouldLoadMetadata || isLoading ? (
-					<div className='space-y-2'>
+					<div className='min-w-0 flex-1 space-y-2'>
 						<div className='h-3 w-24 animate-pulse rounded bg-muted' />
 						<div className='h-4 w-full animate-pulse rounded bg-muted' />
 						<div className='h-4 w-3/4 animate-pulse rounded bg-muted' />
 					</div>
 				) : metadata ? (
-					<a href={url} rel='noopener noreferrer' target='_blank'>
+					<a className='min-w-0 flex-1' href={url} rel='noopener noreferrer' target='_blank'>
 						<div className='mb-2 flex items-center gap-1'>
 							{metadata.favicon ? (
 								// oxlint-disable-next-line nextjs/no-img-element
@@ -91,7 +91,7 @@ export const LinkPreview = ({ url, children, className, onClick }: LinkPreviewPr
 									</span>
 								</div>
 							)}
-							<span className='truncate text-xs font-medium text-foreground'>{metadata.siteName}</span>
+							<span className='min-w-0 truncate text-xs font-medium text-foreground'>{metadata.siteName}</span>
 						</div>
 
 						<p className='line-clamp-2 text-sm font-medium text-foreground'>{metadata.title}</p>
