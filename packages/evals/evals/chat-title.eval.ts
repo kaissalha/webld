@@ -1,8 +1,6 @@
-import { Output, generateText } from "ai";
 import { createScorer, evalite } from "evalite";
 
-import { models } from "@webld/ai/models";
-import { dashboardChatTitlePrompt, dashboardChatTitleSchema } from "@webld/ai/prompts";
+import { generateDashboardChatTitle } from "@webld/ai/generate-dashboard-chat-title";
 
 import { countWords, scoreKeywordGroups } from "./utils";
 
@@ -62,16 +60,6 @@ evalite<ChatTitleInput, string, ChatTitleExpected>("Dashboard chat title prompt"
 			},
 		},
 	],
-	task: async ({ message }) => {
-		const { output } = await generateText({
-			...models.cheapFast,
-			output: Output.object({
-				schema: dashboardChatTitleSchema,
-			}),
-			prompt: dashboardChatTitlePrompt({ message }),
-		});
-
-		return output.title.trim();
-	},
+	task: async ({ message }) => generateDashboardChatTitle({ message }),
 	scorers: [wordBudgetScorer, noQuotesScorer, noTrailingPunctuationScorer, keywordCoverageScorer],
 });

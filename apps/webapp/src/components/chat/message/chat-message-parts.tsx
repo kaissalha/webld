@@ -51,12 +51,14 @@ const renderMessagePart = ({
 	messageId,
 	isUser,
 	isStreamingText,
+	isStreamingMessage,
 }: {
 	part: ChatMessagePart;
 	partIdx: number;
 	messageId: string;
 	isUser: boolean;
 	isStreamingText: boolean;
+	isStreamingMessage: boolean;
 }) => {
 	const key = `message-${messageId}-${part.type}-${partIdx}`;
 
@@ -67,7 +69,7 @@ const renderMessagePart = ({
 	}
 
 	if (part.type === "reasoning") {
-		return <ReasoningPart key={key} text={part.text} isStreaming={isStreamingText} />;
+		return <ReasoningPart key={key} text={part.text} state={part.state} isStreaming={isStreamingMessage} />;
 	}
 
 	if (part.type === "source-url") {
@@ -124,6 +126,7 @@ export const MessageParts = ({ messageId, parts, isUser, isStreaming }: MessageP
 			messageId,
 			isUser,
 			isStreamingText: isStreaming && !isUser && partIdx === lastTextPartIndex,
+			isStreamingMessage: isStreaming && !isUser,
 		})
 	);
 };

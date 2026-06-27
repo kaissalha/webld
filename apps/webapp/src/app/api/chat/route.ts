@@ -4,11 +4,9 @@ import { after, NextResponse } from "next/server";
 import {
 	convertToModelMessages,
 	createUIMessageStream,
-	generateText,
 	isTextUIPart,
 	JsonToSseTransformStream,
 	lastAssistantMessageIsCompleteWithToolCalls,
-	Output,
 	smoothStream,
 	toUIMessageStream,
 	validateUIMessages,
@@ -18,9 +16,9 @@ import { z } from "zod";
 
 import { convertDbMessagesForUI, streamContext } from "@/utils/chat-utils";
 import { withErrorHandler } from "@/utils/with-error-handler";
+import { generateDashboardChatTitle } from "@webld/ai/generate-dashboard-chat-title";
 import { healModelMessages } from "@webld/ai/heal-messages";
-import { models } from "@webld/ai/models";
-import { dashboardChatTitlePrompt, dashboardChatTitleSchema, memoryContextPrompt } from "@webld/ai/prompts";
+import { memoryContextPrompt } from "@webld/ai/prompts";
 import { logger } from "@webld/logger/server";
 import {
 	dashboardChatAgent,
@@ -40,6 +38,7 @@ import {
 	searchOlderMessages,
 	searchRelatedChats,
 	setLastStreamId,
+	type TextualMessage,
 	updateChatTitle,
 	waitForFilesReady,
 } from "@webld/server";
@@ -255,13 +254,17 @@ export const POST = withErrorHandler(async (req: Request) => {
 	const recentMessages = uiMessages.slice(-MEMORY_WINDOW_SIZE);
 	const olderMessages = uiMessages.slice(0, -MEMORY_WINDOW_SIZE);
 	const recentMessageIds = recentMessages.map((message) => message.id);
+	const recentMessagesForRetrieval: TextualMessage[] = recentMessages.map((message) => ({
+		role: message.role,
+		parts: message.parts as TextualMessage["parts"],
+	}));
 
 	// Retrieval feeds the prompt and is the dominant pre-token latency; persistence overlaps it.
 	// All three searches embed the same message-history query, so embed once and reuse it
 	// instead of paying for three identical embedding round trips.
 	const [[relevantOlderMessages, relevantMemories, relatedChats]] = await Promise.all([
 		(async () => {
-			const retrievalQuery = messageHistoryToQuery(recentMessages);
+			const retrievalQuery = messageHistoryToQuery(recentMessagesForRetrieval);
 			const queryEmbedding = retrievalQuery.trim()
 				? await generateRagEmbedding({ value: retrievalQuery })
 				: undefined;
@@ -273,14 +276,19 @@ export const POST = withErrorHandler(async (req: Request) => {
 							excludeMessageIds: recentMessageIds,
 							organizationId,
 							queryEmbedding,
-							recentMessages,
+							recentMessages: recentMessagesForRetrieval,
 							topK: OLD_MESSAGES_TO_USE,
 						})
-					: Promise.resolve([]),
-				searchMemories({ messages: recentMessages, organizationId, queryEmbedding, topK: MEMORIES_TO_USE }),
+					: Promise.resolve([] as Awaited<ReturnType<typeof searchOlderMessages>>),
+				searchMemories({
+					messages: recentMessagesForRetrieval,
+					organizationId,
+					queryEmbedding,
+					topK: MEMORIES_TO_USE,
+				}),
 				searchRelatedChats({
 					currentChatId: chatId,
-					messages: recentMessages,
+					messages: recentMessagesForRetrieval,
 					organizationId,
 					queryEmbedding,
 					topK: RELATED_CHATS_TO_USE,
@@ -398,7 +406,6 @@ export const POST = withErrorHandler(async (req: Request) => {
 				experimental_transform: smoothStream({ chunking: "word" }),
 			});
 
-			result.consumeStream();
 			writer.merge(toUIMessageStream({ stream: result.stream, sendReasoning: true }));
 		},
 		generateId: uuidv4,
@@ -421,10 +428,17 @@ export const POST = withErrorHandler(async (req: Request) => {
 				try {
 					await Promise.all([
 						chatMessage.role === "user"
-							? embedChatMessage({ message: { id: chatMessage.id, parts: chatMessage.parts } })
+							? embedChatMessage({
+									message: {
+										id: chatMessage.id,
+										parts: chatMessage.parts as TextualMessage["parts"],
+									},
+								})
 							: Promise.resolve(),
 						...assistantMessages.map((message) =>
-							embedChatMessage({ message: { id: message.id, parts: message.parts } })
+							embedChatMessage({
+								message: { id: message.id, parts: message.parts as TextualMessage["parts"] },
+							})
 						),
 					]);
 
@@ -456,20 +470,14 @@ export const POST = withErrorHandler(async (req: Request) => {
 
 			after(async () => {
 				try {
-					const { output } = await generateText({
-						...models.cheapFast,
-						output: Output.object({
-							schema: dashboardChatTitleSchema,
-						}),
-						prompt: dashboardChatTitlePrompt({
-							message: firstMessageText,
-						}),
+					const title = await generateDashboardChatTitle({
+						message: firstMessageText,
 					});
 
 					await updateChatTitle({
 						chatId,
 						organizationId,
-						title: output.title,
+						title,
 					});
 				} catch (error) {
 					logger.error({

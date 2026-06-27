@@ -474,7 +474,18 @@
 						"copyMessage": "نسخ الرسالة",
 						"copiedMessage": "تم نسخ الرسالة",
 						"openInMailApp": "فتح في تطبيق البريد"
+					},
+					"webSearch": {
+						"searching": "جارٍ البحث في الويب",
+						"sources": "{count, plural, zero {# مصدر} one {# مصدر} two {# مصدران} few {# مصادر} many {# مصدرًا} other {# مصدر}}",
+						"noResults": "لم يتم العثور على نتائج على الويب",
+						"error": "فشل البحث في الويب"
 					}
+				},
+				"reasoning": {
+					"thinking": "جارٍ التفكير…",
+					"reasoning": "الاستدلال",
+					"thoughtFor": "فكّر لمدة {seconds} ثانية"
 				},
 				"file": {
 					"file": "ملف",

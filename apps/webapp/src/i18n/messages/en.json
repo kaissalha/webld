@@ -474,7 +474,18 @@
 						"copyMessage": "Copy message",
 						"copiedMessage": "Message copied",
 						"openInMailApp": "Open in mail app"
+					},
+					"webSearch": {
+						"searching": "Searching the web",
+						"sources": "{count, plural, one {# source} other {# sources}}",
+						"noResults": "No results found on the web",
+						"error": "Web search failed"
 					}
+				},
+				"reasoning": {
+					"thinking": "Thinking…",
+					"reasoning": "Reasoning",
+					"thoughtFor": "Thought for {seconds}s"
 				},
 				"file": {
 					"file": "File",

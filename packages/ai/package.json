@@ -25,6 +25,11 @@
 			"types": "./src/heal-messages.ts",
 			"import": "./src/heal-messages.ts",
 			"default": "./src/heal-messages.ts"
+		},
+		"./generate-dashboard-chat-title": {
+			"types": "./src/generate-dashboard-chat-title.ts",
+			"import": "./src/generate-dashboard-chat-title.ts",
+			"default": "./src/generate-dashboard-chat-title.ts"
 		}
 	},
 	"scripts": {

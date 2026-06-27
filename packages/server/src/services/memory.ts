@@ -17,8 +17,8 @@ const DEFAULT_MEMORY_TOP_K = 3;
 const DEFAULT_OLD_MESSAGE_TOP_K = 10;
 const DEFAULT_RELATED_CHATS_TOP_K = 3;
 
-type TextualPart = { type: string; [key: string]: unknown };
-type TextualMessage = { role: string; parts: TextualPart[] };
+export type TextualPart = { type: string; [key: string]: unknown };
+export type TextualMessage = { role: string; parts: TextualPart[] };
 
 // =============================================================================
 // Text utilities
