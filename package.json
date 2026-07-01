@@ -22,8 +22,8 @@
 		"prepare": "husky"
 	},
 	"devDependencies": {
-		"@testcontainers/postgresql": "^12.0.3",
-		"@testcontainers/redis": "^12.0.3",
+		"@testcontainers/postgresql": "^12.0.4",
+		"@testcontainers/redis": "^12.0.4",
 		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/react": "^16.3.2",
 		"@types/pg": "^8.20.0",
@@ -35,11 +35,11 @@
 		"drizzle-orm": "^1.0.0-rc.4",
 		"happy-dom": "^20.10.6",
 		"husky": "^9.1.7",
-		"oxfmt": "^0.56.0",
-		"oxlint": "^1.71.0",
+		"oxfmt": "^0.57.0",
+		"oxlint": "^1.72.0",
 		"pg": "^8.22.0",
-		"testcontainers": "^12.0.3",
-		"turbo": "^2.10.0",
+		"testcontainers": "^12.0.4",
+		"turbo": "^2.10.2",
 		"typescript": "^7.0.1-rc",
 		"vitest": "^4.1.9"
 	},

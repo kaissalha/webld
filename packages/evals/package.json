@@ -12,11 +12,11 @@
 	"dependencies": {
 		"@webld/ai": "workspace:*",
 		"@webld/server": "workspace:*",
-		"ai": "^7.0.2",
+		"ai": "^7.0.10",
 		"zod": "^4.4.3"
 	},
 	"devDependencies": {
-		"@types/node": "^26.0.1",
+		"@types/node": "^26.1.0",
 		"@webld/tsconfig": "workspace:*",
 		"better-sqlite3": "^12.11.1",
 		"dotenv-cli": "^11.0.0",

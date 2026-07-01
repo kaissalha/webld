@@ -11,7 +11,7 @@
       "source": "vercel/ai",
       "sourceType": "github",
       "skillPath": "skills/use-ai-sdk/SKILL.md",
-      "computedHash": "2249889eb47ef0f61c4dba4cf2afe01c1c8dd793bb4c24230347c1ab909bb7dd"
+      "computedHash": "2fdbb3c2c9c0e19c64f03f2febd4fec134473e2fe7443f7ebe67870eba5b3c75"
     },
     "animation-best-practices": {
       "source": "millionco/react-doctor",
@@ -41,7 +41,7 @@
       "source": "cosscom/coss",
       "sourceType": "github",
       "skillPath": "apps/ui/skills/coss/SKILL.md",
-      "computedHash": "b5e0fbcf1f17902ba34ccfe2b06ff1b6af07a37fb1c6c1424587a92630f39cd3"
+      "computedHash": "8d06783bce9259bff723026dc7791a7ea0717ba26732a42c229374bc71fdc1e1"
     },
     "coss-particles": {
       "source": "cosscom/coss",
@@ -101,7 +101,7 @@
       "source": "pbakaus/impeccable",
       "sourceType": "github",
       "skillPath": ".agents/skills/impeccable/SKILL.md",
-      "computedHash": "c5c260ee8333b2710285ba484ab92d5abd23cc03d03cbf984bc2f108a8a47d8a"
+      "computedHash": "1e310d65fb286f8bd22c193f48e4aef8dc6c8b9caa6816eecca582b8faa5a096"
     },
     "improve": {
       "source": "shadcn/improve",
@@ -131,7 +131,7 @@
       "source": "vercel/turborepo",
       "sourceType": "github",
       "skillPath": "skills/turborepo/SKILL.md",
-      "computedHash": "b7c3165ae67a2892d6195a5b2cba15c8d96341f5c64ddd0d3ce4225c94a2ae83"
+      "computedHash": "02d55b7d0eec2ed40eecb1a022b6e78106fb9951c8da0a7b0199104e358f43b7"
     },
     "two-factor-authentication-best-practices": {
       "source": "better-auth/skills",

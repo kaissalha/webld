@@ -36,15 +36,15 @@
 		"typecheck": "tsc --noEmit --skipLibCheck"
 	},
 	"dependencies": {
-		"@ai-sdk/devtools": "^1.0.0",
-		"@ai-sdk/gateway": "^4.0.2",
-		"@ai-sdk/provider-utils": "^5.0.0",
-		"ai": "^7.0.2",
+		"@ai-sdk/devtools": "^1.0.1",
+		"@ai-sdk/gateway": "^4.0.8",
+		"@ai-sdk/provider-utils": "^5.0.3",
+		"ai": "^7.0.10",
 		"ai-sdk-heal": "^0.2.0",
 		"zod": "^4.4.3"
 	},
 	"devDependencies": {
-		"@types/node": "^26.0.1",
+		"@types/node": "^26.1.0",
 		"@webld/tsconfig": "workspace:*",
 		"typescript": "^7.0.1-rc"
 	}
