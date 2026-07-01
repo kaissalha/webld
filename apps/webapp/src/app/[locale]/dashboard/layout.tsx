@@ -20,7 +20,7 @@ const AppSidebarFallback = () => (
 		</SidebarHeader>
 		<SidebarContent>
 			<div className='flex flex-col gap-1 px-3 py-2'>
-				{["home", "contacts"].map((item) => (
+				{["home", "chat"].map((item) => (
 					<div key={item} className='flex h-8 items-center gap-2 rounded-md px-2'>
 						<div className='size-4 animate-pulse rounded bg-sidebar-accent' />
 					</div>

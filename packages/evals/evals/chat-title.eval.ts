@@ -50,11 +50,11 @@ evalite<ChatTitleInput, string, ChatTitleExpected>("Dashboard chat title prompt"
 		},
 		{
 			input: {
-				message: "Find all Acme contacts and draft a concise follow-up for the customer success lead",
+				message: "Search our Acme onboarding docs and draft a concise follow-up for the customer success lead",
 			},
 			expected: {
 				keywordGroups: [
-					["Acme", "contacts"],
+					["Acme", "onboarding"],
 					["follow-up", "follow up", "customer success"],
 				],
 			},

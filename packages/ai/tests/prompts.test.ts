@@ -35,10 +35,10 @@ describe("prompts", () => {
 
 	it("builds the dashboard chat title prompt around the user message", () => {
 		const prompt = dashboardChatTitlePrompt({
-			message: "Find contacts from Acme and draft a follow-up",
+			message: "Search Acme docs and draft a follow-up",
 		});
 
-		expect(prompt).toContain("Find contacts from Acme and draft a follow-up");
+		expect(prompt).toContain("Search Acme docs and draft a follow-up");
 		expect(prompt).toContain("- 2 to 6 words");
 	});
 

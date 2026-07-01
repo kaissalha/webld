@@ -12,9 +12,6 @@ export const dashboardChatAgent = new ToolLoopAgent({
 	tools: dashboardChatTools,
 	toolsContext: {
 		composeEmail: {},
-		createContact: {},
-		getContact: {},
-		getContacts: {},
 		getKnowledgeContent: {},
 		retrieveKnowledge: {},
 	},
@@ -45,9 +42,6 @@ export const dashboardChatAgent = new ToolLoopAgent({
 			runtimeContext: aiContext,
 			toolsContext: {
 				composeEmail: aiContext,
-				createContact: aiContext,
-				getContact: aiContext,
-				getContacts: aiContext,
 				getKnowledgeContent: aiContext,
 				retrieveKnowledge: aiContext,
 			},

@@ -30,13 +30,6 @@ export const ChatEmptyState = () => {
 				<Button
 					type='button'
 					variant='outline'
-					onClick={() => handleSuggestionSelect(t("suggestions.dashboard.contacts"))}
-				>
-					{t("suggestions.dashboard.contacts")}
-				</Button>
-				<Button
-					type='button'
-					variant='outline'
 					onClick={() => handleSuggestionSelect(t("suggestions.dashboard.knowledge"))}
 				>
 					{t("suggestions.dashboard.knowledge")}

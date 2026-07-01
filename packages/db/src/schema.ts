@@ -20,8 +20,6 @@ export {
 	oauthConnections,
 	oauthProviderEnum,
 } from "./schema/integrations/oauth-connections.ts";
-// Contacts schema
-export { contacts } from "./schema/contacts/contacts.ts";
 // Files (vault) schema
 export {
 	fileAccess,

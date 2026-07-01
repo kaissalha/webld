@@ -54,7 +54,6 @@ export * from "./schema/auth/organizations.ts";
 export * from "./schema/auth/sessions.ts";
 export * from "./schema/auth/users.ts";
 export * from "./schema/auth/verifications.ts";
-export * from "./schema/contacts/contacts.ts";
 export * from "./schema/integrations/oauth-connections.ts";
 export * from "./schema/files/file-chunks.ts";
 export * from "./schema/files/files.ts";

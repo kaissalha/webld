@@ -176,12 +176,4 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.organizations.id,
 		}),
 	},
-
-	// Contacts relations
-	contacts: {
-		organization: r.one.organizations({
-			from: r.contacts.organizationId,
-			to: r.organizations.id,
-		}),
-	},
 }));

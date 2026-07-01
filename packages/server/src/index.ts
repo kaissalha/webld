@@ -13,7 +13,6 @@ export * from "./lib/resend";
 // Services
 // =============================================================================
 export * from "./services/chat";
-export * from "./services/contacts";
 export * from "./services/document-extraction";
 export * from "./services/enrichment";
 export * from "./services/location";

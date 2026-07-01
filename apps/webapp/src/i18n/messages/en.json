@@ -83,7 +83,6 @@
 		"askAnything": "Ask me anything about your business and I'll help you out.",
 		"suggestions": {
 			"dashboard": {
-				"contacts": "Find contacts",
 				"knowledge": "Search knowledge"
 			}
 		},
@@ -184,7 +183,7 @@
 			},
 			"testimonials": {
 				"slide0": {
-					"lead": "We finally have one place for workspace context, contacts, and follow-ups,",
+					"lead": "We finally have one place for workspace context, knowledge, and follow-ups,",
 					"punct": " ",
 					"highlight": "and the team onboards new staff in a day instead of a week\"",
 					"name": "Jordan Lee",
@@ -200,7 +199,7 @@
 				"slide2": {
 					"lead": "We replaced three tools with a single workflow",
 					"punct": " ",
-					"highlight": "and contacts get clearer, faster answers.\"",
+					"highlight": "and customers get clearer, faster answers.\"",
 					"name": "Elena Rossi",
 					"role": "Independent workspace • Italy"
 				},
@@ -466,7 +465,6 @@
 					"error": "An error occurred",
 					"searchingKnowledge": "Searching your knowledge…",
 					"draftingEmail": "Drafting an email…",
-					"lookingUpContacts": "Looking up contacts…",
 					"emailDraft": {
 						"to": "To",
 						"subject": "Subject",
@@ -546,7 +544,7 @@
 			"name": {
 				"title": "Workspace name",
 				"description": "The name shown for your workspace in the app and in shared contexts.",
-				"hint": "Use the name contacts and teammates recognize.",
+				"hint": "Use the name teammates and customers recognize.",
 				"placeholder": "Acme Physiotherapy"
 			},
 			"logo": {

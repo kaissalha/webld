@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 
-import { BookTextIcon, UsersIcon, WrenchIcon } from "lucide-react";
+import { BookTextIcon, WrenchIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { TextShimmer } from "@webld/ui/components/text-shimmer";
@@ -25,14 +25,10 @@ export type ToolPartProps = {
 };
 
 const KNOWLEDGE_TOOLS = new Set(["retrieveKnowledge", "getKnowledgeContent"]);
-const CONTACT_TOOLS = new Set(["createContact", "getContact", "getContacts"]);
 
 const getToolIcon = (toolName: string): ReactNode => {
 	if (KNOWLEDGE_TOOLS.has(toolName)) {
 		return <BookTextIcon className='size-3.5' />;
-	}
-	if (CONTACT_TOOLS.has(toolName)) {
-		return <UsersIcon className='size-3.5' />;
 	}
 
 	return <WrenchIcon className='size-3.5' />;
@@ -63,11 +59,7 @@ const GenericToolStep = ({
 	const t = useTranslations("components.chat.message.tool");
 	const isRunning = state === "input-streaming" || state === "input-available";
 
-	const runningLabel = KNOWLEDGE_TOOLS.has(toolName)
-		? t("searchingKnowledge")
-		: CONTACT_TOOLS.has(toolName)
-			? t("lookingUpContacts")
-			: t("processing");
+	const runningLabel = KNOWLEDGE_TOOLS.has(toolName) ? t("searchingKnowledge") : t("processing");
 
 	const label =
 		state === "output-error" ? (

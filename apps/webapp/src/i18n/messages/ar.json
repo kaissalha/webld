@@ -83,7 +83,6 @@
 		"askAnything": "اسألني عن أي شيء يخص عملك وسأساعدك.",
 		"suggestions": {
 			"dashboard": {
-				"contacts": "البحث عن جهات الاتصال",
 				"knowledge": "البحث في المعرفة"
 			}
 		},
@@ -466,7 +465,6 @@
 					"error": "حدث خطأ",
 					"searchingKnowledge": "جارٍ البحث في معرفتك…",
 					"draftingEmail": "جارٍ صياغة بريد إلكتروني…",
-					"lookingUpContacts": "جارٍ البحث في جهات الاتصال…",
 					"emailDraft": {
 						"to": "إلى",
 						"subject": "الموضوع",

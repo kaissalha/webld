@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl";
 
 import { Loader } from "@webld/ui/components/loader";
 import { TextShimmer } from "@webld/ui/components/text-shimmer";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@webld/ui/components/tooltip";
 
 import { formatToolName } from "./tool-output-helpers";
 
@@ -26,29 +25,6 @@ export const ToolError = ({ errorText }: { errorText?: string }) => {
 			<TriangleAlertIcon className='size-4' />
 			<span className='text-sm'>{errorText || t("error")}</span>
 		</div>
-	);
-};
-
-export const DataToolBadge = ({ toolName }: { toolName: string }) => {
-	const label = formatToolName(toolName);
-
-	return (
-		<TooltipProvider>
-			<Tooltip>
-				<TooltipTrigger
-					delay={0}
-					render={
-						<div className='border-black/6 bg-black/2 flex w-fit max-w-full items-center gap-2.5 rounded-xl border px-3.5 py-2 text-sm text-black/65'>
-							<CheckCircle2Icon className='size-4 shrink-0 text-black/45' />
-							<span className='max-w-100 truncate'>{label}</span>
-						</div>
-					}
-				/>
-				<TooltipContent side='top' align='start' className='max-w-130'>
-					<p className='wrap-break-word max-w-130'>{label}</p>
-				</TooltipContent>
-			</Tooltip>
-		</TooltipProvider>
 	);
 };
 

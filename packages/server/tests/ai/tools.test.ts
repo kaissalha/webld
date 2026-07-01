@@ -1,17 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { createContact, createFileChunkSnippet, getContact, listContacts, retrieveFileChunks } = vi.hoisted(() => ({
-	createContact: vi.fn(),
+const { createFileChunkSnippet, retrieveFileChunks } = vi.hoisted(() => ({
 	createFileChunkSnippet: vi.fn(),
-	getContact: vi.fn(),
-	listContacts: vi.fn(),
 	retrieveFileChunks: vi.fn(),
-}));
-
-vi.mock("../../src/services/contacts", () => ({
-	createContact,
-	getContact,
-	listContacts,
 }));
 
 vi.mock("../../src/services/rag", () => ({
@@ -22,9 +13,6 @@ vi.mock("../../src/services/rag", () => ({
 import type { ModelMessage, ToolExecuteFunction, ToolExecutionOptions } from "ai";
 
 import { composeEmailTool } from "../../src/ai/tools/compose-email";
-import { createContactTool } from "../../src/ai/tools/create-contact";
-import { getContactTool } from "../../src/ai/tools/get-contact";
-import { getContactsTool } from "../../src/ai/tools/get-contacts";
 import { retrieveKnowledgeTool } from "../../src/ai/tools/retrieve-knowledge";
 import type { AppContext } from "../../src/ai/types";
 
@@ -63,75 +51,6 @@ const runTool = async <TInput, TOutput, TContext extends AppContext>(
 describe("ai tools", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-	});
-
-	it("getContactsTool returns error without organization", async () => {
-		const outputs = await runTool(getContactsTool.execute, { search: "test", pageSize: 1 }, {});
-
-		expect(outputs[1]).toEqual({ status: "error", error: "Organization context not found" });
-	});
-
-	it("getContactsTool returns contacts on success", async () => {
-		listContacts.mockResolvedValue({
-			data: [
-				{
-					createdAt: "2026-05-01T10:00:00.000Z",
-					email: "sam@example.com",
-					firstName: "Sam",
-					id: "contact-1",
-					lastName: "Test",
-					phoneNumber: null,
-				},
-			],
-			meta: { cursor: null, totalData: 1 },
-		});
-
-		const outputs = await runTool(
-			getContactsTool.execute,
-			{ search: "sam", pageSize: 1 },
-			{ organizationId: "org-1" }
-		);
-
-		expect(outputs.at(-1)).toEqual(
-			expect.objectContaining({
-				contacts: expect.arrayContaining([expect.objectContaining({ id: "contact-1" })]),
-				hasMore: false,
-				status: "success",
-				totalCount: 1,
-			})
-		);
-	});
-
-	it("getContactTool returns error when contact is missing", async () => {
-		getContact.mockResolvedValue(null);
-
-		const outputs = await runTool(getContactTool.execute, { contactId: "contact-1" }, { organizationId: "org-1" });
-
-		expect(outputs.at(-1)).toEqual({ status: "error", error: "Contact not found" });
-	});
-
-	it("createContactTool returns success", async () => {
-		createContact.mockResolvedValue({
-			createdAt: "2026-05-01T10:00:00.000Z",
-			email: "sam@example.com",
-			firstName: "Sam",
-			id: "contact-1",
-			lastName: "Test",
-			phoneNumber: null,
-		});
-
-		const outputs = await runTool(
-			createContactTool.execute,
-			{ firstName: "Sam", lastName: "Test", email: "sam@example.com" },
-			{ organizationId: "org-1" }
-		);
-
-		expect(outputs.at(-1)).toEqual(
-			expect.objectContaining({
-				contact: expect.objectContaining({ id: "contact-1" }),
-				status: "success",
-			})
-		);
 	});
 
 	it("retrieveKnowledgeTool returns ranked snippets", async () => {
