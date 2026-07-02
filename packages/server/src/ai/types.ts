@@ -25,6 +25,7 @@ export const appContextSchema = z
 			)
 			.optional(),
 		memoryContext: z.string().optional(),
+		knowledgeContext: z.string().optional(),
 		locale: z.string().optional(),
 		timezone: z.string().optional(),
 	})

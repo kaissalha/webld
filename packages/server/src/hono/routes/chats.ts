@@ -14,7 +14,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { generateDashboardChatTitle } from "@webld/ai/generate-dashboard-chat-title";
 import { healModelMessages } from "@webld/ai/heal-messages";
-import { memoryContextPrompt } from "@webld/ai/prompts";
+import { knowledgeContextPrompt, memoryContextPrompt } from "@webld/ai/prompts";
 
 import { dashboardChatAgent } from "../../ai/agents/dashboard-chat-agent";
 import type { BaseChatUIMessage, DashboardChatUIMessage } from "../../ai/types";
@@ -34,15 +34,15 @@ import {
 	embedChatMessage,
 	episodeToText,
 	extractAndUpdateMemories,
+	loadMemories,
 	memoryToText,
 	messageHistoryToQuery,
 	reflectOnChat,
-	searchMemories,
 	searchOlderMessages,
 	searchRelatedChats,
 	type TextualMessage,
 } from "../../services/memory";
-import { generateRagEmbedding } from "../../services/rag";
+import { generateRagEmbedding, retrieveFileChunks } from "../../services/rag";
 import { waitForFilesReady } from "../../services/storage";
 import type { CreateApiAppOptions } from "../context";
 import { logServerEvent } from "../logger";
@@ -53,8 +53,8 @@ import { errorResponse, uiMessageSchema } from "../schemas";
 
 const MEMORY_WINDOW_SIZE = 10;
 const OLD_MESSAGES_TO_USE = 10;
-const MEMORIES_TO_USE = 3;
 const RELATED_CHATS_TO_USE = 3;
+const KNOWLEDGE_CHUNKS_TO_USE = 5;
 
 const chatIdParamsSchema = z.object({
 	chatId: z.uuid().openapi({
@@ -446,7 +446,12 @@ export const createChatsRoutes = (options: CreateApiAppOptions) => {
 				parts: recentMessage.parts as TextualMessage["parts"],
 			}));
 
-			const [[relevantOlderMessages, relevantMemories, relatedChats]] = await Promise.all([
+			const lastUserMessage = recentMessages.findLast((recentMessage) => recentMessage.role === "user");
+			const lastUserText = lastUserMessage ? getMessageText(lastUserMessage).trim() : "";
+
+			// Preload all per-turn context here (memories, related chats, knowledge) so the
+			// agent can answer directly instead of opening the turn with retrieval tool calls.
+			const [[relevantOlderMessages, relatedChats, knowledgeChunks], orgMemories] = await Promise.all([
 				(async () => {
 					const retrievalQuery = messageHistoryToQuery(recentMessagesForRetrieval);
 					const queryEmbedding = retrievalQuery.trim()
@@ -464,12 +469,6 @@ export const createChatsRoutes = (options: CreateApiAppOptions) => {
 									topK: OLD_MESSAGES_TO_USE,
 								})
 							: Promise.resolve([] as Awaited<ReturnType<typeof searchOlderMessages>>),
-						searchMemories({
-							messages: recentMessagesForRetrieval,
-							organizationId,
-							queryEmbedding,
-							topK: MEMORIES_TO_USE,
-						}),
 						searchRelatedChats({
 							currentChatId: chatId,
 							messages: recentMessagesForRetrieval,
@@ -477,8 +476,19 @@ export const createChatsRoutes = (options: CreateApiAppOptions) => {
 							queryEmbedding,
 							topK: RELATED_CHATS_TO_USE,
 						}),
+						queryEmbedding
+							? retrieveFileChunks({
+									keywords: lastUserText ? [lastUserText] : undefined,
+									organizationId,
+									queryEmbedding,
+									rerank: false,
+									searchQuery: retrievalQuery,
+									topK: KNOWLEDGE_CHUNKS_TO_USE,
+								})
+							: Promise.resolve([] as Awaited<ReturnType<typeof retrieveFileChunks>>),
 					]);
 				})(),
+				loadMemories({ organizationId }),
 				persistMessagePromise,
 			]);
 
@@ -523,13 +533,24 @@ export const createChatsRoutes = (options: CreateApiAppOptions) => {
 			}
 
 			const memoryContext =
-				relevantMemories.length > 0 || relatedChats.length > 0
+				orgMemories.length > 0 || relatedChats.length > 0
 					? memoryContextPrompt({
-							memories: relevantMemories.map((result) => ({
-								id: result.memory.id,
-								text: memoryToText(result.memory),
+							memories: orgMemories.map((memory) => ({
+								id: memory.id,
+								text: memoryToText(memory),
 							})),
 							relatedChats: relatedChats.map((result) => episodeToText(result.episode)),
+						})
+					: undefined;
+
+			const knowledgeContext =
+				knowledgeChunks.length > 0
+					? knowledgeContextPrompt({
+							excerpts: knowledgeChunks.map((chunk) => ({
+								chunkId: chunk.chunkId,
+								content: chunk.content,
+								source: chunk.file.title ?? chunk.file.name,
+							})),
 						})
 					: undefined;
 
@@ -586,6 +607,7 @@ export const createChatsRoutes = (options: CreateApiAppOptions) => {
 									email: session.user.email ?? undefined,
 									name: session.user.name ?? undefined,
 								},
+								knowledgeContext,
 								memoryContext,
 								organizationId,
 							},

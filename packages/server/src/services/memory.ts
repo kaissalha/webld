@@ -14,7 +14,6 @@ import { aiChatMessages, aiChats, type ChatEpisode, chatEpisodes, db, type Memor
 import type { BaseChatUIMessage } from "../ai/types";
 import { generateRagEmbedding } from "./rag";
 
-const DEFAULT_MEMORY_TOP_K = 3;
 const DEFAULT_OLD_MESSAGE_TOP_K = 10;
 const DEFAULT_RELATED_CHATS_TOP_K = 3;
 
@@ -115,43 +114,6 @@ export const updateMemory = async ({
 
 export const deleteMemory = async ({ id, organizationId }: { id: string; organizationId: string }) =>
 	db.delete(memories).where(and(eq(memories.id, id), eq(memories.organizationId, organizationId)));
-
-export const searchMemories = async ({
-	messages,
-	organizationId,
-	queryEmbedding: providedEmbedding,
-	topK = DEFAULT_MEMORY_TOP_K,
-}: {
-	messages: TextualMessage[];
-	organizationId: string;
-	/** Precomputed embedding of the message-history query, to avoid re-embedding when callers fan out. */
-	queryEmbedding?: number[];
-	topK?: number;
-}) => {
-	const query = messageHistoryToQuery(messages);
-
-	if (!query.trim()) {
-		return [];
-	}
-
-	const queryEmbedding = providedEmbedding ?? (await generateRagEmbedding({ value: query }));
-	const similarity = sql<number>`1 - (${cosineDistance(memories.embedding, queryEmbedding)})`;
-
-	const rows = await db
-		.select({
-			content: memories.content,
-			id: memories.id,
-			similarity,
-			source: memories.source,
-			title: memories.title,
-		})
-		.from(memories)
-		.where(eq(memories.organizationId, organizationId))
-		.orderBy((row) => desc(row.similarity))
-		.limit(topK);
-
-	return rows.map(({ similarity: score, ...memory }) => ({ memory, similarity: Number(score) }));
-};
 
 /**
  * Runs the memory-extraction prompt over a conversation and returns the raw

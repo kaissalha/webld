@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
 	dashboardChatSystemPrompt,
 	dashboardChatTitlePrompt,
+	knowledgeContextPrompt,
 	memoryExtractionSchema,
 	ragAnswerSystemPrompt,
 } from "../src/prompts";
@@ -49,6 +50,31 @@ describe("prompts", () => {
 		expect(prompt).toContain("getKnowledgeContent");
 		expect(ragAnswerSystemPrompt).toContain("retrieveKnowledge");
 		expect(ragAnswerSystemPrompt).toContain("cite sources");
+	});
+
+	it("directs the agent to answer from preloaded knowledge before using tools", () => {
+		const prompt = dashboardChatSystemPrompt();
+
+		expect(prompt).toContain("<knowledge>");
+		expect(prompt).toContain("preloaded");
+		expect(prompt).toContain("Only reach for the knowledge tools when the preloaded excerpts are insufficient");
+	});
+
+	it("renders knowledge excerpts with citations, chunk IDs, and sources", () => {
+		const prompt = knowledgeContextPrompt({
+			excerpts: [
+				{
+					chunkId: "chunk-1",
+					content: "Follow-up visits happen within 14 days.",
+					source: "Onboarding guide",
+				},
+			],
+		});
+
+		expect(prompt).toContain('citation="[1]"');
+		expect(prompt).toContain('chunkId="chunk-1"');
+		expect(prompt).toContain('source="Onboarding guide"');
+		expect(prompt).toContain("Follow-up visits happen within 14 days.");
 	});
 
 	it("unwraps JSON Schema-shaped memory extraction output", () => {

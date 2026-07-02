@@ -36,6 +36,7 @@ export const dashboardChatAgent = new ToolLoopAgent({
 					currentUser: aiContext.currentUser,
 				}),
 				aiContext.memoryContext,
+				aiContext.knowledgeContext,
 			]
 				.filter(Boolean)
 				.join("\n\n"),

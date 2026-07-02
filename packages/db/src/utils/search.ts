@@ -2,7 +2,12 @@ import { type SQL, sql } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
 
 export const buildSearchQuery = (input: string) => {
-	const terms = input.trim().split(/\s+/).filter(Boolean);
+	// Strip tsquery syntax characters so raw user text can't produce an invalid query.
+	const terms = input
+		.trim()
+		.split(/\s+/)
+		.map((term) => term.replaceAll(/[^\p{L}\p{N}]/gu, ""))
+		.filter(Boolean);
 
 	if (terms.length === 0) {
 		return "";

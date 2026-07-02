@@ -11,8 +11,13 @@ describe("buildSearchQuery", () => {
 		expect(buildSearchQuery("   ")).toBe("");
 	});
 
-	it("preserves punctuation in terms", () => {
-		expect(buildSearchQuery("Hello, World!")).toBe("hello,:* & world!:*");
+	it("strips tsquery syntax characters from terms", () => {
+		expect(buildSearchQuery("Hello, World!")).toBe("hello:* & world:*");
+		expect(buildSearchQuery("O'Brien & co: (1.5%)")).toBe("obrien:* & co:* & 15:*");
+	});
+
+	it("returns empty string when input is only punctuation", () => {
+		expect(buildSearchQuery("?! & |")).toBe("");
 	});
 });
 

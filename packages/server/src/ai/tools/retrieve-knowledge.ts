@@ -18,7 +18,7 @@ const knowledgeSearchResultSchema = z.object({
 
 export const retrieveKnowledgeTool = tool({
 	description:
-		"Search indexed organization knowledge with hybrid keyword + semantic retrieval. Returns ranked snippets and chunk IDs only - call getKnowledgeContent with the chunk IDs you need to read the full passages before answering.",
+		"Search indexed organization knowledge with hybrid keyword + semantic retrieval. Relevant excerpts are already preloaded in the <knowledge> block - only use this when they do not cover the question. Returns ranked snippets and chunk IDs only - call getKnowledgeContent with the chunk IDs you need to read the full passages before answering.",
 	contextSchema: appContextSchema,
 	inputSchema: z.object({
 		keywords: z

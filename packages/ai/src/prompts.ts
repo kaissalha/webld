@@ -29,15 +29,14 @@ export const dashboardChatSystemPrompt = ({
 ## Guidelines
 
 - Be concise and professional in your responses
-- When asked about organization knowledge, always use the appropriate tools to fetch real data
-- Use webSearch for questions about current events, recent information, public companies/people, or anything that is not in the organization's knowledge base. Prefer organization knowledge (retrieveKnowledge) for internal/private information.
+- Knowledge-base excerpts relevant to the latest message are preloaded in the <knowledge> block below when available. Answer directly from them whenever they cover the question - do not re-search for information you already have.
+- Use webSearch for questions about current events, recent information, public companies/people, or anything that is not in the organization's knowledge base. Prefer organization knowledge for internal/private information.
 - After a web search, synthesize the findings and cite the sources you used inline with markdown links to their URLs. Do not fabricate URLs.
-- For questions that may depend on indexed documents, policies, protocols, guides, or uploaded knowledge, follow this workflow:
-  1. Call retrieveKnowledge with both 'keywords' (exact terms, names, codes, amounts) and 'searchQuery' (the broader concept in natural language). It returns ranked snippets and chunk IDs only.
-  2. Review the snippets. If they already answer the question, answer and cite them.
-  3. If you need the full passage, call getKnowledgeContent with the relevant chunk IDs (set includeNeighbors to true when surrounding context matters), then answer.
-- Ground your answer in retrieved content and cite sources with their bracketed citation numbers
-- If retrieval returns weak or incomplete matches, say what is missing instead of inventing details
+- Only reach for the knowledge tools when the preloaded excerpts are insufficient:
+  - Call getKnowledgeContent with an excerpt's chunkId (set includeNeighbors to true) when you need the passage surrounding a preloaded excerpt.
+  - Call retrieveKnowledge with both 'keywords' (exact terms, names, codes, amounts) and 'searchQuery' (the broader concept in natural language) when the question needs knowledge the preloaded excerpts do not cover, then fetch full passages with getKnowledgeContent as needed.
+- Ground your answer in preloaded or retrieved content and cite sources with their bracketed citation numbers
+- If the available knowledge is weak or incomplete, say what is missing instead of inventing details
 - When the user asks you to write, draft, or rewrite an email, use composeEmail instead of pasting the full draft as regular chat text
 - For composeEmail, include the recipient email when it is clearly known, and write a complete subject and plain-text body that is ready to edit and send
 - When drafting emails, never use placeholders like [Your Name] or {{your_name}} in the body or signature
@@ -294,4 +293,25 @@ Here are summaries of related past conversations. Use what worked well and avoid
 
 ${relatedChatsSection}
 </related-chats>`;
+};
+
+export type KnowledgeExcerptForPrompt = {
+	chunkId: string;
+	content: string;
+	source: string;
+};
+
+export const knowledgeContextPrompt = ({ excerpts }: { excerpts: KnowledgeExcerptForPrompt[] }) => {
+	const excerptsSection = excerpts
+		.map(
+			(excerpt, index) =>
+				`<excerpt citation="[${index + 1}]" chunkId="${excerpt.chunkId}" source="${excerpt.source}">\n${excerpt.content}\n</excerpt>`
+		)
+		.join("\n\n");
+
+	return `<knowledge>
+Knowledge-base excerpts retrieved for the latest message. Answer from these when they cover the question, citing the bracketed citation numbers. Use getKnowledgeContent with a chunkId for surrounding context, or retrieveKnowledge only if these excerpts are insufficient:
+
+${excerptsSection}
+</knowledge>`;
 };

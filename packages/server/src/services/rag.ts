@@ -332,16 +332,19 @@ export const searchFileChunksBySemantic = async ({
 	limit = FILE_CANDIDATES_PER_RETRIEVER,
 	organizationId,
 	query,
+	queryEmbedding: providedEmbedding,
 }: {
 	limit?: number;
 	organizationId: string;
 	query: string;
+	/** Precomputed embedding of the query, to avoid re-embedding when callers fan out. */
+	queryEmbedding?: number[];
 }): Promise<RetrievedFileChunk[]> => {
-	if (!query.trim()) {
+	if (!providedEmbedding && !query.trim()) {
 		return [];
 	}
 
-	const queryEmbedding = await generateRagEmbedding({ value: query });
+	const queryEmbedding = providedEmbedding ?? (await generateRagEmbedding({ value: query }));
 	const similarity = sql<number>`1 - (${cosineDistance(fileChunks.embedding, queryEmbedding)})`;
 
 	const rows = await db
@@ -486,17 +489,25 @@ export const rerankFileChunks = async ({
 /**
  * Hybrid retrieval: keyword (Postgres full-text search) + semantic (pgvector)
  * fused with reciprocal rank fusion, then reranked by a cheap LLM.
+ *
+ * Set `rerank: false` on latency-sensitive paths (e.g. preloading context before
+ * a chat turn) to return the fused ranking directly without the LLM call.
  */
 export const retrieveFileChunks = async ({
 	conversationHistory,
 	keywords,
 	organizationId,
+	queryEmbedding,
+	rerank = true,
 	searchQuery,
 	topK = 5,
 }: {
 	conversationHistory?: RagRerankConversationMessage[];
 	keywords?: string[];
 	organizationId: string;
+	/** Precomputed embedding of the semantic query, to avoid re-embedding when callers fan out. */
+	queryEmbedding?: number[];
+	rerank?: boolean;
 	searchQuery?: string;
 	topK?: number;
 }): Promise<RetrievedFileChunk[]> => {
@@ -505,7 +516,9 @@ export const retrieveFileChunks = async ({
 
 	const [keywordResults, semanticResults] = await Promise.all([
 		keywordQuery ? searchFileChunksByKeyword({ organizationId, query: keywordQuery }) : Promise.resolve([]),
-		semanticQuery ? searchFileChunksBySemantic({ organizationId, query: semanticQuery }) : Promise.resolve([]),
+		semanticQuery || queryEmbedding
+			? searchFileChunksBySemantic({ organizationId, query: semanticQuery, queryEmbedding })
+			: Promise.resolve([]),
 	]);
 
 	const fused = reciprocalRankFusion({
@@ -520,6 +533,10 @@ export const retrieveFileChunks = async ({
 	const candidates = fused
 		.slice(0, FILE_CANDIDATES_PER_RETRIEVER)
 		.map(({ item, score }) => ({ ...item, similarity: score }));
+
+	if (!rerank) {
+		return candidates.slice(0, topK);
+	}
 
 	const query = [keywords?.join(" "), searchQuery].filter(Boolean).join(" ");
 
