@@ -20,15 +20,15 @@ export const loggerProvider = posthogProjectToken
 				"deployment.environment": process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? "development",
 			}),
 			processors: [
-				new SimpleLogRecordProcessor(
-					new OTLPLogExporter({
+				new SimpleLogRecordProcessor({
+					exporter: new OTLPLogExporter({
 						url: new URL("/i/v1/logs", posthogHost).toString(),
 						headers: {
 							Authorization: `Bearer ${posthogProjectToken}`,
 							"Content-Type": "application/json",
 						},
-					})
-				),
+					}),
+				}),
 			],
 		})
 	: null;
