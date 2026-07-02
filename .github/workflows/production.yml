@@ -30,6 +30,9 @@ jobs:
             - name: 🔦 Check Lint
               run: bun check
 
+            - name: 🔦 Structural conventions
+              run: bun konsistent
+
             - name: 🪐 Check Typecheck
               run: bun typecheck
 

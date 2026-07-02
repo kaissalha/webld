@@ -8,7 +8,7 @@
 - Always use Mobbin MCP to fetch similar screens for designs inspirations.
 - Always check for relevant skills.
 - Always read the emil-design-engineering skill when working on the ui design.
-- Always run `bun typecheck`, `bun lint`, and `bun react-doctor` at the end to verify everything is correct
+- Always run `bun typecheck`, `bun lint`, `bun konsistent`, and `bun react-doctor` at the end to verify everything is correct
 - When running tests, use `bun run test` instead of `bun test` to run the tests using vitest instead of bun test runner.
 - Treat `react-doctor` warnings in touched files as real cleanup signals, not optional polish. Fix them when the change is in scope.
 - Keep shared components global only when they have multiple real consumers. If a component is route-owned, colocate it next to the route instead of leaving it in a global folder.
@@ -88,7 +88,7 @@
 - `bun dev` - Start dev server (uses turbo)
 - `bun run test` - Run the Vitest suite
 - `bun typecheck` - TypeScript check (uses tsc in webapp)
-- `bun lint` - Lint and format check with Oxlint + Oxfmt, plus konsistent structural conventions
+- `bun lint` - Lint and format check with Oxlint + Oxfmt
 - `bun konsistent` - Check structural conventions against konsistent.json
 - `bun run lint:fix` - Apply Oxlint fixes and format with Oxfmt
 - `bun react-doctor` - Run React Doctor across the repo
