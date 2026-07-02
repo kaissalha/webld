@@ -6,7 +6,7 @@ import { ErrorPageView } from "@/components/layout/error-page-view";
 import enMessages from "@/i18n/messages/en.json";
 import { routing } from "@/i18n/routing";
 import { createErrorReloadHandler } from "@/utils/error-reload";
-import { getDirection } from "@webld/utils";
+import { locale as localeUtils } from "@webld/utils";
 import "@webld/ui/globals.css";
 
 type GlobalErrorProps = {
@@ -22,7 +22,7 @@ const { globalError } = enMessages;
 
 export default function GlobalError({ error, reset, unstable_retry }: GlobalErrorProps) {
 	const locale = routing.defaultLocale;
-	const dir = getDirection(locale);
+	const dir = localeUtils.getDirection(locale);
 
 	useEffect(() => {
 		console.error(error);

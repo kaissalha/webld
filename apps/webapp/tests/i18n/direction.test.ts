@@ -3,18 +3,18 @@
  */
 import { describe, expect, it } from "vitest";
 
-import { getDirection } from "@webld/utils";
+import { locale as localeUtils } from "@webld/utils";
 
 describe("getDirection", () => {
 	it("returns rtl for Arabic", () => {
-		expect(getDirection("ar")).toBe("rtl");
+		expect(localeUtils.getDirection("ar")).toBe("rtl");
 	});
 
 	it("returns ltr for English", () => {
-		expect(getDirection("en")).toBe("ltr");
+		expect(localeUtils.getDirection("en")).toBe("ltr");
 	});
 
 	it("defaults to ltr for unknown locales", () => {
-		expect(getDirection("fr")).toBe("ltr");
+		expect(localeUtils.getDirection("fr")).toBe("ltr");
 	});
 });

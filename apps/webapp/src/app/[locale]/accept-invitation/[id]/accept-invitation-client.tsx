@@ -21,15 +21,6 @@ type AcceptInvitationClientProps = {
 	userEmail: string;
 };
 
-const formatRole = (role: string | undefined) => {
-	if (!role) return "";
-	return role
-		.split(/[_\-\s]+/)
-		.filter(Boolean)
-		.map((segment) => `${segment.slice(0, 1).toUpperCase()}${segment.slice(1)}`)
-		.join(" ");
-};
-
 export const AcceptInvitationClient = ({
 	invitationEmail,
 	invitationId,
@@ -118,7 +109,12 @@ export const AcceptInvitationClient = ({
 							<p className='text-sm text-muted-foreground'>
 								{t("description", {
 									email: invitationEmail ?? userEmail,
-									role: formatRole(invitationRole) || t("defaultRole"),
+									role:
+										invitationRole
+											?.split(/[_\-\s]+/)
+											.filter(Boolean)
+											.map((segment) => `${segment.slice(0, 1).toUpperCase()}${segment.slice(1)}`)
+											.join(" ") || t("defaultRole"),
 								})}
 							</p>
 						) : (

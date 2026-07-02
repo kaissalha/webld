@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { type ReactNode, useMemo } from "react";
 
 import type { BaseChatUIMessage } from "@webld/server";
 
@@ -37,21 +37,6 @@ type MessagePartsProps = {
 	isUser: boolean;
 	isStreaming: boolean;
 };
-
-const getLastTextPartIndex = (parts: BaseChatUIMessage["parts"]) => {
-	for (let index = parts.length - 1; index >= 0; index -= 1) {
-		if (parts[index].type === "text") {
-			return index;
-		}
-	}
-
-	return -1;
-};
-
-// Reasoning and tool calls are the "steps" of an assistant turn and render as a
-// connected timeline. The composeEmail draft is an editable result, not a step.
-const isStepPart = (part: ChatMessagePart) =>
-	part.type === "reasoning" || (part.type.startsWith("tool-") && part.type !== "tool-composeEmail");
 
 const renderMessagePart = ({
 	part,
@@ -135,61 +120,126 @@ const renderMessagePart = ({
 	return null;
 };
 
-export const MessageParts = ({ messageId, parts, isUser, isStreaming }: MessagePartsProps) => {
-	const lastTextPartIndex = getLastTextPartIndex(parts);
-	const isStreamingMessage = isStreaming && !isUser;
+const isStepPart = (part: ChatMessagePart) =>
+	part.type === "reasoning" || (part.type.startsWith("tool-") && part.type !== "tool-composeEmail");
 
-	const elements: ReactNode[] = [];
-	let stepBuffer: Array<{ part: ChatMessagePart; partIdx: number }> = [];
+type StepBufferItem = { part: ChatMessagePart; partIdx: number };
 
-	const flushSteps = () => {
-		if (stepBuffer.length === 0) {
-			return;
-		}
-
+const buildMessagePartElements = ({
+	parts,
+	messageId,
+	isUser,
+	isStreamingMessage,
+	lastTextPartIndex,
+}: {
+	parts: BaseChatUIMessage["parts"];
+	messageId: string;
+	isUser: boolean;
+	isStreamingMessage: boolean;
+	lastTextPartIndex: number;
+}) => {
+	const renderStepGroup = (stepBuffer: StepBufferItem[]) => {
 		const lastStepIndex = stepBuffer.length - 1;
-		const stepNodes = stepBuffer.map(({ part, partIdx }, stepIndex) =>
-			renderMessagePart({
-				part,
-				partIdx,
-				messageId,
-				isUser,
-				isStreamingText: false,
-				isStreamingMessage,
-				isLast: stepIndex === lastStepIndex,
-			})
-		);
 
-		elements.push(<ChatSteps key={`message-${messageId}-steps-${stepBuffer[0].partIdx}`}>{stepNodes}</ChatSteps>);
-		stepBuffer = [];
+		return (
+			<ChatSteps key={`message-${messageId}-steps-${stepBuffer[0].partIdx}`}>
+				{stepBuffer.map(({ part, partIdx }, stepIndex) =>
+					renderMessagePart({
+						part,
+						partIdx,
+						messageId,
+						isUser,
+						isStreamingText: false,
+						isStreamingMessage,
+						isLast: stepIndex === lastStepIndex,
+					})
+				)}
+			</ChatSteps>
+		);
 	};
 
-	parts.forEach((part, partIdx) => {
-		// Step boundaries are invisible; skipping them keeps consecutive tool/reasoning
-		// parts grouped into a single timeline.
-		if (part.type === "step-start") {
-			return;
-		}
+	return parts.reduce<{ elements: ReactNode[]; stepBuffer: StepBufferItem[] }>(
+		(acc, part, partIdx) => {
+			if (part.type === "step-start") {
+				return acc;
+			}
 
-		if (isStepPart(part)) {
-			stepBuffer.push({ part, partIdx });
-			return;
-		}
+			if (isStepPart(part)) {
+				return {
+					...acc,
+					stepBuffer: [...acc.stepBuffer, { part, partIdx }],
+				};
+			}
 
-		flushSteps();
-		elements.push(
-			renderMessagePart({
-				part,
-				partIdx,
-				messageId,
-				isUser,
-				isStreamingText: isStreamingMessage && partIdx === lastTextPartIndex,
-				isStreamingMessage,
-			})
-		);
-	});
+			const flushedElements =
+				acc.stepBuffer.length > 0 ? [...acc.elements, renderStepGroup(acc.stepBuffer)] : acc.elements;
 
-	flushSteps();
+			return {
+				elements: [
+					...flushedElements,
+					renderMessagePart({
+						part,
+						partIdx,
+						messageId,
+						isUser,
+						isStreamingText: isStreamingMessage && partIdx === lastTextPartIndex,
+						isStreamingMessage,
+					}),
+				],
+				stepBuffer: [],
+			};
+		},
+		{ elements: [], stepBuffer: [] }
+	);
+};
+
+const renderTrailingStepGroup = ({
+	stepBuffer,
+	messageId,
+	isUser,
+	isStreamingMessage,
+}: {
+	stepBuffer: StepBufferItem[];
+	messageId: string;
+	isUser: boolean;
+	isStreamingMessage: boolean;
+}) => {
+	const lastStepIndex = stepBuffer.length - 1;
+
+	return (
+		<ChatSteps key={`message-${messageId}-steps-${stepBuffer[0].partIdx}`}>
+			{stepBuffer.map(({ part, partIdx }, stepIndex) =>
+				renderMessagePart({
+					part,
+					partIdx,
+					messageId,
+					isUser,
+					isStreamingText: false,
+					isStreamingMessage,
+					isLast: stepIndex === lastStepIndex,
+				})
+			)}
+		</ChatSteps>
+	);
+};
+
+export const MessageParts = ({ messageId, parts, isUser, isStreaming }: MessagePartsProps) => {
+	const isStreamingMessage = isStreaming && !isUser;
+	const lastTextPartIndex = parts.findLastIndex((part) => part.type === "text");
+
+	const elements = useMemo(() => {
+		const { elements: renderedElements, stepBuffer } = buildMessagePartElements({
+			parts,
+			messageId,
+			isUser,
+			isStreamingMessage,
+			lastTextPartIndex,
+		});
+
+		return stepBuffer.length > 0
+			? [...renderedElements, renderTrailingStepGroup({ stepBuffer, messageId, isUser, isStreamingMessage })]
+			: renderedElements;
+	}, [isStreamingMessage, isUser, lastTextPartIndex, messageId, parts]);
 
 	return elements;
 };

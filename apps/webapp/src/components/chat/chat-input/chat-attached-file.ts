@@ -1,3 +1,5 @@
+import { file } from "@webld/utils";
+
 export const TEXT_LIKE_EXTENSIONS = new Set([
 	"md",
 	"txt",
@@ -30,12 +32,7 @@ export const TEXT_LIKE_EXTENSIONS = new Set([
 export const LINE_BREAK_REGEX = /\r\n|\r|\n/;
 export const MAX_PREVIEW_BYTES = 512 * 1024;
 
-export const getFileExtension = ({ filename, mediaType }: { filename: string; mediaType: string }) => {
-	const dot = filename.lastIndexOf(".");
-	const fromName = dot >= 0 ? filename.slice(dot + 1, dot + 9).toLowerCase() : "";
-	const fromType = mediaType.split("/")[1]?.replaceAll("+", " ").slice(0, 8).toLowerCase() ?? "";
-	return fromName || fromType;
-};
+export const getFileExtension = file.getFileExtension;
 
 export const isTextLikeFile = ({ filename, mediaType }: { filename: string; mediaType: string }) => {
 	return mediaType.startsWith("text/") || TEXT_LIKE_EXTENSIONS.has(getFileExtension({ filename, mediaType }));

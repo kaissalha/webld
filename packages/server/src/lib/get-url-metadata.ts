@@ -1,3 +1,5 @@
+import { url } from "@webld/utils";
+
 export type UrlMetadata = {
 	title: string;
 	description: string;
@@ -26,7 +28,7 @@ export const extractUrlMetadata = (html: string, originalUrl: string): UrlMetada
 	return {
 		title: title || "Untitled",
 		description: description.slice(0, 150) || "",
-		siteName: siteName || new URL(originalUrl).hostname,
+		siteName: siteName || url.getHostnameFromUrl({ url: originalUrl }),
 		favicon,
 		url: originalUrl,
 	};
@@ -41,26 +43,14 @@ const extractFavicon = (html: string, originalUrl: string): string | null => {
 
 	for (const pattern of patterns) {
 		const match = html.match(pattern);
+
 		if (match) {
-			const faviconUrl = match[1];
-			if (faviconUrl.startsWith("//")) {
-				return `https:${faviconUrl}`;
-			}
-			if (faviconUrl.startsWith("/")) {
-				const baseUrl = new URL(originalUrl);
-				return baseUrl.origin + faviconUrl;
-			}
-			if (!faviconUrl.startsWith("http")) {
-				const baseUrl = new URL(originalUrl);
-				return `${baseUrl.origin}/${faviconUrl}`;
-			}
-			return faviconUrl;
+			return url.resolveUrl({ href: match[1], base: originalUrl });
 		}
 	}
 
 	try {
-		const baseUrl = new URL(originalUrl);
-		return `${baseUrl.origin}/favicon.ico`;
+		return `${new URL(originalUrl).origin}/favicon.ico`;
 	} catch {
 		return null;
 	}

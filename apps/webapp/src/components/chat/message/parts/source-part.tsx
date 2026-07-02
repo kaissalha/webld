@@ -3,6 +3,7 @@
 import { ExternalLinkIcon, LinkIcon } from "lucide-react";
 
 import { cn } from "@webld/ui/lib/utils";
+import { url as urlUtils } from "@webld/utils";
 
 export type SourcePartProps = {
 	url: string;
@@ -10,8 +11,7 @@ export type SourcePartProps = {
 };
 
 export const SourcePart = ({ url, title }: SourcePartProps) => {
-	// Extract domain from URL for display if no title
-	const displayTitle = title || extractDomain(url);
+	const displayTitle = title || urlUtils.getHostnameFromUrl({ url });
 
 	return (
 		<a
@@ -32,16 +32,6 @@ export const SourcePart = ({ url, title }: SourcePartProps) => {
 };
 
 SourcePart.displayName = "SourcePart";
-
-// Helper to extract domain from URL
-const extractDomain = (url: string): string => {
-	try {
-		const urlObj = new URL(url);
-		return urlObj.hostname.replace("www.", "");
-	} catch {
-		return url;
-	}
-};
 
 // Container for multiple sources
 export type SourcesContainerProps = {

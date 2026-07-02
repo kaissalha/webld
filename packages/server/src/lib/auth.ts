@@ -14,7 +14,7 @@ import { db, members, organizations } from "@webld/db";
 import * as schema from "@webld/db/schema";
 import { InvitationEmail, OtpEmail } from "@webld/email";
 import { logger } from "@webld/logger/server";
-import { getBaseURL } from "@webld/utils";
+import { url } from "@webld/utils";
 
 import { resend } from "./resend";
 
@@ -31,8 +31,8 @@ const redis = createTCPRedisClient(process.env.REDIS_URL);
 export const auth = betterAuth({
 	appName: "webld",
 	debug: true,
-	baseURL: getBaseURL().toString(),
-	trustedOrigins: [getBaseURL().toString(), "webld-mobile://", "mobile://"],
+	baseURL: url.getBaseURL().toString(),
+	trustedOrigins: [url.getBaseURL().toString(), "webld-mobile://", "mobile://"],
 	database: drizzleAdapter(db, {
 		provider: "pg",
 		usePlural: true,
@@ -46,7 +46,7 @@ export const auth = betterAuth({
 		twoFactor(),
 		organization({
 			async sendInvitationEmail({ id, email, role, organization, inviter }) {
-				const inviteLink = new URL(`/accept-invitation/${id}`, getBaseURL()).toString();
+				const inviteLink = new URL(`/accept-invitation/${id}`, url.getBaseURL()).toString();
 				const html = await render(
 					InvitationEmail({
 						inviteLink,

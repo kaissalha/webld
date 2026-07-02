@@ -16,7 +16,7 @@ import type { Locale } from "@/i18n/routing";
 import { ApiProvider } from "@/lib/api";
 import { PostHogClientEffects } from "@/lib/posthog";
 import { Toaster } from "@webld/ui/components/sonner";
-import { getDirection } from "@webld/utils";
+import { locale as localeUtils } from "@webld/utils";
 
 import "server-only";
 
@@ -53,7 +53,7 @@ type BaseLayoutProps = {
 };
 
 export const BaseLayout = ({ children, locale, messages }: BaseLayoutProps) => {
-	const dir = getDirection(locale);
+	const dir = localeUtils.getDirection(locale);
 
 	return (
 		<html

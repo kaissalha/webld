@@ -2,6 +2,8 @@ import { del, get, put, type PutBlobResult } from "@vercel/blob";
 import { handleUpload, type HandleUploadBody, type HandleUploadOptions } from "@vercel/blob/client";
 import { v4 as uuidv4 } from "uuid";
 
+import { file } from "@webld/utils";
+
 import { type MediaAccess, mediaAccessValues } from "../constants/upload";
 import { logServerEvent } from "../hono/logger";
 import { parseJsonRecord } from "../utils/parse-json-payload";
@@ -55,27 +57,13 @@ const getBlobTokenForAccess = (access: MediaAccess): string | undefined => {
 	return privateToken;
 };
 
-const getFileExtensionFromMediaType = (mediaType: string): string => {
-	const normalizedMediaType = mediaType.split(";")[0]?.trim().toLowerCase();
-	if (!normalizedMediaType) {
-		return "bin";
-	}
-
-	const fallbackSubtype = normalizedMediaType.split("/")[1];
-	if (!fallbackSubtype) {
-		return "bin";
-	}
-
-	return fallbackSubtype.split("+")[0] || "bin";
-};
-
 export const uploadBufferToBlob = async (
 	buffer: Buffer,
 	mediaType: string,
 	options: PutBase64Options = {}
 ): Promise<PutBlobResult> => {
 	const access = options.access ?? "public";
-	const ext = getFileExtensionFromMediaType(mediaType);
+	const ext = file.getExtensionFromMediaType({ mediaType });
 	const key = `${process.env.VERCEL_ENV ?? "development"}/${options.prefix ?? ""}${uuidv4()}.${ext}`;
 
 	try {

@@ -1,7 +1,5 @@
 "use client";
 
-import type { ReactNode } from "react";
-
 import { BookTextIcon, WrenchIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -25,25 +23,6 @@ export type ToolPartProps = {
 };
 
 const KNOWLEDGE_TOOLS = new Set(["retrieveKnowledge", "getKnowledgeContent"]);
-
-const getToolIcon = (toolName: string): ReactNode => {
-	if (KNOWLEDGE_TOOLS.has(toolName)) {
-		return <BookTextIcon className='size-3.5' />;
-	}
-
-	return <WrenchIcon className='size-3.5' />;
-};
-
-const getStepStatus = (state: ToolState): ChatStepStatus => {
-	if (state === "output-error") {
-		return "error";
-	}
-	if (state === "output-available") {
-		return "done";
-	}
-
-	return "running";
-};
 
 const GenericToolStep = ({
 	toolName,
@@ -69,8 +48,15 @@ const GenericToolStep = ({
 		) : (
 			formatToolName(toolName)
 		);
+	const icon = KNOWLEDGE_TOOLS.has(toolName) ? (
+		<BookTextIcon className='size-3.5' />
+	) : (
+		<WrenchIcon className='size-3.5' />
+	);
+	const status: ChatStepStatus =
+		state === "output-error" ? "error" : state === "output-available" ? "done" : "running";
 
-	return <ChatStepItem icon={getToolIcon(toolName)} status={getStepStatus(state)} isLast={isLast} label={label} />;
+	return <ChatStepItem icon={icon} status={status} isLast={isLast} label={label} />;
 };
 
 export const ToolPart = ({

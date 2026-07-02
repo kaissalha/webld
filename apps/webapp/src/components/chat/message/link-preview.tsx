@@ -10,7 +10,7 @@ import { useTranslations } from "next-intl";
 import { linkPreviewQueryOptions } from "@/lib/api-client";
 import { PreviewCard, PreviewCardPopup, PreviewCardTrigger } from "@webld/ui/components/preview-card";
 import { cn } from "@webld/ui/lib/utils";
-import { getInitials } from "@webld/utils";
+import { user } from "@webld/utils";
 
 const baseLinkStyles = "truncate rounded-xl bg-muted/50 px-2 py-1 text-xs text-muted-foreground transition-colors";
 
@@ -84,7 +84,7 @@ export const LinkPreview = ({ url, children, className, onClick }: LinkPreviewPr
 							) : (
 								<div className='flex size-4 shrink-0 items-center justify-center rounded-md bg-muted'>
 									<span className='text-xs font-bold text-foreground'>
-										{getInitials({ name: metadata.siteName, length: 1 }) ?? "·"}
+										{user.getInitials({ name: metadata.siteName, length: 1 }) ?? "·"}
 									</span>
 								</div>
 							)}

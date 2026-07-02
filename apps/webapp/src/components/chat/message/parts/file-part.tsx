@@ -6,6 +6,7 @@ import { FileIcon, ImageIcon, PaperclipIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { cn } from "@webld/ui/lib/utils";
+import { file } from "@webld/utils";
 
 export type FilePartProps = {
 	url: string;
@@ -44,42 +45,9 @@ const ImageFile = ({ url, filename }: FilePartProps) => {
 	);
 };
 
-const getFilenameExtension = ({ filename }: { filename: string | undefined }) => {
-	if (!filename) {
-		return null;
-	}
-
-	const lastDot = filename.lastIndexOf(".");
-
-	if (lastDot <= 0 || lastDot === filename.length - 1) {
-		return null;
-	}
-
-	return filename.slice(lastDot + 1).toUpperCase();
-};
-
-const getMediaTypeExtension = ({ mediaType }: { mediaType: string }) => {
-	const subtype = mediaType.split("/").pop();
-
-	if (!subtype) {
-		return null;
-	}
-
-	if (subtype.includes(".")) {
-		const tail = subtype.split(".").pop();
-		return tail ? tail.toUpperCase() : null;
-	}
-
-	if (subtype.length > 8) {
-		return null;
-	}
-
-	return subtype.toUpperCase();
-};
-
 const GenericFile = ({ mediaType, filename }: Omit<FilePartProps, "url">) => {
 	const t = useTranslations("components.chat.message.file");
-	const extension = getFilenameExtension({ filename }) ?? getMediaTypeExtension({ mediaType }) ?? t("file");
+	const extension = file.getDisplayFileExtension({ filename, mediaType }) ?? t("file");
 
 	return (
 		<div

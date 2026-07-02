@@ -2,16 +2,6 @@ import { locales } from "@/i18n/routing";
 
 const defaultRedirectPath = "/dashboard";
 
-const isInvalidRedirectPath = ({ path }: { path: string }) => {
-	return (
-		path === "/" ||
-		path.startsWith("/login") ||
-		path.startsWith("/signup") ||
-		path.startsWith("/onboarding") ||
-		path.startsWith("//")
-	);
-};
-
 export const getOnboardingRedirectPath = ({ redirectUrl }: { redirectUrl?: string | string[] | undefined }) => {
 	const value = Array.isArray(redirectUrl) ? redirectUrl[0] : redirectUrl;
 
@@ -22,7 +12,13 @@ export const getOnboardingRedirectPath = ({ redirectUrl }: { redirectUrl?: strin
 	const localePattern = new RegExp(`^/(?:${locales.join("|")})(?=/|\\?|$)`);
 	const sanitizedPath = value.replace(localePattern, "") || "/";
 
-	if (isInvalidRedirectPath({ path: sanitizedPath })) {
+	if (
+		sanitizedPath === "/" ||
+		sanitizedPath.startsWith("/login") ||
+		sanitizedPath.startsWith("/signup") ||
+		sanitizedPath.startsWith("/onboarding") ||
+		sanitizedPath.startsWith("//")
+	) {
 		return defaultRedirectPath;
 	}
 

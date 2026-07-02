@@ -23,6 +23,18 @@ const textDocumentSchema = z
 	})
 	.openapi("CreateDocumentInput");
 
+const uploadDocumentSchema = z
+	.object({
+		file: z
+			.file()
+			.max(MAX_INGEST_FILE_SIZE_BYTES, `File is too large. Maximum size is ${MAX_INGEST_FILE_SIZE_MB}MB.`)
+			// The OpenAPI generator cannot introspect z.file(); the explicit type
+			// short-circuits schema generation so /openapi.json does not throw.
+			.openapi({ type: "string", format: "binary" }),
+		name: z.string().trim().optional(),
+	})
+	.openapi("UploadDocumentInput");
+
 const documentParamsSchema = z.object({
 	documentId: z.uuid().openapi({
 		param: {
@@ -39,6 +51,15 @@ const createDocumentResponseSchema = z
 		runId: z.string(),
 	})
 	.openapi("CreateDocumentResponse");
+
+const acceptedDocumentResponse = {
+	description: "The document was accepted for ingestion.",
+	content: {
+		"application/json": {
+			schema: createDocumentResponseSchema,
+		},
+	},
+};
 
 const toDocumentResponse = (file: FileRecord) => ({
 	id: file.id,
@@ -62,52 +83,48 @@ const createDocumentRoute = createRoute({
 	method: "post",
 	path: "/documents",
 	operationId: "createDocument",
-	summary: "Create a knowledge-base document",
-	description:
-		"Accepts either a JSON text document or a multipart file upload and queues it for knowledge-base ingestion.",
+	summary: "Create a knowledge-base text document",
+	description: "Creates a text document and queues it for knowledge-base ingestion.",
 	tags: ["documents"],
 	security: betterAuthSecurity,
 	request: {
 		body: {
 			required: true,
 			content: {
-				// Plain OpenAPI schema objects (not zod) so the dual content types are
-				// documented without attaching a validator for the wrong content type;
-				// the handler validates per content type.
 				"application/json": {
-					schema: {
-						type: "object",
-						required: ["name", "text"],
-						properties: {
-							name: { type: "string", minLength: 1 },
-							source: { type: "string", minLength: 1 },
-							text: { type: "string", minLength: 1 },
-						},
-					},
-				},
-				"multipart/form-data": {
-					schema: {
-						type: "object",
-						required: ["file"],
-						properties: {
-							file: { type: "string", format: "binary" },
-							name: { type: "string" },
-						},
-					},
+					schema: textDocumentSchema,
 				},
 			},
 		},
 	},
 	responses: {
-		202: {
-			description: "The document was accepted for ingestion.",
+		202: acceptedDocumentResponse,
+		400: errorResponse("Invalid document payload."),
+		401: errorResponse("Authentication is required."),
+	},
+});
+
+const uploadDocumentRoute = createRoute({
+	method: "post",
+	path: "/documents/upload",
+	operationId: "uploadDocument",
+	summary: "Upload a knowledge-base document",
+	description: "Accepts a multipart file upload and queues it for knowledge-base ingestion.",
+	tags: ["documents"],
+	security: betterAuthSecurity,
+	request: {
+		body: {
+			required: true,
 			content: {
-				"application/json": {
-					schema: createDocumentResponseSchema,
+				"multipart/form-data": {
+					schema: uploadDocumentSchema,
 				},
 			},
 		},
-		400: errorResponse("Invalid document payload."),
+	},
+	responses: {
+		202: acceptedDocumentResponse,
+		400: errorResponse("Invalid upload payload."),
 		401: errorResponse("Authentication is required."),
 	},
 });
@@ -148,72 +165,7 @@ export const createDocumentsRoutes = (options: CreateApiAppOptions) => {
 			const session = c.get("session");
 			const organizationId = requireActiveOrganization(session);
 			const uploadedBy = session.user.id;
-			const contentType = c.req.header("content-type") ?? "";
-
-			if (contentType.includes("multipart/form-data")) {
-				const formData = await c.req.formData();
-				const file = formData.get("file");
-
-				if (!(file instanceof File)) {
-					throw new HTTPException(400, { message: "File is required" });
-				}
-
-				if (file.size > MAX_INGEST_FILE_SIZE_BYTES) {
-					throw new HTTPException(400, {
-						message: `File is too large. Maximum size is ${MAX_INGEST_FILE_SIZE_MB}MB.`,
-					});
-				}
-
-				const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
-				const mimeType = file.type || "application/octet-stream";
-				const kind = detectFileKind({ extension, mimeType });
-
-				if (kind !== "image" && !isSupportedRagFile({ extension, mimeType })) {
-					throw new HTTPException(400, {
-						message: `Unsupported file type: ${mimeType || extension || "unknown"}`,
-					});
-				}
-
-				const buffer = Buffer.from(await file.arrayBuffer());
-				const submittedName = formData.get("name");
-				const blob = await uploadBufferToBlob(buffer, mimeType, {
-					access: "public",
-					prefix: `${organizationId}/`,
-				});
-
-				const fileRecord = await createFile({
-					access: "public",
-					contentHash: createHash("sha256").update(buffer).digest("hex"),
-					contentType: mimeType,
-					kind,
-					metadata: { originalFilename: file.name },
-					name: typeof submittedName === "string" && submittedName.trim() ? submittedName.trim() : file.name,
-					organizationId,
-					ragStatus: "pending",
-					sizeBytes: file.size,
-					sourceType: "upload",
-					uploadedBy,
-					url: blob.url,
-				});
-
-				const run = await options.startIngestFile({ fileId: fileRecord.id, organizationId });
-
-				await logServerEvent({
-					level: "info",
-					message: "file received for ingestion",
-					metadata: { fileId: fileRecord.id, mimeType, runId: run.runId, size: file.size },
-				});
-
-				return c.json({ document: toDocumentResponse(fileRecord), runId: run.runId }, 202);
-			}
-
-			const parseResult = textDocumentSchema.safeParse(await c.req.json());
-
-			if (!parseResult.success) {
-				throw new HTTPException(400, { message: "Invalid request data" });
-			}
-
-			const { name, source, text } = parseResult.data;
+			const { name, source, text } = c.req.valid("json");
 
 			const fileRecord = await createFile({
 				contentHash: createHash("sha256").update(text).digest("hex"),
@@ -229,6 +181,53 @@ export const createDocumentsRoutes = (options: CreateApiAppOptions) => {
 			});
 
 			const run = await options.startIngestFile({ fileId: fileRecord.id, organizationId, text });
+
+			return c.json({ document: toDocumentResponse(fileRecord), runId: run.runId }, 202);
+		})
+		.openapi(uploadDocumentRoute, async (c) => {
+			const session = c.get("session");
+			const organizationId = requireActiveOrganization(session);
+			const uploadedBy = session.user.id;
+			const { file, name } = c.req.valid("form");
+
+			const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
+			const mimeType = file.type || "application/octet-stream";
+			const kind = detectFileKind({ extension, mimeType });
+
+			if (kind !== "image" && !isSupportedRagFile({ extension, mimeType })) {
+				throw new HTTPException(400, {
+					message: `Unsupported file type: ${mimeType || extension || "unknown"}`,
+				});
+			}
+
+			const buffer = Buffer.from(await file.arrayBuffer());
+			const blob = await uploadBufferToBlob(buffer, mimeType, {
+				access: "public",
+				prefix: `${organizationId}/`,
+			});
+
+			const fileRecord = await createFile({
+				access: "public",
+				contentHash: createHash("sha256").update(buffer).digest("hex"),
+				contentType: mimeType,
+				kind,
+				metadata: { originalFilename: file.name },
+				name: name || file.name,
+				organizationId,
+				ragStatus: "pending",
+				sizeBytes: file.size,
+				sourceType: "upload",
+				uploadedBy,
+				url: blob.url,
+			});
+
+			const run = await options.startIngestFile({ fileId: fileRecord.id, organizationId });
+
+			await logServerEvent({
+				level: "info",
+				message: "file received for ingestion",
+				metadata: { fileId: fileRecord.id, mimeType, runId: run.runId, size: file.size },
+			});
 
 			return c.json({ document: toDocumentResponse(fileRecord), runId: run.runId }, 202);
 		})

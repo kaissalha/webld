@@ -10,6 +10,7 @@ import {
 	isInlineModelAttachment,
 	isKnowledgeBaseAttachment,
 } from "@/components/chat/chat-attachments";
+import { apiClient } from "@/lib/api-client";
 
 const STATUS_POLL_INTERVAL_MS = 1500;
 const STATUS_POLL_TIMEOUT_MS = 5 * 60 * 1000;
@@ -20,8 +21,19 @@ type ClearAttachmentsOptions = {
 	abort?: boolean;
 };
 
-const readFileAsDataUrl = ({ file }: { file: File }) =>
-	new Promise<string>((resolve, reject) => {
+const createAttachmentFromFile = async ({
+	file,
+	uploadStatus,
+}: {
+	file: File;
+	uploadStatus?: ChatFileAttachment["uploadStatus"];
+}): Promise<ChatFileAttachment> => ({
+	filename: file.name,
+	id: crypto.randomUUID(),
+	mediaType: file.type || "application/octet-stream",
+	size: file.size,
+	uploadStatus,
+	url: await new Promise<string>((resolve, reject) => {
 		const reader = new FileReader();
 
 		reader.onerror = () => {
@@ -36,21 +48,7 @@ const readFileAsDataUrl = ({ file }: { file: File }) =>
 			reject(new Error("Failed to read file"));
 		};
 		reader.readAsDataURL(file);
-	});
-
-const createAttachmentFromFile = async ({
-	file,
-	uploadStatus,
-}: {
-	file: File;
-	uploadStatus?: ChatFileAttachment["uploadStatus"];
-}): Promise<ChatFileAttachment> => ({
-	filename: file.name,
-	id: crypto.randomUUID(),
-	mediaType: file.type || "application/octet-stream",
-	size: file.size,
-	uploadStatus,
-	url: await readFileAsDataUrl({ file }),
+	}),
 });
 
 const getAttachmentUploadMode = ({
@@ -83,45 +81,20 @@ const getAttachmentUploadMode = ({
 	return "unsupported";
 };
 
-const shouldUploadAttachment = ({ mode }: { mode: AttachmentUploadMode }) => {
-	return mode === "knowledge" || mode === "inline-and-knowledge";
-};
-
-const isAbortError = ({ error }: { error: unknown }) => {
-	return error instanceof Error && (error.name === "AbortError" || error.message === "Upload cancelled");
-};
-
 const uploadKnowledgeBaseDocument = async ({ file, signal }: { file: File; signal?: AbortSignal }) => {
-	const formData = new FormData();
-
-	formData.set("file", file);
-	formData.set("name", file.name);
-	formData.set("source", file.name);
-	formData.set(
-		"metadata",
-		JSON.stringify({
-			lastModified: file.lastModified,
-			mediaType: file.type || "application/octet-stream",
-			size: file.size,
-		})
+	const response = await apiClient.api.documents.upload.$post(
+		{ form: { file, name: file.name } },
+		{ init: { signal } }
 	);
 
-	const response = await fetch("/api/documents", {
-		method: "POST",
-		body: formData,
-		signal,
-	});
-
 	if (!response.ok) {
-		const errorBody = (await response.json().catch(() => null)) as { error?: { message?: string } } | null;
+		const errorBody = await response.json().catch(() => null);
 		throw new Error(errorBody?.error?.message ?? `Upload failed (${response.status})`);
 	}
 
-	const body = (await response.json()) as {
-		document: { id: string; ragStatus: "failed" | "none" | "pending" | "ready" };
-	};
+	const { document } = await response.json();
 
-	return body.document;
+	return document;
 };
 
 const pollKnowledgeBaseStatus = async ({
@@ -138,13 +111,13 @@ const pollKnowledgeBaseStatus = async ({
 			throw new Error("Upload cancelled");
 		}
 
-		const response = await fetch(`/api/documents/${fileId}`, { signal });
+		const response = await apiClient.api.documents[":documentId"].$get(
+			{ param: { documentId: fileId } },
+			{ init: { signal } }
+		);
 
 		if (response.ok) {
-			const document = (await response.json()) as {
-				processingError?: string | null;
-				ragStatus: "failed" | "none" | "pending" | "ready";
-			};
+			const document = await response.json();
 
 			if (document.ragStatus === "ready" || document.ragStatus === "none") {
 				return "ready";
@@ -222,7 +195,10 @@ export const useChatFileUpload = ({ uploadToKnowledgeBase = false }: { uploadToK
 					});
 				})
 				.catch((error: unknown) => {
-					if (isAbortError({ error })) {
+					if (
+						error instanceof Error &&
+						(error.name === "AbortError" || error.message === "Upload cancelled")
+					) {
 						return;
 					}
 
@@ -284,7 +260,8 @@ export const useChatFileUpload = ({ uploadToKnowledgeBase = false }: { uploadToK
 					acceptedFiles.map(({ file, mode }) =>
 						createAttachmentFromFile({
 							file,
-							uploadStatus: shouldUploadAttachment({ mode }) ? "uploading" : undefined,
+							uploadStatus:
+								mode === "knowledge" || mode === "inline-and-knowledge" ? "uploading" : undefined,
 						})
 					)
 				);
@@ -307,7 +284,10 @@ export const useChatFileUpload = ({ uploadToKnowledgeBase = false }: { uploadToK
 			nextAttachments.forEach((attachment, index) => {
 				const preparedFile = acceptedFiles[index];
 
-				if (!preparedFile || !shouldUploadAttachment({ mode: preparedFile.mode })) {
+				if (
+					!preparedFile ||
+					(preparedFile.mode !== "knowledge" && preparedFile.mode !== "inline-and-knowledge")
+				) {
 					return;
 				}
 

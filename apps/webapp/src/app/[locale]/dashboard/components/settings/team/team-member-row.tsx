@@ -12,6 +12,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@webld/ui/components/dropdown-menu";
+import { user } from "@webld/utils";
 
 export type TeamMemberData = {
 	id: string;
@@ -43,30 +44,10 @@ type TeamMemberRowProps = {
 	onManage: ({ entry }: { entry: TeamRowEntry }) => void;
 };
 
-const getInitials = ({ name, email }: { email: string; name: string }) => {
-	const source = name?.trim() || email;
-	if (!source) return "?";
-	const parts = source.split(/\s+/).filter(Boolean);
-	if (parts.length >= 2) {
-		return `${parts[0][0] ?? ""}${parts[1][0] ?? ""}`.toUpperCase();
-	}
-	return source.slice(0, 2).toUpperCase();
-};
-
-const getRoleBadgeVariant = (role: string) => {
-	let variant: "dark" | "secondary" | "outline" = "outline";
-
-	switch (role) {
-		case "owner":
-			variant = "dark";
-			break;
-		case "admin":
-			variant = "secondary";
-			break;
-	}
-
-	return variant;
-};
+const ROLE_BADGE_VARIANTS = {
+	owner: "dark",
+	admin: "secondary",
+} as const;
 
 export const TeamMemberRow = ({
 	canManageMembers,
@@ -86,21 +67,23 @@ export const TeamMemberRow = ({
 	const canShowMenu = isInvitation
 		? canManageInvitations
 		: entry.role !== "owner" && !isCurrentUser && canManageMembers;
-	let roleLabel = t("roles.member");
-	if (!isInvitation) {
-		if (entry.role === "owner") {
-			roleLabel = t("roles.owner");
-		} else if (entry.role === "admin") {
-			roleLabel = t("roles.admin");
-		}
-	}
+	const roleLabel = isInvitation
+		? t("roles.member")
+		: entry.role === "owner"
+			? t("roles.owner")
+			: entry.role === "admin"
+				? t("roles.admin")
+				: t("roles.member");
+	const roleBadgeVariant = ROLE_BADGE_VARIANTS[entry.role as keyof typeof ROLE_BADGE_VARIANTS] ?? "outline";
 
 	return (
 		<li className='flex items-center justify-between gap-3 px-6 py-3'>
 			<div className='flex min-w-0 items-center gap-3'>
 				<Avatar className='size-9'>
 					{imageUrl ? <AvatarImage src={imageUrl} alt={displayName} /> : null}
-					<AvatarFallback>{getInitials({ name: displayName, email: displayEmail })}</AvatarFallback>
+					<AvatarFallback>
+						{user.getPersonInitials({ name: displayName, email: displayEmail })}
+					</AvatarFallback>
 				</Avatar>
 				<div className='flex min-w-0 flex-col'>
 					<div className='flex items-center gap-2'>
@@ -119,7 +102,7 @@ export const TeamMemberRow = ({
 						{t("status.pending")}
 					</Badge>
 				) : (
-					<Badge variant={getRoleBadgeVariant(entry.role)} size='sm'>
+					<Badge variant={roleBadgeVariant} size='sm'>
 						{roleLabel}
 					</Badge>
 				)}

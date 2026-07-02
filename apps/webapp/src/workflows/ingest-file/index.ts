@@ -15,16 +15,6 @@ import {
 /** Chunks per embed step. Small files → a single batch runs inline; large files fan out. */
 const EMBED_BATCH_SIZE = 20;
 
-const batch = <T>(items: T[], size: number): T[][] => {
-	const batches: T[][] = [];
-
-	for (let index = 0; index < items.length; index += size) {
-		batches.push(items.slice(index, index + size));
-	}
-
-	return batches;
-};
-
 /**
  * Durable ingestion: branch by kind → enrich → chunk → embed → persist → mark ready.
  * The blob is already usable when this starts; this only drives indexing/enrichment.
@@ -84,7 +74,11 @@ export const ingestFileWorkflow = async ({
 
 		if (chunkSource.trim()) {
 			const chunks = await chunkContent({ source: file.name, text: chunkSource });
-			const batches = batch<IngestChunk>(chunks, EMBED_BATCH_SIZE);
+			const batches: IngestChunk[][] = [];
+
+			for (let index = 0; index < chunks.length; index += EMBED_BATCH_SIZE) {
+				batches.push(chunks.slice(index, index + EMBED_BATCH_SIZE));
+			}
 
 			await Promise.all(
 				batches.map((chunkBatch) => embedAndInsertChunks({ chunks: chunkBatch, fileId, organizationId }))

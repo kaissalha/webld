@@ -60,14 +60,6 @@ export const classifyImageContent = async ({
 	return output;
 };
 
-const slugify = (value: string) =>
-	value
-		.toLowerCase()
-		.trim()
-		.replace(/[^a-z0-9]+/gu, "-")
-		.replace(/^-+|-+$/gu, "")
-		.slice(0, 64);
-
 /** Upsert organization-scoped tags and assign them to a file. */
 export const upsertFileTags = async ({
 	fileId,
@@ -85,7 +77,12 @@ export const upsertFileTags = async ({
 	}
 
 	for (const name of unique) {
-		const slug = slugify(name);
+		const slug = name
+			.toLowerCase()
+			.trim()
+			.replace(/[^a-z0-9]+/gu, "-")
+			.replace(/^-+|-+$/gu, "")
+			.slice(0, 64);
 
 		if (!slug) {
 			continue;

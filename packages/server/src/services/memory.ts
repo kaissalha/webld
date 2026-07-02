@@ -25,12 +25,9 @@ export type TextualMessage = { role: string; parts: TextualPart[] };
 // Text utilities
 // =============================================================================
 
-const partToText = (part: TextualPart) =>
-	part.type === "text" && typeof part.text === "string" ? part.text : undefined;
-
 export const messagePartsToText = (parts: TextualPart[]) =>
 	parts
-		.map(partToText)
+		.map((part) => (part.type === "text" && typeof part.text === "string" ? part.text : undefined))
 		.filter((text): text is string => typeof text === "string")
 		.join("\n");
 

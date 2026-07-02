@@ -83,15 +83,6 @@ const messageBodySchema = z.object({
 	message: uiMessageSchema,
 });
 
-const sseResponse = (description: string) => ({
-	description,
-	content: {
-		"text/event-stream": {
-			schema: z.string(),
-		},
-	},
-});
-
 const attachmentDataSchema = z.object({
 	fileId: z.uuid(),
 	filename: z.string().min(1),
@@ -103,11 +94,6 @@ const getMessageText = (message: DashboardChatUIMessage) =>
 		.filter(isTextUIPart)
 		.map((part) => part.text)
 		.join(" ");
-
-const isModelSupportedAttachment = ({ mediaType }: { mediaType: string }) =>
-	mediaType.startsWith("image/") || mediaType === "application/pdf";
-
-const isImageAttachment = ({ mediaType }: { mediaType: string }) => mediaType.startsWith("image/");
 
 const getIndexedAttachments = (message: DashboardChatUIMessage) =>
 	message.parts.flatMap((part) => {
@@ -128,11 +114,13 @@ const prepareMessagesForModel = (messages: DashboardChatUIMessage[]): DashboardC
 	messages.map((message) => {
 		const droppedAttachments: string[] = [];
 		const indexedAttachments = getIndexedAttachments(message);
-		const documentAttachments = indexedAttachments.filter((attachment) => !isImageAttachment(attachment));
+		const documentAttachments = indexedAttachments.filter(
+			(attachment) => !attachment.mediaType.startsWith("image/")
+		);
 		const hasAttachmentDataPart = message.parts.some((part) => part.type === "data-attachment");
 
 		for (const part of message.parts) {
-			if (part.type === "file" && !isModelSupportedAttachment({ mediaType: part.mediaType })) {
+			if (part.type === "file" && !part.mediaType.startsWith("image/") && part.mediaType !== "application/pdf") {
 				droppedAttachments.push(part.filename ?? "attachment");
 			}
 		}
@@ -146,7 +134,7 @@ const prepareMessagesForModel = (messages: DashboardChatUIMessage[]): DashboardC
 				return false;
 			}
 
-			return part.type !== "file" || isModelSupportedAttachment({ mediaType: part.mediaType });
+			return part.type !== "file" || part.mediaType.startsWith("image/") || part.mediaType === "application/pdf";
 		});
 
 		if (documentAttachments.length > 0) {
@@ -173,16 +161,6 @@ const prepareMessagesForModel = (messages: DashboardChatUIMessage[]): DashboardC
 		};
 	});
 
-const createInitialChatTitle = (message: DashboardChatUIMessage) => {
-	const messageText = getMessageText(message);
-
-	if (!messageText) {
-		return "New chat";
-	}
-
-	return messageText.slice(0, 50);
-};
-
 const createChatStreamRoute = createRoute({
 	method: "post",
 	path: "/chats/{chatId}/stream",
@@ -203,7 +181,14 @@ const createChatStreamRoute = createRoute({
 		},
 	},
 	responses: {
-		200: sseResponse("A text/event-stream response containing UI message stream events."),
+		200: {
+			description: "A text/event-stream response containing UI message stream events.",
+			content: {
+				"text/event-stream": {
+					schema: z.string(),
+				},
+			},
+		},
 		400: errorResponse("Invalid chat request."),
 		401: errorResponse("Authentication is required."),
 	},
@@ -220,7 +205,14 @@ const getChatStreamRoute = createRoute({
 		params: chatIdParamsSchema,
 	},
 	responses: {
-		200: sseResponse("A text/event-stream response for the active or recently completed stream."),
+		200: {
+			description: "A text/event-stream response for the active or recently completed stream.",
+			content: {
+				"text/event-stream": {
+					schema: z.string(),
+				},
+			},
+		},
 		401: errorResponse("Authentication is required."),
 		404: errorResponse("No resumable stream was found."),
 	},
@@ -394,7 +386,7 @@ export const createChatsRoutes = (options: CreateApiAppOptions) => {
 					? [...uiMessagesFromDb.slice(0, -1), chatMessage]
 					: [...uiMessagesFromDb, chatMessage];
 			const documentAttachmentIds = getIndexedAttachments(chatMessage)
-				.filter((attachment) => !isImageAttachment(attachment))
+				.filter((attachment) => !attachment.mediaType.startsWith("image/"))
 				.map((attachment) => attachment.fileId);
 			const chatHasImageAttachment = uiMessages.some((message) =>
 				message.parts.some((part) => part.type === "file" && part.mediaType.startsWith("image/"))
@@ -405,7 +397,7 @@ export const createChatsRoutes = (options: CreateApiAppOptions) => {
 					await saveChat({
 						id: chatId,
 						organizationId,
-						title: createInitialChatTitle(chatMessage),
+						title: getMessageText(chatMessage).slice(0, 50) || "New chat",
 					});
 				}
 

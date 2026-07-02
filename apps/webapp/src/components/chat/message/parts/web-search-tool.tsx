@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 
 import { Skeleton } from "@webld/ui/components/skeleton";
 import { TextShimmer } from "@webld/ui/components/text-shimmer";
+import { date, url } from "@webld/utils";
 
 import { ChatStepItem } from "../chat-step-item";
 import type { ToolState } from "./tool-part-types";
@@ -30,33 +31,12 @@ const SKELETON_KEYS = ["row-1", "row-2", "row-3"];
 
 const searchIcon = <SearchIcon className='size-3.5' />;
 
-const getHostname = (url: string) => {
-	try {
-		return new URL(url).hostname.replace(/^www\./, "");
-	} catch {
-		return url;
-	}
-};
-
-const formatPublishedDate = ({ value, locale }: { value?: string | null; locale: string }) => {
-	if (!value) {
-		return null;
-	}
-
-	const date = new Date(value);
-	if (Number.isNaN(date.getTime())) {
-		return null;
-	}
-
-	return new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric" }).format(date);
-};
-
 const SearchSource = ({ result }: { result: ExaSearchResult }) => {
 	const locale = useLocale();
-	const hostname = getHostname(result.url);
+	const hostname = url.getHostnameFromUrl({ url: result.url });
 	const snippet = result.summary || result.highlights?.[0] || result.text;
 	const faviconUrl = result.favicon || `https://www.google.com/s2/favicons?sz=64&domain=${hostname}`;
-	const publishedLabel = formatPublishedDate({ locale, value: result.publishedDate });
+	const publishedLabel = date.formatLocalizedDate({ locale, value: result.publishedDate });
 
 	return (
 		<a

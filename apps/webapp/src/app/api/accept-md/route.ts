@@ -62,24 +62,6 @@ const getBaseURLFromRequest = (request: BaseURLRequest, fallbackPort: number | s
 	return request.nextUrl?.origin ? new URL(request.nextUrl.origin) : new URL(`http://localhost:${fallbackPort}`);
 };
 
-const getFetchErrorStatusCode = (error: unknown) => {
-	if (!(error instanceof Error)) {
-		return null;
-	}
-
-	const statusMatch = error.message.match(/Failed to fetch page:\s*(\d{3})/);
-	if (!statusMatch) {
-		return null;
-	}
-
-	const statusCode = Number.parseInt(statusMatch[1], 10);
-	if (!Number.isFinite(statusCode) || statusCode < 400 || statusCode > 599) {
-		return null;
-	}
-
-	return statusCode;
-};
-
 export const GET = withErrorHandler(async (request: NextRequest) => {
 	const path = resolveRequestPath(request, {
 		pathHeaderName: "x-accept-md-path",
@@ -111,7 +93,20 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
 			},
 		});
 	} catch (err) {
-		const statusCode = getFetchErrorStatusCode(err);
+		let statusCode: number | null = null;
+
+		if (err instanceof Error) {
+			const statusMatch = err.message.match(/Failed to fetch page:\s*(\d{3})/);
+
+			if (statusMatch) {
+				const parsedStatusCode = Number.parseInt(statusMatch[1], 10);
+
+				if (Number.isFinite(parsedStatusCode) && parsedStatusCode >= 400 && parsedStatusCode <= 599) {
+					statusCode = parsedStatusCode;
+				}
+			}
+		}
+
 		if (statusCode === 404) {
 			return new NextResponse(NOT_FOUND_MARKDOWN, {
 				status: 404,

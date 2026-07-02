@@ -49,7 +49,7 @@
 		},
 		{
 			"name": "shared-utils-exports",
-			"description": "Each @webld/utils module exports a function named after its file.",
+			"description": "Each @webld/utils domain module exports a namespace object named after its file.",
 			"paths": ["packages/utils/src/{util}.ts", "!packages/utils/src/index.ts"],
 			"must": {
 				"export": ["${util.toCamelCase()}"]

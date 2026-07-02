@@ -9,24 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@webld/ui/components/c
 
 import type { OnboardingInvitation } from "./use-onboarding-controller";
 
-const formatInvitationRole = ({ role }: { role: string }) => {
-	return role
-		.split(/[_-\s]+/)
-		.filter(Boolean)
-		.map((segment) => `${segment.slice(0, 1).toUpperCase()}${segment.slice(1)}`)
-		.join(" ");
-};
-
-const formatInvitationDate = ({ value }: { value: Date | string }) => {
-	const date = value instanceof Date ? value : new Date(value);
-
-	if (Number.isNaN(date.getTime())) {
-		return "";
-	}
-
-	return format(date, "MMM d, yyyy");
-};
-
 type InvitationListProps = {
 	invitations: OnboardingInvitation[];
 	isAcceptingInvitation: boolean;
@@ -47,7 +29,14 @@ export const InvitationList = ({
 			{invitations.map((invitation) => {
 				const isPendingCurrentInvitation = isAcceptingInvitation && pendingInvitationId === invitation.id;
 				const organizationName = invitation.organizationName || invitation.organizationId;
-				const expiresAt = formatInvitationDate({ value: invitation.expiresAt });
+				const expiresAtDate =
+					invitation.expiresAt instanceof Date ? invitation.expiresAt : new Date(invitation.expiresAt);
+				const expiresAt = Number.isNaN(expiresAtDate.getTime()) ? "" : format(expiresAtDate, "MMM d, yyyy");
+				const roleLabel = invitation.role
+					.split(/[_-\s]+/)
+					.filter(Boolean)
+					.map((segment) => `${segment.slice(0, 1).toUpperCase()}${segment.slice(1)}`)
+					.join(" ");
 
 				return (
 					<Card
@@ -57,7 +46,7 @@ export const InvitationList = ({
 						<CardHeader className='gap-3'>
 							<div className='flex flex-wrap items-center gap-3'>
 								<Badge variant='dark' size='sm'>
-									{formatInvitationRole({ role: invitation.role })}
+									{roleLabel}
 								</Badge>
 								{expiresAt ? (
 									<span className='text-xs text-muted-foreground'>

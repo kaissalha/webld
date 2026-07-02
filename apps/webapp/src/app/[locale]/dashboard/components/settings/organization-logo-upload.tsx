@@ -8,6 +8,7 @@ import { LogoPicker } from "@/components/organization/logo-picker";
 import { authClient } from "@/lib/auth-client";
 import { uploadFromClient } from "@/lib/storage";
 import { toast } from "@webld/ui/components/sonner";
+import { file as fileUtils } from "@webld/utils";
 
 type OrganizationLogoUploadProps = {
 	canEdit: boolean;
@@ -20,19 +21,13 @@ type OrganizationLogoUploadProps = {
 
 const maxLogoMb = 4;
 
-const getFileExtension = ({ file }: { file: File }) => {
-	const extensionFromName = file.name.split(".").pop()?.toLowerCase();
-	if (extensionFromName && extensionFromName.length <= 5) {
-		return extensionFromName;
-	}
-
-	return file.type.split("/")[1]?.split("+")[0]?.toLowerCase() || "bin";
-};
-
 const uploadOrganizationLogo = async ({ file, organizationId }: { file: File; organizationId: string }) => {
 	try {
-		const pathname = `organizations/${organizationId}/logo-${Date.now()}.${getFileExtension({
-			file,
+		const pathname = `organizations/${organizationId}/logo-${Date.now()}.${fileUtils.getFileExtension({
+			filename: file.name,
+			mediaType: file.type,
+			maxNameExtensionLength: 5,
+			fallback: "bin",
 		})}`;
 
 		return await uploadFromClient({

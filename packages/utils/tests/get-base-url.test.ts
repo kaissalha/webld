@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 
-import { getBaseURL } from "../src/get-base-url";
+import { url } from "../src/url";
 
 const originalWindow = globalThis.window;
 const originalEnv = {
@@ -55,33 +55,33 @@ describe("getBaseURL", () => {
 			configurable: true,
 		});
 
-		const url = getBaseURL();
+		const baseURL = url.getBaseURL();
 
-		expect(url.toString()).toBe("https://client.example/");
+		expect(baseURL.toString()).toBe("https://client.example/");
 	});
 
 	it("uses production URL when on main branch", () => {
 		process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF = "main";
 
-		const url = getBaseURL();
+		const baseURL = url.getBaseURL();
 
-		expect(url.toString()).toBe("https://webld.vercel.app/");
+		expect(baseURL.toString()).toBe("https://webld-webapp.vercel.app/");
 	});
 
 	it("uses production URL when on master branch", () => {
 		process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF = "master";
 
-		const url = getBaseURL();
+		const baseURL = url.getBaseURL();
 
-		expect(url.toString()).toBe("https://webld.vercel.app/");
+		expect(baseURL.toString()).toBe("https://webld-webapp.vercel.app/");
 	});
 
 	it("uses branch URL when provided", () => {
 		process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL = "branch-preview.vercel.app";
 
-		const url = getBaseURL();
+		const baseURL = url.getBaseURL();
 
-		expect(url.toString()).toBe("https://branch-preview.vercel.app/");
+		expect(baseURL.toString()).toBe("https://branch-preview.vercel.app/");
 	});
 
 	it("prefers main branch URL over other envs", () => {
@@ -89,35 +89,35 @@ describe("getBaseURL", () => {
 		process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL = "branch-preview.vercel.app";
 		process.env.NEXT_PUBLIC_VERCEL_URL = "preview.vercel.app";
 
-		const url = getBaseURL();
+		const baseURL = url.getBaseURL();
 
-		expect(url.toString()).toBe("https://webld.vercel.app/");
+		expect(baseURL.toString()).toBe("https://webld-webapp.vercel.app/");
 	});
 
 	it("prefers branch URL over preview URL", () => {
 		process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL = "branch-preview.vercel.app";
 		process.env.NEXT_PUBLIC_VERCEL_URL = "preview.vercel.app";
 
-		const url = getBaseURL();
+		const baseURL = url.getBaseURL();
 
-		expect(url.toString()).toBe("https://branch-preview.vercel.app/");
+		expect(baseURL.toString()).toBe("https://branch-preview.vercel.app/");
 	});
 
 	it("uses preview URL when provided", () => {
 		process.env.NEXT_PUBLIC_VERCEL_URL = "preview.vercel.app";
 
-		const url = getBaseURL();
+		const baseURL = url.getBaseURL();
 
-		expect(url.toString()).toBe("https://preview.vercel.app/");
+		expect(baseURL.toString()).toBe("https://preview.vercel.app/");
 	});
 
 	it("ignores blank env vars", () => {
 		process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL = "";
 		process.env.NEXT_PUBLIC_VERCEL_URL = "";
 
-		const url = getBaseURL();
+		const baseURL = url.getBaseURL();
 
-		expect(url.toString()).toBe("http://localhost:3000/");
+		expect(baseURL.toString()).toBe("http://localhost:3000/");
 	});
 
 	it("falls back when window origin is missing", () => {
@@ -127,9 +127,9 @@ describe("getBaseURL", () => {
 			configurable: true,
 		});
 
-		const url = getBaseURL();
+		const baseURL = url.getBaseURL();
 
-		expect(url.toString()).toBe("http://localhost:3000/");
+		expect(baseURL.toString()).toBe("http://localhost:3000/");
 	});
 
 	it("falls back when window origin is malformed", () => {
@@ -139,14 +139,14 @@ describe("getBaseURL", () => {
 			configurable: true,
 		});
 
-		const url = getBaseURL();
+		const baseURL = url.getBaseURL();
 
-		expect(url.toString()).toBe("http://localhost:3000/");
+		expect(baseURL.toString()).toBe("http://localhost:3000/");
 	});
 
 	it("defaults to localhost when no env vars", () => {
-		const url = getBaseURL();
+		const baseURL = url.getBaseURL();
 
-		expect(url.toString()).toBe("http://localhost:3000/");
+		expect(baseURL.toString()).toBe("http://localhost:3000/");
 	});
 });

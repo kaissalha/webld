@@ -18,19 +18,6 @@ const routeMiddlewares: Record<string, Array<(req: NextRequest) => Promise<NextR
 	"/signup": [publicMiddleware],
 };
 
-// Helper function to check if a path matches a route pattern
-const matchesRoute = (pathname: string, route: string): boolean => {
-	// Remove locale prefix for matching (e.g., /en/dashboard -> /dashboard)
-	const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "");
-	const normalizedPath = pathWithoutLocale || "/";
-
-	if (route === "/dashboard") {
-		return normalizedPath.startsWith("/dashboard");
-	}
-
-	return normalizedPath === route;
-};
-
 const applyPostHogMiddleware = async (request: NextRequest, response?: NextResponse) => {
 	return postHogMiddleware({
 		proxy: true,
@@ -65,7 +52,12 @@ export default async function proxy(req: NextRequest, _event: NextFetchEvent) {
 	}
 
 	for (const [route, middlewares] of Object.entries(routeMiddlewares)) {
-		if (matchesRoute(pathname, route)) {
+		const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "");
+		const normalizedPath = pathWithoutLocale || "/";
+		const matchesRoute =
+			route === "/dashboard" ? normalizedPath.startsWith("/dashboard") : normalizedPath === route;
+
+		if (matchesRoute) {
 			// Execute route-specific middleware
 
 			for (const middlewareFn of middlewares) {
