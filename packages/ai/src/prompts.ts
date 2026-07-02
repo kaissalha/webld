@@ -71,11 +71,8 @@ ${message}
 - No quotation marks
 - No trailing punctuation
 - Reflect the user's request, not the assistant's response
+- Respond with the title text only, nothing else
 `;
-
-export const dashboardChatTitleSchema = z.object({
-	title: z.string(),
-});
 
 export const ragAnswerSystemPrompt = `You are a RAG assistant for organization knowledge.
 
@@ -159,7 +156,7 @@ Rules:
 - language: primary language of visible text as a lowercase English name, or null.
 - tags: up to 6 short keywords — subject, merchant/brand, document type. Lowercase, no punctuation.`;
 
-type MemoryForPrompt = {
+export type MemoryForPrompt = {
 	id: string;
 	text: string;
 };
@@ -264,7 +261,12 @@ Examples:
 - Bad whatWorkedWell: "Used the tools well"
 
 - Good whatToAvoid: "Drafting an email before confirming the recipient's correct address"
-- Bad whatToAvoid: "Made a mistake"`;
+- Bad whatToAvoid: "Made a mistake"
+
+Return a JSON object with the actual values, for example:
+{"tags": ["email_drafting"], "summary": "Drafted a follow-up email for Acme Corp", "whatWorkedWell": "Searching the knowledge base before drafting", "whatToAvoid": "Guessing the recipient's address"}
+
+Return actual data, not a JSON Schema definition with type/properties.`;
 
 export const memoryContextPrompt = ({
 	memories,

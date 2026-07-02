@@ -1,10 +1,11 @@
-import { convertToModelMessages, generateText, Output } from "ai";
+import { convertToModelMessages, generateText, NoObjectGeneratedError, Output } from "ai";
 import { and, cosineDistance, desc, eq, isNotNull, ne, notInArray, sql } from "drizzle-orm";
 
-import { models } from "@webld/ai/models";
+import { type ModelConfig, models } from "@webld/ai/models";
 import {
 	chatReflectionSchema,
 	chatReflectionSystemPrompt,
+	type MemoryForPrompt,
 	memoryExtractionSchema,
 	memoryExtractionSystemPrompt,
 } from "@webld/ai/prompts";
@@ -156,6 +157,38 @@ export const searchMemories = async ({
 };
 
 /**
+ * Runs the memory-extraction prompt over a conversation and returns the raw
+ * additions/updates/deletions the model proposes. Pure (no DB I/O) so it can be
+ * exercised directly by evals; callers persist the result.
+ */
+export const extractMemories = async ({
+	existingMemories,
+	messages,
+	model = models.fast,
+}: {
+	existingMemories: MemoryForPrompt[];
+	messages: BaseChatUIMessage[];
+	model?: ModelConfig;
+}) => {
+	const filteredMessages = messages.filter((message) => message.role === "user" || message.role === "assistant");
+
+	if (filteredMessages.length === 0) {
+		return null;
+	}
+
+	const { output } = await generateText({
+		...model,
+		output: Output.object({
+			schema: memoryExtractionSchema,
+		}),
+		instructions: memoryExtractionSystemPrompt({ memories: existingMemories }),
+		messages: await convertToModelMessages(filteredMessages),
+	});
+
+	return output;
+};
+
+/**
  * Extracts permanent facts from a conversation and reconciles them with the
  * existing org-scoped memory bank (additions, updates, deletions).
  */
@@ -168,24 +201,16 @@ export const extractAndUpdateMemories = async ({
 	messages: BaseChatUIMessage[];
 	organizationId: string;
 }) => {
-	const filteredMessages = messages.filter((message) => message.role === "user" || message.role === "assistant");
-
-	if (filteredMessages.length === 0) {
-		return;
-	}
-
 	const existingMemories = await loadMemories({ organizationId });
 
-	const { output } = await generateText({
-		...models.fast,
-		output: Output.object({
-			schema: memoryExtractionSchema,
-		}),
-		instructions: memoryExtractionSystemPrompt({
-			memories: existingMemories.map((memory) => ({ id: memory.id, text: memoryToText(memory) })),
-		}),
-		messages: await convertToModelMessages(filteredMessages),
+	const output = await extractMemories({
+		existingMemories: existingMemories.map((memory) => ({ id: memory.id, text: memoryToText(memory) })),
+		messages,
 	});
+
+	if (!output) {
+		return;
+	}
 
 	const { additions, deletions, updates } = output;
 	const filteredDeletions = deletions.filter((deletion) => !updates.some((update) => update.id === deletion));
@@ -278,6 +303,29 @@ export const searchOlderMessages = async ({
 // =============================================================================
 
 /**
+ * Runs the chat-reflection prompt over a conversation and returns the structured
+ * reflection. Pure (no DB I/O) so it can be exercised directly by evals.
+ */
+export const generateChatReflection = async ({
+	chat,
+	model = models.cheapFast,
+}: {
+	chat: { messages: TextualMessage[]; title: string };
+	model?: ModelConfig;
+}) => {
+	const { output } = await generateText({
+		...model,
+		output: Output.object({
+			schema: chatReflectionSchema,
+		}),
+		instructions: chatReflectionSystemPrompt,
+		prompt: chatToText(chat),
+	});
+
+	return output;
+};
+
+/**
  * Generates a structured reflection on a finished chat and stores it as an
  * episode that future conversations can recall.
  */
@@ -291,13 +339,13 @@ export const reflectOnChat = async ({ chatId, organizationId }: { chatId: string
 		return;
 	}
 
-	const { output } = await generateText({
-		...models.cheapFast,
-		output: Output.object({
-			schema: chatReflectionSchema,
-		}),
-		instructions: chatReflectionSystemPrompt,
-		prompt: chatToText({ messages: chat.messages, title: chat.title }),
+	// The cheap model occasionally echoes the JSON schema instead of matching it.
+	const output = await generateChatReflection({ chat, model: models.cheapFast }).catch((error) => {
+		if (!NoObjectGeneratedError.isInstance(error)) {
+			throw error;
+		}
+
+		return generateChatReflection({ chat, model: models.fast });
 	});
 
 	const embedding = await generateRagEmbedding({ value: episodeToText(output) });

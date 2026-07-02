@@ -11,10 +11,20 @@
 			"import": "./src/index.ts",
 			"default": "./src/index.ts"
 		},
-		"./trpc": {
-			"types": "./src/trpc/create-trpc.ts",
-			"import": "./src/trpc/create-trpc.ts",
-			"default": "./src/trpc/create-trpc.ts"
+		"./hono": {
+			"types": "./src/hono/app.ts",
+			"import": "./src/hono/app.ts",
+			"default": "./src/hono/app.ts"
+		},
+		"./openapi": {
+			"types": "./src/hono/openapi.ts",
+			"import": "./src/hono/openapi.ts",
+			"default": "./src/hono/openapi.ts"
+		},
+		"./api-schemas": {
+			"types": "./src/hono/schemas.ts",
+			"import": "./src/hono/schemas.ts",
+			"default": "./src/hono/schemas.ts"
 		},
 		"./auth": {
 			"types": "./src/lib/auth.ts",
@@ -25,24 +35,30 @@
 			"types": "./src/services/document-extraction.ts",
 			"import": "./src/services/document-extraction.ts",
 			"default": "./src/services/document-extraction.ts"
+		},
+		"./memory": {
+			"types": "./src/services/memory.ts",
+			"import": "./src/services/memory.ts",
+			"default": "./src/services/memory.ts"
 		}
 	},
 	"scripts": {
 		"typecheck": "tsc --noEmit --skipLibCheck"
 	},
 	"dependencies": {
-		"@ai-sdk/google": "^4.0.5",
+		"@ai-sdk/google": "^4.0.6",
 		"@ai-sdk/workflow": "^1.0.11",
 		"@better-auth/expo": "^1.6.23",
 		"@better-auth/redis-storage": "^1.6.23",
 		"@better-fetch/fetch": "^1.3.1",
 		"@exalabs/ai-sdk": "^2.1.0",
-		"@trpc/server": "^11.18.0",
+		"@hono/zod-openapi": "1.4.0",
 		"@types/pg": "^8.20.0",
 		"@vectorstores/core": "^0.1.8",
 		"@vectorstores/env": "^0.1.0",
 		"@vectorstores/excel": "^0.1.8",
 		"@vectorstores/readers": "^0.1.8",
+		"@vercel/blob": "^2.5.0",
 		"@vercel/functions": "^3.7.5",
 		"@webld/ai": "workspace:*",
 		"@webld/cache": "workspace:*",
@@ -55,10 +71,10 @@
 		"countries-list": "^3.3.0",
 		"drizzle-orm": "^1.0.0-rc.4",
 		"dub": "^0.72.1",
+		"hono": "4.12.27",
 		"react-email": "^6.6.5",
 		"resend": "^6.16.0",
 		"sharp": "^0.35.3",
-		"superjson": "^2.2.6",
 		"uuid": "^14.0.1",
 		"zod": "^4.4.3"
 	},

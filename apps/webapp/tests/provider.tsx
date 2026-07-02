@@ -2,8 +2,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NextIntlClientProvider } from "next-intl";
 import { NuqsTestingAdapter, type OnUrlUpdateFunction } from "nuqs/adapters/testing";
 
-import { TRPCProviderContext, trpcClient } from "@/lib/trpc";
-
 // Create a client
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -25,9 +23,7 @@ export const Provider = ({ children, searchParams = {}, onUrlUpdate }: ProviderP
 	return (
 		<NuqsTestingAdapter searchParams={searchParams} onUrlUpdate={onUrlUpdate}>
 			<QueryClientProvider client={queryClient}>
-				<TRPCProviderContext trpcClient={trpcClient} queryClient={queryClient}>
-					<NextIntlClientProvider locale='en'>{children}</NextIntlClientProvider>
-				</TRPCProviderContext>
+				<NextIntlClientProvider locale='en'>{children}</NextIntlClientProvider>
 			</QueryClientProvider>
 		</NuqsTestingAdapter>
 	);

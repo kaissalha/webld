@@ -15,7 +15,7 @@ type Props = {
 	locale?: string;
 };
 
-const InvitationEmail = ({
+export const InvitationEmail = ({
 	inviteLink = "https://example.com/accept-invitation/invitation-id",
 	inviterEmail = "jane@example.com",
 	inviterName = "Jane Doe",

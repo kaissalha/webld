@@ -3,7 +3,7 @@
  */
 import { describe, expect, it } from "vitest";
 
-import { getDirection } from "@/utils/get-direction";
+import { getDirection } from "@webld/utils";
 
 describe("getDirection", () => {
 	it("returns rtl for Arabic", () => {

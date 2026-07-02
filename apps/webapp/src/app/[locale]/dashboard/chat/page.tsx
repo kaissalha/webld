@@ -2,8 +2,7 @@ import { headers } from "next/headers";
 
 import { z } from "zod";
 
-import { convertDbMessagesForUI } from "@/utils/chat-utils";
-import { type DashboardChatUIMessage, getChatWithMessages } from "@webld/server";
+import { convertDbMessagesForUI, type DashboardChatUIMessage, getChatWithMessages } from "@webld/server";
 import { auth } from "@webld/server/auth";
 
 import { DashboardChatPage, DashboardNewChatPage } from "./components/dashboard-chat-page";

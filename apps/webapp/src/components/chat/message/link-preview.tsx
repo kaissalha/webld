@@ -1,14 +1,16 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useState, type SyntheticEvent } from "react";
+
+import Image from "next/image";
 
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
-import { useTRPC } from "@/lib/trpc";
-import { getInitials } from "@/utils/string";
+import { linkPreviewQueryOptions } from "@/lib/api-client";
 import { PreviewCard, PreviewCardPopup, PreviewCardTrigger } from "@webld/ui/components/preview-card";
 import { cn } from "@webld/ui/lib/utils";
+import { getInitials } from "@webld/utils";
 
 const baseLinkStyles = "truncate rounded-xl bg-muted/50 px-2 py-1 text-xs text-muted-foreground transition-colors";
 
@@ -21,20 +23,13 @@ type LinkPreviewProps = {
 
 export const LinkPreview = ({ url, children, className, onClick }: LinkPreviewProps) => {
 	const t = useTranslations("components.chat.message.linkPreview");
-	const trpc = useTRPC();
 	const [shouldLoadMetadata, setShouldLoadMetadata] = useState(false);
-	const loadMetadata = useCallback(() => {
-		setShouldLoadMetadata(true);
-	}, []);
 
 	const { data: metadata, isLoading } = useQuery(
-		trpc.chat.getUrlMetadata.queryOptions(
-			{ url },
-			{
-				staleTime: 20 * 60 * 1000,
-				enabled: shouldLoadMetadata,
-			}
-		)
+		linkPreviewQueryOptions({
+			url,
+			enabled: shouldLoadMetadata,
+		})
 	);
 
 	return (
@@ -49,8 +44,8 @@ export const LinkPreview = ({ url, children, className, onClick }: LinkPreviewPr
 				delay={150}
 				href={url}
 				onClick={onClick}
-				onFocus={loadMetadata}
-				onMouseEnter={loadMetadata}
+				onFocus={() => setShouldLoadMetadata(true)}
+				onMouseEnter={() => setShouldLoadMetadata(true)}
 				rel='noopener noreferrer'
 				target='_blank'
 			>
@@ -75,12 +70,14 @@ export const LinkPreview = ({ url, children, className, onClick }: LinkPreviewPr
 					<a className='min-w-0 flex-1' href={url} rel='noopener noreferrer' target='_blank'>
 						<div className='mb-2 flex items-center gap-1'>
 							{metadata.favicon ? (
-								// oxlint-disable-next-line nextjs/no-img-element
-								<img
+								<Image
 									alt={t("faviconAlt", { siteName: metadata.siteName })}
 									className='size-4 shrink-0 rounded-md'
+									height={16}
+									unoptimized
 									src={metadata.favicon}
-									onError={(event: React.SyntheticEvent<HTMLImageElement>) => {
+									width={16}
+									onError={(event: SyntheticEvent<HTMLImageElement>) => {
 										event.currentTarget.style.display = "none";
 									}}
 								/>

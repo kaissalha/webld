@@ -1,0 +1,59 @@
+{
+	"$schema": "node_modules/konsistent/konsistent.schema.json",
+	"version": "v1",
+	"kebabToCamelMap": {
+		"get-base-url": "getBaseURL"
+	},
+	"conventions": [
+		{
+			"name": "packages-have-src-barrel",
+			"description": "Workspace packages are consumed as source through src/index.ts, except config-only (tsconfig), glob-exported (ui), and eval-only (evals) packages.",
+			"paths": ["packages/{pkg}", "!packages/tsconfig", "!packages/ui", "!packages/evals"],
+			"must": {
+				"haveType": "directory",
+				"haveFiles": ["src/index.ts", "package.json", "tsconfig.json"]
+			}
+		},
+		{
+			"name": "api-route-modules",
+			"description": "Each Hono route module exports a create{Resource}Routes factory and builds its sub-router with createApiRouter, so zod validation and the OpenAPI document share one definition.",
+			"paths": "packages/server/src/hono/routes/{resource}.ts",
+			"must": {
+				"export": ["create${resource.toPascalCase()}Routes"],
+				"import": [{ "name": "createApiRouter", "from": "../router" }]
+			}
+		},
+		{
+			"name": "ai-tools-export-tool",
+			"description": "Each AI tool module exports a {toolName}Tool definition.",
+			"paths": ["packages/server/src/ai/tools/{tool}.ts", "!packages/server/src/ai/tools/index.ts"],
+			"must": {
+				"export": ["${tool.toCamelCase()}Tool"]
+			}
+		},
+		{
+			"name": "email-templates",
+			"description": "Each email template declares a {Name}Email component.",
+			"paths": "packages/email/src/emails/{template}.tsx",
+			"must": {
+				"exportConstants": ["${template.toPascalCase()}Email"]
+			}
+		},
+		{
+			"name": "evals-use-evalite",
+			"description": "Eval suites are defined with evalite.",
+			"paths": "packages/evals/evals/{name}.eval.ts",
+			"must": {
+				"import": [{ "name": "evalite", "from": "evalite" }]
+			}
+		},
+		{
+			"name": "shared-utils-exports",
+			"description": "Each @webld/utils module exports a function named after its file.",
+			"paths": ["packages/utils/src/{util}.ts", "!packages/utils/src/index.ts"],
+			"must": {
+				"export": ["${util.toCamelCase()}"]
+			}
+		}
+	]
+}

@@ -10,7 +10,7 @@ type Props = {
 	locale?: string;
 };
 
-const WelcomeEmail = ({ fullName = "Viktor Hofte", locale = "en" }: Props) => {
+export const WelcomeEmail = ({ fullName = "Viktor Hofte", locale = "en" }: Props) => {
 	const firstName = fullName.split(" ").at(0);
 	const { markup, t } = getI18n({ locale });
 

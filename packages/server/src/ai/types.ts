@@ -77,7 +77,7 @@ export type DashboardChatUIMessage = UIMessage<BaseMessageMetadata, BaseCustomUI
 
 /**
  * Async generator that yields values from a ReadableStream.
- * Useful for tRPC streaming mutations with createUIMessageStream.
+ * Useful for API streaming handlers with createUIMessageStream.
  */
 export const streamToAsyncIterable = async function* <T>(stream: ReadableStream<T>) {
 	const reader = stream.getReader();

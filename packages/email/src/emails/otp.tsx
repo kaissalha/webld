@@ -10,7 +10,7 @@ type Props = {
 	locale?: string;
 };
 
-const OtpEmail = ({ otp = "123456", locale = "en" }: Props) => {
+export const OtpEmail = ({ otp = "123456", locale = "en" }: Props) => {
 	const { markup, t } = getI18n({ locale });
 
 	return (

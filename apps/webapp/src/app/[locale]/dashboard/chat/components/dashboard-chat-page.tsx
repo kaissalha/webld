@@ -41,7 +41,7 @@ export const DashboardChatPage = ({ chatId, initialMessages = EMPTY_INITIAL_MESS
 			initialMessages={initialMessages}
 			runtime={{
 				chatId,
-				api: "/api/chat",
+				api: "/api/chats",
 				onChatCreated: handleChatCreated,
 			}}
 		>

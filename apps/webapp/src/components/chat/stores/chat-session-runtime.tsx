@@ -15,7 +15,6 @@ import { useAutoResume } from "./use-auto-resume";
 export type ChatSessionRuntimeConfig = {
 	chatId: string;
 	api: string;
-	chatMetadata?: Record<string, unknown>;
 	autoResume?: boolean;
 	onChatCreated?: (chatId: string) => void;
 	onData?: (dataPart: DataUIPart<Record<string, unknown>>) => void;
@@ -26,13 +25,10 @@ type ChatSessionRuntimeProps = ChatSessionRuntimeConfig & {
 	store: StoreApi<ChatSessionState>;
 };
 
-const EMPTY_CHAT_METADATA: Record<string, unknown> = {};
-
 export const ChatSessionRuntime = ({
 	chatId,
 	initialMessages,
 	api,
-	chatMetadata = EMPTY_CHAT_METADATA,
 	autoResume = true,
 	onChatCreated,
 	onData,
@@ -46,11 +42,12 @@ export const ChatSessionRuntime = ({
 				api,
 				credentials: "include",
 				prepareSendMessagesRequest: ({ id, messages }) => ({
-					body: { chatId: id, message: messages.at(-1), chatMetadata },
+					api: `${api}/${id}/stream`,
+					body: { message: messages.at(-1) },
 				}),
 				prepareReconnectToStreamRequest: ({ id }) => ({ api: `${api}/${id}/stream` }),
 			}),
-		[api, chatMetadata]
+		[api]
 	);
 
 	const {

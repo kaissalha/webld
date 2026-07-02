@@ -1,7 +1,7 @@
-import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
+import { HTTPException } from "hono/http-exception";
 
-import { aiChatMessages, aiChats, type DbChatNewMessage, db } from "@webld/db";
+import { aiChatMessages, aiChats, type DbChatMessage, type DbChatNewMessage, db } from "@webld/db";
 
 import type { BaseChatUIMessage } from "../ai/types";
 
@@ -25,6 +25,25 @@ export const saveChat = async ({
 	}
 };
 
+// Postgres json/text columns cannot store the NUL character (code point 0), and
+// tool output (e.g. web search results) occasionally contains it, which fails the
+// insert with error 22P05. Strip it from every string in the parts before saving.
+const stripNullBytes = <T>(value: T): T => {
+	if (typeof value === "string") {
+		return value.replace(/\u0000/g, "") as T;
+	}
+
+	if (Array.isArray(value)) {
+		return value.map(stripNullBytes) as T;
+	}
+
+	if (value !== null && typeof value === "object") {
+		return Object.fromEntries(Object.entries(value).map(([key, val]) => [key, stripNullBytes(val)])) as T;
+	}
+
+	return value;
+};
+
 export const convertUIMessagesForDB = <TMessage extends BaseChatUIMessage>(
 	chatId: string,
 	messages: TMessage[]
@@ -33,8 +52,22 @@ export const convertUIMessagesForDB = <TMessage extends BaseChatUIMessage>(
 		id: message.id,
 		chatId,
 		role: message.role,
-		parts: message.parts,
+		parts: stripNullBytes(message.parts),
 	}));
+};
+
+export const convertDbMessagesForUI = <TMessage extends BaseChatUIMessage>(messages: DbChatMessage[]): TMessage[] => {
+	return messages.map<TMessage>(
+		(message) =>
+			({
+				id: message.id,
+				role: message.role as TMessage["role"],
+				parts: message.parts as TMessage["parts"],
+				metadata: {
+					createdAt: new Date(message.createdAt).toISOString(),
+				},
+			}) as TMessage
+	);
 };
 
 export const saveOrUpdateChatMessage = async (chatId: string, message: BaseChatUIMessage) => {
@@ -47,7 +80,7 @@ export const saveOrUpdateChatMessage = async (chatId: string, message: BaseChatU
 			.onConflictDoUpdate({
 				target: aiChatMessages.id,
 				set: {
-					parts: message.parts,
+					parts: stripNullBytes(message.parts),
 					updatedAt: new Date().toISOString(),
 				},
 			});
@@ -120,7 +153,7 @@ export const deleteChat = async (chatId: string, organizationId: string) => {
 	const chat = await getChat(chatId, organizationId);
 
 	if (!chat) {
-		throw new TRPCError({ message: "Chat not found", code: "NOT_FOUND" });
+		throw new HTTPException(404, { message: "Chat not found" });
 	}
 
 	return db.delete(aiChats).where(eq(aiChats.id, chatId));
@@ -138,7 +171,7 @@ export const updateChatTitle = async ({
 	const chat = await getChat(chatId, organizationId);
 
 	if (!chat) {
-		throw new TRPCError({ message: "Chat not found", code: "NOT_FOUND" });
+		throw new HTTPException(404, { message: "Chat not found" });
 	}
 
 	return db.update(aiChats).set({ title, updatedAt: new Date().toISOString() }).where(eq(aiChats.id, chatId));

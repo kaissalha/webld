@@ -1,17 +1,17 @@
-import { Output, generateText } from "ai";
+import { generateText } from "ai";
 
 import { models } from "./models";
-import { dashboardChatTitlePrompt, dashboardChatTitleSchema } from "./prompts";
+import { dashboardChatTitlePrompt } from "./prompts";
 
 export const generateDashboardChatTitle = async ({ message }: { message: string }) => {
-	const { output } = await generateText({
+	const { text } = await generateText({
 		...models.cheapFast,
 		reasoning: "none",
-		output: Output.object({
-			schema: dashboardChatTitleSchema,
-		}),
 		prompt: dashboardChatTitlePrompt({ message }),
 	});
 
-	return output.title.trim();
+	return text
+		.trim()
+		.replace(/^["'`]+/u, "")
+		.replace(/["'`.!?,;:\s]+$/u, "");
 };

@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 
-import { TRPCError } from "@trpc/server";
-import { getHTTPStatusCodeFromError } from "@trpc/server/http";
+import { HTTPException } from "hono/http-exception";
 
 import { logger } from "@webld/logger/server";
 
 /**
- * Wraps API route handlers to catch TRPCErrors and other errors.
+ * Wraps API route handlers to catch HTTP exceptions and other errors.
  */
 export const withErrorHandler =
 	<T extends Request>(handler: (req: T) => Promise<Response>): ((req: T) => Promise<Response>) =>
@@ -14,8 +13,8 @@ export const withErrorHandler =
 		try {
 			return await handler(req);
 		} catch (error) {
-			if (error instanceof TRPCError) {
-				const httpStatusCode = getHTTPStatusCodeFromError(error);
+			if (error instanceof HTTPException) {
+				const httpStatusCode = error.status;
 				const errorMessage = error.message;
 
 				if (httpStatusCode >= 500) {

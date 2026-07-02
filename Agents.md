@@ -7,7 +7,7 @@
 - Automatically use Context7 MCP tools without me having to ask.
 - Always use Mobbin MCP to fetch similar screens for designs inspirations.
 - Always check for relevant skills.
-- Always read emil-design-eng and emil-design-engineering when working when working on the ui design.
+- Always read the emil-design-engineering skill when working on the ui design.
 - Always run `bun typecheck`, `bun lint`, and `bun react-doctor` at the end to verify everything is correct
 - When running tests, use `bun run test` instead of `bun test` to run the tests using vitest instead of bun test runner.
 - Treat `react-doctor` warnings in touched files as real cleanup signals, not optional polish. Fix them when the change is in scope.
@@ -32,8 +32,8 @@
 - Do not create one-line named helpers that only wrap property access, a simple condition, a static string, or a single `map`/`filter` expression. Inline that code unless the helper has multiple real consumers and a domain name that improves readability.
 - For repeated feature workflows such as PDF preview/download, query-param selection, or modal submission flows, extract adjacent reusable hooks instead of duplicating local state machines.
 - Use the impeccable skills to ensure the design of high standard. Ensure it's adapted to our design patterns.
-- Use the vercel-react-best-practices, vercel-composition-patterns, deslop, effect-best-practices, and effect-portable-patterns to ensure we have high quality code
-- Use the emil-design-eng, emil-design-engineering, and animation-best-practices skills to add intuitive animations
+- Use the vercel-react-best-practices, vercel-composition-patterns, and deslop skills to ensure we have high quality code
+- Use the emil-design-engineering and animation-best-practices skills to add intuitive animations
 - Use adjacent `use-*-controller.ts` or `use-*-form.ts` hooks for non-visual state logic when it makes a component shell easier to read.
 - Keep page/layout/component files focused on rendering structure and wiring. Move mutation orchestration, dialog open/close flows, and query-state coordination into adjacent hooks.
 - Do not create broad generic abstractions too early. Prefer feature-local reuse first, and only make something global after it proves it has multiple consumers.
@@ -43,6 +43,15 @@
 - When reusing expensive or stateful child forms across changing server data, use a keyed boundary to reset them instead of an effect that copies props into state.
 - We are using the latest React. Ensure you don't use forwardRef and utilize new functionalities like Activity and useEffectEvent.
 - Always prefer async/await over .then and .catch
+
+## API Conventions
+
+- API routes live in `packages/server/src/hono/routes/{resource}.ts`. Each file exports a `create{Resource}Routes(options)` factory that builds a sub-router with `createApiRouter()` and defines every endpoint with `createRoute()` + `.openapi()`, so zod validation and the OpenAPI document share a single definition. Never document routes in a separate file.
+- Paths are RESTful: plural kebab-case resource nouns (`/chats/{chatId}/stream`, `/documents/{documentId}`), no verbs in URLs. operationIds are camelCase verb+resource (`createChatStream`, `getDocument`) and unique. Every route declares tags and `security: betterAuthSecurity`.
+- All errors use the shared `ErrorResponse` shape `{ error: { message, issues? } }`. Throw `HTTPException` in handlers; the app-level `onError` serializes it. Validation failures are handled by the `createApiRouter` defaultHook.
+- The spec is served at `/api/openapi.json` and drives Speakeasy SDK generation and the MCP server. `packages/server/tests/hono/openapi.test.ts` enforces spec quality; keep it passing.
+- Auth endpoints under `/api/auth/*` are owned by Better Auth and stay out of the OpenAPI document.
+- The webapp consumes the API through the typed Hono RPC client in `apps/webapp/src/lib/api-client.ts` (`hc<AppType>`); reuse it instead of raw fetch when calling JSON endpoints.
 
 ## Code Style
 
@@ -79,7 +88,8 @@
 - `bun dev` - Start dev server (uses turbo)
 - `bun run test` - Run the Vitest suite
 - `bun typecheck` - TypeScript check (uses tsc in webapp)
-- `bun lint` - Lint and format check with Oxlint + Oxfmt
+- `bun lint` - Lint and format check with Oxlint + Oxfmt, plus konsistent structural conventions
+- `bun konsistent` - Check structural conventions against konsistent.json
 - `bun run lint:fix` - Apply Oxlint fixes and format with Oxfmt
 - `bun react-doctor` - Run React Doctor across the repo
 - `bun eval:dev` - Run Evalite in watch mode
@@ -91,7 +101,7 @@
 ## Architecture
 
 - **Monorepo**: Bun workspaces + Turborepo
-- **apps/webapp**: Next.js 16 app (App Router, next-intl i18n, better-auth, tRPC, AI SDK)
+- **apps/webapp**: Next.js 16 app (App Router, next-intl i18n, better-auth, Hono, AI SDK)
   `src/app` holds routes and API handlers; `src/components` holds app-specific UI; `src/server`, `src/services`, and `src/workflows` hold domain logic and orchestration
 - **packages/ai**: Shared AI models, prompt helpers, and AI SDK configuration
 - **packages/cache**: Redis/KV utilities and rate-limit helpers (Upstash + ioredis)
@@ -100,10 +110,10 @@
 - **packages/evals**: Evalite-based evaluation suite for prompts and AI behavior
 - **packages/logger**: Shared logging and observability helpers for client/server usage
 - **packages/pdf**: React PDF templates and document-generation helpers
-- **packages/server**: Server-side services and lib integrations (AI agents/tools, auth, Resend, tRPC)
+- **packages/server**: Server-side services and lib integrations (AI agents/tools, auth, Resend, Hono)
 - **packages/tsconfig**: Shared TypeScript configs (base, web, node, react-lib, react-native)
 - **packages/ui**: Shared UI components, hooks, and global design tokens (Tailwind v4, CVA, Base UI/Radix)
-- **packages/utils**: Shared utility functions (get-base-url)
+- **packages/utils**: Shared utility functions (get-base-url, get-direction, get-initials)
 
 ## AI Skills
 
@@ -124,7 +134,7 @@ Read the relevant skill before implementing or changing AI retrieval, memory, ev
 - betterauth: https://www.better-auth.com/llms.txt
 - baseui: https://base-ui.com/llms.txt
 - cossui: https://coss.com/ui/llms.txt
-- trpc: https://trpc.io/llms.txt
+- hono: https://hono.dev/llms.txt
 - tanstack query: https://tanstack.com/llms.txt
 - drizzle ORM: https://orm.drizzle.team/llms.txt
 - flags sdk: https://flags-sdk.dev/llms.txt

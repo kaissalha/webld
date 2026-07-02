@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
 
-import { connection } from "next/server";
+import { cacheLife } from "next/cache";
 
 import { ArrowRight } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -53,10 +53,15 @@ const socialLinks = [
 	{ name: "YouTube", href: "https://youtube.com", icon: siYoutube },
 ];
 
+const getCopyrightYear = async () => {
+	"use cache";
+	cacheLife("days");
+	return new Date().getFullYear();
+};
+
 export const Footer = async ({ className, ...props }: ComponentProps<"footer">) => {
 	const t = await getTranslations("site.footer");
-	await connection();
-	const year = new Date().getFullYear();
+	const year = await getCopyrightYear();
 
 	return (
 		<footer className={cn("pt-16 bg-olive-950/2.5 py-16 text-olive-950", className)} {...props}>

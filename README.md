@@ -16,7 +16,7 @@ This repo is a Bun workspaces + Turborepo monorepo centered around a Next.js 16 
 |   |-- evals/               # Evalite-based evaluation suite
 |   |-- logger/              # Shared client/server logging utilities
 |   |-- pdf/                 # React PDF templates and helpers
-|   |-- server/              # Shared server-side services, auth, AI tools, and tRPC helpers
+|   |-- server/              # Shared server-side services, auth, AI tools, and Hono API helpers
 |   |-- tsconfig/            # Shared TypeScript configs
 |   |-- ui/                  # Shared UI primitives, hooks, and design tokens
 |   `-- utils/               # Shared utilities
@@ -28,19 +28,19 @@ This repo is a Bun workspaces + Turborepo monorepo centered around a Next.js 16 
 
 ## Package overview
 
-| Package    | Role                                         |
-| ---------- | -------------------------------------------- |
-| `ai`       | AI models, prompts, AI SDK configuration     |
-| `cache`    | Redis / KV and rate limits                   |
-| `db`       | Drizzle schema, migrations, DB access        |
-| `email`    | React Email + Resend                         |
-| `evals`    | Evalite evals for prompts and model behavior |
-| `logger`   | Shared logging for client and server         |
-| `pdf`      | React PDF templates and helpers              |
-| `server`   | tRPC, auth, agents, integrations (Dub, etc.) |
-| `tsconfig` | Shared TypeScript bases                      |
-| `ui`       | Design system, Tailwind tokens, CVA, Base UI |
-| `utils`    | Shared utilities (e.g. base URL helpers)     |
+| Package    | Role                                             |
+| ---------- | ------------------------------------------------ |
+| `ai`       | AI models, prompts, AI SDK configuration         |
+| `cache`    | Redis / KV and rate limits                       |
+| `db`       | Drizzle schema, migrations, DB access            |
+| `email`    | React Email + Resend                             |
+| `evals`    | Evalite evals for prompts and model behavior     |
+| `logger`   | Shared logging for client and server             |
+| `pdf`      | React PDF templates and helpers                  |
+| `server`   | Hono API, auth, agents, integrations (Dub, etc.) |
+| `tsconfig` | Shared TypeScript bases                          |
+| `ui`       | Design system, Tailwind tokens, CVA, Base UI     |
+| `utils`    | Shared utilities (e.g. base URL helpers)         |
 
 ## Local Development Notes
 

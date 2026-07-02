@@ -13,10 +13,10 @@ import { NextIntlClientProvider } from "next-intl";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import type { Locale } from "@/i18n/routing";
+import { ApiProvider } from "@/lib/api";
 import { PostHogClientEffects } from "@/lib/posthog";
-import { TRPCProvider } from "@/lib/trpc";
-import { getDirection } from "@/utils/get-direction";
 import { Toaster } from "@webld/ui/components/sonner";
+import { getDirection } from "@webld/utils";
 
 import "server-only";
 
@@ -76,7 +76,7 @@ export const BaseLayout = ({ children, locale, messages }: BaseLayoutProps) => {
 
 					<NextIntlClientProvider locale={locale} messages={messages}>
 						<NuqsAdapter>
-							<TRPCProvider>
+							<ApiProvider>
 								<DirectionProvider direction={dir}>
 									<ThemeProvider attribute='class' defaultTheme='light' disableTransitionOnChange>
 										<div className='flex min-h-dvh flex-col'>
@@ -89,7 +89,7 @@ export const BaseLayout = ({ children, locale, messages }: BaseLayoutProps) => {
 										<SpeedInsights />
 									</ThemeProvider>
 								</DirectionProvider>
-							</TRPCProvider>
+							</ApiProvider>
 						</NuqsAdapter>
 					</NextIntlClientProvider>
 				</BaseLayoutPostHogProvider>

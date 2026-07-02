@@ -79,12 +79,6 @@
       "skillPath": "better-auth/emailAndPassword/SKILL.md",
       "computedHash": "747d7f73bd9e2ec5317b8ef88dc70f97df716d00e3d02de4051feebaa48b062d"
     },
-    "emil-design-eng": {
-      "source": "emilkowalski/skill",
-      "sourceType": "github",
-      "skillPath": "skills/emil-design-eng/SKILL.md",
-      "computedHash": "8bdf9e4e6de7a4969147bf4828a4ad2c5aacd9fba4b690b250a85e0467ca387d"
-    },
     "expect": {
       "source": "millionco/expect",
       "sourceType": "github",
@@ -109,6 +103,18 @@
       "skillPath": "skills/improve/SKILL.md",
       "computedHash": "39a9358732dcff385e9e4d3e60b4547856f834e54a58b35e455aa9bd49928c13"
     },
+    "konsistent-config": {
+      "source": "vercel-labs/konsistent",
+      "sourceType": "github",
+      "skillPath": "skills/konsistent-config/SKILL.md",
+      "computedHash": "7a8e77f1ead2d471300a081d282abaef90701b7a555270d5028026739ecf6005"
+    },
+    "konsistent-fix-violations": {
+      "source": "vercel-labs/konsistent",
+      "sourceType": "github",
+      "skillPath": "skills/konsistent-fix-violations/SKILL.md",
+      "computedHash": "deeee5396178ffa672b2d1a6b86b8f9976a10a17ee29ad88992d6e16768b23f1"
+    },
     "organization-best-practices": {
       "source": "better-auth/skills",
       "sourceType": "github",
@@ -121,17 +127,11 @@
       "skillPath": "skills/react-doctor/SKILL.md",
       "computedHash": "fa180e84006740f0ad139f3d11bc9b1ba43de91b376e73d4e40b5e09e37fa9ed"
     },
-    "remotion-best-practices": {
-      "source": "millionco/react-doctor",
-      "sourceType": "github",
-      "skillPath": ".agents/skills/remotion-best-practices/SKILL.md",
-      "computedHash": "9ddcc88dc6383855c8da2c5a0e01ce3a569fe965f8560f18e4148c927c0f27b3"
-    },
     "turborepo": {
       "source": "vercel/turborepo",
       "sourceType": "github",
       "skillPath": "skills/turborepo/SKILL.md",
-      "computedHash": "02d55b7d0eec2ed40eecb1a022b6e78106fb9951c8da0a7b0199104e358f43b7"
+      "computedHash": "83fd96a9823bb56e81c802c67ed7826307c49380f1b8dd21d826b1df2d93bc13"
     },
     "two-factor-authentication-best-practices": {
       "source": "better-auth/skills",

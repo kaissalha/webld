@@ -3,7 +3,7 @@ import type { ProviderOptions } from "@ai-sdk/provider-utils";
 import type { EmbeddingModel, LanguageModel } from "ai";
 import { gateway, wrapLanguageModel } from "ai";
 
-type ModelConfig = {
+export type ModelConfig = {
 	model: LanguageModel;
 	providerOptions?: ProviderOptions;
 };

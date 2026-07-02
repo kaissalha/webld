@@ -106,26 +106,22 @@ const uploadKnowledgeBaseDocument = async ({ file, signal }: { file: File; signa
 		})
 	);
 
-	const response = await fetch("/api/rag/documents", {
+	const response = await fetch("/api/documents", {
 		method: "POST",
 		body: formData,
 		signal,
 	});
 
 	if (!response.ok) {
-		const errorBody = (await response.json().catch(() => null)) as { error?: string | { message?: string } } | null;
-		const message =
-			typeof errorBody?.error === "string"
-				? errorBody.error
-				: (errorBody?.error?.message ?? `Upload failed (${response.status})`);
-		throw new Error(message);
+		const errorBody = (await response.json().catch(() => null)) as { error?: { message?: string } } | null;
+		throw new Error(errorBody?.error?.message ?? `Upload failed (${response.status})`);
 	}
 
 	const body = (await response.json()) as {
-		file: { id: string; ragStatus: "failed" | "none" | "pending" | "ready" };
+		document: { id: string; ragStatus: "failed" | "none" | "pending" | "ready" };
 	};
 
-	return body.file;
+	return body.document;
 };
 
 const pollKnowledgeBaseStatus = async ({
@@ -142,19 +138,20 @@ const pollKnowledgeBaseStatus = async ({
 			throw new Error("Upload cancelled");
 		}
 
-		const response = await fetch(`/api/rag/documents/${fileId}`, { signal });
+		const response = await fetch(`/api/documents/${fileId}`, { signal });
 
 		if (response.ok) {
-			const body = (await response.json()) as {
-				file: { processingError?: string | null; ragStatus: "failed" | "none" | "pending" | "ready" };
+			const document = (await response.json()) as {
+				processingError?: string | null;
+				ragStatus: "failed" | "none" | "pending" | "ready";
 			};
 
-			if (body.file.ragStatus === "ready" || body.file.ragStatus === "none") {
+			if (document.ragStatus === "ready" || document.ragStatus === "none") {
 				return "ready";
 			}
 
-			if (body.file.ragStatus === "failed") {
-				throw new Error(body.file.processingError ?? "Indexing failed");
+			if (document.ragStatus === "failed") {
+				throw new Error(document.processingError ?? "Indexing failed");
 			}
 		}
 

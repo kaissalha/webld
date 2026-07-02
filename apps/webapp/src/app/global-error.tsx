@@ -6,7 +6,7 @@ import { ErrorPageView } from "@/components/layout/error-page-view";
 import enMessages from "@/i18n/messages/en.json";
 import { routing } from "@/i18n/routing";
 import { createErrorReloadHandler } from "@/utils/error-reload";
-import { getDirection } from "@/utils/get-direction";
+import { getDirection } from "@webld/utils";
 import "@webld/ui/globals.css";
 
 type GlobalErrorProps = {

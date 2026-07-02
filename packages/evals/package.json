@@ -4,8 +4,8 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "evalite watch",
-		"eval:ci": "evalite",
+		"dev": "dotenv -e ../../apps/webapp/.env.local -- evalite watch",
+		"eval:ci": "dotenv -e ../../apps/webapp/.env.local -- evalite",
 		"eval:export": "evalite export --output=./.evalite/ui",
 		"typecheck": "tsc --noEmit --skipLibCheck"
 	},

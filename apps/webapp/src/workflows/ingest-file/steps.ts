@@ -1,4 +1,4 @@
-import { downloadBlob } from "@/lib/server/storage";
+import { downloadBlob } from "@webld/server";
 import {
 	applyFileEnrichment,
 	chunkText,
