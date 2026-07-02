@@ -43,6 +43,7 @@ export const db = drizzle({
 
 // Export relations for use elsewhere
 export * from "./relations.ts";
+export * from "./schema/ai/block.ts";
 export * from "./schema/ai/chat.ts";
 export * from "./schema/ai/episode.ts";
 export * from "./schema/ai/memory.ts";

@@ -125,10 +125,23 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.organizations.id,
 		}),
 		messages: r.many.aiChatMessages(),
+		blocks: r.many.aiChatBlocks(),
 		episode: r.one.chatEpisodes({
 			from: r.aiChats.id,
 			to: r.chatEpisodes.chatId,
 			optional: true,
+		}),
+	},
+
+	// AI Chat block relations
+	aiChatBlocks: {
+		chat: r.one.aiChats({
+			from: r.aiChatBlocks.chatId,
+			to: r.aiChats.id,
+		}),
+		organization: r.one.organizations({
+			from: r.aiChatBlocks.organizationId,
+			to: r.organizations.id,
 		}),
 	},
 

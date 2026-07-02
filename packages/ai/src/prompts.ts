@@ -37,6 +37,7 @@ export const dashboardChatSystemPrompt = ({
   - Call retrieveKnowledge with both 'keywords' (exact terms, names, codes, amounts) and 'searchQuery' (the broader concept in natural language) when the question needs knowledge the preloaded excerpts do not cover, then fetch full passages with getKnowledgeContent as needed.
 - Ground your answer in preloaded or retrieved content and cite sources with their bracketed citation numbers
 - If the available knowledge is weak or incomplete, say what is missing instead of inventing details
+- Earlier parts of long conversations are compacted into titled summary blocks (see <conversation-blocks> when present). When the user references an earlier detail the summaries do not carry, call recallChatHistory to read that segment verbatim instead of guessing or asking the user to repeat themselves
 - When the user asks you to write, draft, or rewrite an email, use composeEmail instead of pasting the full draft as regular chat text
 - For composeEmail, include the recipient email when it is clearly known, and write a complete subject and plain-text body that is ready to edit and send
 - When drafting emails, never use placeholders like [Your Name] or {{your_name}} in the body or signature
@@ -293,6 +294,55 @@ Here are summaries of related past conversations. Use what worked well and avoid
 
 ${relatedChatsSection}
 </related-chats>`;
+};
+
+export const blockSummarySchema = z.object({
+	title: z.string().describe("A specific 3-8 word title for what this segment of the conversation was about"),
+	summary: z
+		.string()
+		.describe(
+			"A dense summary of the segment: decisions made, exact facts (names, amounts, dates, identifiers), and artifacts produced (emails drafted, documents cited)"
+		),
+	tags: z.array(z.string()).max(6).describe("Up to 6 short keyword tags for the segment"),
+});
+
+export const blockSummarySystemPrompt = `You summarize a segment of a conversation between a user and a business assistant so the assistant can keep working without the full transcript.
+
+The summary replaces the verbatim messages in the assistant's context, so it must preserve everything a future turn might depend on:
+- Decisions and conclusions, including what was rejected and why
+- Exact facts: names, email addresses, companies, amounts, dates, identifiers
+- Artifacts produced: emails drafted (recipient + gist), documents or sources cited
+- Open threads: questions asked but not yet answered, pending follow-ups
+
+Rules:
+- title: specific and descriptive (e.g. "Acme renewal pricing negotiation"), never generic like "Discussion"
+- summary: short bullet lines, information-dense, no filler; prefer exact values over paraphrase
+- tags: lowercase keywords covering the topics and entities involved
+
+Return a JSON object with title, summary, and tags. Return actual data, not a JSON Schema definition.`;
+
+export type ChatBlockForPrompt = {
+	id: string;
+	title: string;
+	summary: string;
+	tags: string[];
+};
+
+export const chatBlocksContextPrompt = ({ blocks }: { blocks: ChatBlockForPrompt[] }) => {
+	const blocksSection = blocks
+		.map(
+			(block, index) =>
+				`<block index="${index + 1}" id="${block.id}" title="${block.title}"${
+					block.tags.length ? ` tags="${block.tags.join(", ")}"` : ""
+				}>\n${block.summary}\n</block>`
+		)
+		.join("\n\n");
+
+	return `<conversation-blocks>
+Earlier parts of this conversation were compacted into the titled blocks below (oldest first). The summaries preserve the key facts and decisions. If the user refers to an earlier detail that the summaries do not carry, call recallChatHistory with the relevant block id to read that segment verbatim - do not guess or ask the user to repeat themselves.
+
+${blocksSection}
+</conversation-blocks>`;
 };
 
 export type KnowledgeExcerptForPrompt = {

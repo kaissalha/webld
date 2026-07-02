@@ -13,6 +13,7 @@ export const dashboardChatAgent = new ToolLoopAgent({
 	toolsContext: {
 		composeEmail: {},
 		getKnowledgeContent: {},
+		recallChatHistory: {},
 		retrieveKnowledge: {},
 	},
 	callOptionsSchema: z
@@ -31,12 +32,15 @@ export const dashboardChatAgent = new ToolLoopAgent({
 			...settings,
 			model: modelConfig.model,
 			providerOptions: modelConfig.providerOptions,
+			// Per-turn context (memories, related chats, knowledge) is injected at the
+			// tail of the message list by the route, NOT here: instructions are the
+			// first prompt tokens, and changing them busts provider prompt caching
+			// for the whole conversation. Only stable-per-chat content belongs here.
 			instructions: [
 				dashboardChatSystemPrompt({
 					currentUser: aiContext.currentUser,
 				}),
-				aiContext.memoryContext,
-				aiContext.knowledgeContext,
+				aiContext.blocksContext,
 			]
 				.filter(Boolean)
 				.join("\n\n"),
@@ -44,6 +48,7 @@ export const dashboardChatAgent = new ToolLoopAgent({
 			toolsContext: {
 				composeEmail: aiContext,
 				getKnowledgeContent: aiContext,
+				recallChatHistory: aiContext,
 				retrieveKnowledge: aiContext,
 			},
 		};

@@ -127,6 +127,9 @@ export const getChatWithMessages = async ({ chatId, organizationId }: { chatId: 
 				organizationId,
 			},
 			with: {
+				blocks: {
+					orderBy: { orderIndex: "asc" },
+				},
 				messages: {
 					orderBy: { createdAt: "asc" },
 				},

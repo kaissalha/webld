@@ -14,7 +14,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { generateDashboardChatTitle } from "@webld/ai/generate-dashboard-chat-title";
 import { healModelMessages } from "@webld/ai/heal-messages";
-import { knowledgeContextPrompt, memoryContextPrompt } from "@webld/ai/prompts";
+import { chatBlocksContextPrompt, knowledgeContextPrompt, memoryContextPrompt } from "@webld/ai/prompts";
 
 import { dashboardChatAgent } from "../../ai/agents/dashboard-chat-agent";
 import type { BaseChatUIMessage, DashboardChatUIMessage } from "../../ai/types";
@@ -31,14 +31,14 @@ import {
 	updateChatTitle,
 } from "../../services/chat";
 import {
-	embedChatMessage,
+	compactChatIfNeeded,
 	episodeToText,
 	extractAndUpdateMemories,
+	liveWindowMessages,
 	loadMemories,
 	memoryToText,
 	messageHistoryToQuery,
 	reflectOnChat,
-	searchOlderMessages,
 	searchRelatedChats,
 	type TextualMessage,
 } from "../../services/memory";
@@ -51,10 +51,10 @@ import { betterAuthSecurity } from "../openapi";
 import { createApiRouter } from "../router";
 import { errorResponse, uiMessageSchema } from "../schemas";
 
-const MEMORY_WINDOW_SIZE = 10;
-const OLD_MESSAGES_TO_USE = 10;
 const RELATED_CHATS_TO_USE = 3;
 const KNOWLEDGE_CHUNKS_TO_USE = 5;
+// Messages considered when building the retrieval query and extracting memories.
+const RETRIEVAL_WINDOW_MESSAGES = 10;
 
 const chatIdParamsSchema = z.object({
 	chatId: z.uuid().openapi({
@@ -438,9 +438,13 @@ export const createChatsRoutes = (options: CreateApiAppOptions) => {
 				}
 			}
 
-			const recentMessages = uiMessages.slice(-MEMORY_WINDOW_SIZE);
-			const olderMessages = uiMessages.slice(0, -MEMORY_WINDOW_SIZE);
-			const recentMessageIds = recentMessages.map((recentMessage) => recentMessage.id);
+			// Live window: everything after the newest compaction block. The window is
+			// append-only between compactions, so the prompt prefix stays byte-identical
+			// across turns and provider prompt caching keeps hitting.
+			const chatBlocks = existingChat?.blocks ?? [];
+			const liveMessages = liveWindowMessages({ blocks: chatBlocks, messages: uiMessages });
+
+			const recentMessages = liveMessages.slice(-RETRIEVAL_WINDOW_MESSAGES);
 			const recentMessagesForRetrieval: TextualMessage[] = recentMessages.map((recentMessage) => ({
 				role: recentMessage.role,
 				parts: recentMessage.parts as TextualMessage["parts"],
@@ -449,9 +453,9 @@ export const createChatsRoutes = (options: CreateApiAppOptions) => {
 			const lastUserMessage = recentMessages.findLast((recentMessage) => recentMessage.role === "user");
 			const lastUserText = lastUserMessage ? getMessageText(lastUserMessage).trim() : "";
 
-			// Preload all per-turn context here (memories, related chats, knowledge) so the
-			// agent can answer directly instead of opening the turn with retrieval tool calls.
-			const [[relevantOlderMessages, relatedChats, knowledgeChunks], orgMemories] = await Promise.all([
+			// Preload per-turn context (memories, related chats, knowledge) so the agent
+			// can answer directly instead of opening the turn with retrieval tool calls.
+			const [[relatedChats, knowledgeChunks], orgMemories] = await Promise.all([
 				(async () => {
 					const retrievalQuery = messageHistoryToQuery(recentMessagesForRetrieval);
 					const queryEmbedding = retrievalQuery.trim()
@@ -459,16 +463,6 @@ export const createChatsRoutes = (options: CreateApiAppOptions) => {
 						: undefined;
 
 					return Promise.all([
-						olderMessages.length > 0
-							? searchOlderMessages({
-									chatId,
-									excludeMessageIds: recentMessageIds,
-									organizationId,
-									queryEmbedding,
-									recentMessages: recentMessagesForRetrieval,
-									topK: OLD_MESSAGES_TO_USE,
-								})
-							: Promise.resolve([] as Awaited<ReturnType<typeof searchOlderMessages>>),
 						searchRelatedChats({
 							currentChatId: chatId,
 							messages: recentMessagesForRetrieval,
@@ -492,12 +486,6 @@ export const createChatsRoutes = (options: CreateApiAppOptions) => {
 				persistMessagePromise,
 			]);
 
-			const relevantOlderMessageIds = new Set(relevantOlderMessages.map((result) => result.id));
-			const oldMessagesToUse = olderMessages.filter((olderMessage) =>
-				relevantOlderMessageIds.has(olderMessage.id)
-			);
-			const messageHistoryForLLM = [...oldMessagesToUse, ...recentMessages];
-
 			const conversationHistory = recentMessages.flatMap((recentMessage) => {
 				if (recentMessage.role !== "user" && recentMessage.role !== "assistant") {
 					return [];
@@ -509,7 +497,7 @@ export const createChatsRoutes = (options: CreateApiAppOptions) => {
 			});
 
 			const { messages: modelMessages, repairs: messageRepairs } = healModelMessages(
-				await convertToModelMessages(prepareMessagesForModel(messageHistoryForLLM), {
+				await convertToModelMessages(prepareMessagesForModel(liveMessages), {
 					ignoreIncompleteToolCalls: true,
 				}),
 				{
@@ -553,6 +541,38 @@ export const createChatsRoutes = (options: CreateApiAppOptions) => {
 							})),
 						})
 					: undefined;
+
+			// Per-turn context rides at the tail, attached to the newest user message:
+			// injecting it any earlier (e.g. into instructions) would invalidate the
+			// provider prompt cache for the entire conversation on every turn. It is
+			// never persisted, so the UI and the stored history are unaffected.
+			const turnContext = [memoryContext, knowledgeContext].filter(Boolean).join("\n\n");
+			const lastUserModelMessage = modelMessages.findLast((modelMessage) => modelMessage.role === "user");
+
+			if (turnContext && lastUserModelMessage?.role === "user") {
+				const contextPart = { type: "text" as const, text: turnContext };
+
+				lastUserModelMessage.content =
+					typeof lastUserModelMessage.content === "string"
+						? [contextPart, { type: "text" as const, text: lastUserModelMessage.content }]
+						: [contextPart, ...lastUserModelMessage.content];
+			}
+
+			const blocksContext =
+				chatBlocks.length > 0
+					? chatBlocksContextPrompt({
+							blocks: chatBlocks.map((block) => ({
+								id: block.id,
+								summary: block.summary,
+								tags: block.tags,
+								title: block.title,
+							})),
+						})
+					: undefined;
+
+			// Input tokens of the turn's final model call, reported by the gateway;
+			// drives the post-turn compaction check.
+			let lastPromptTokens: number | undefined;
 
 			let shouldRunCancellationLoop = true;
 
@@ -602,13 +622,13 @@ export const createChatsRoutes = (options: CreateApiAppOptions) => {
 						messages: modelMessages,
 						options: {
 							aiContext: {
+								blocksContext,
+								chatId,
 								conversationHistory,
 								currentUser: {
 									email: session.user.email ?? undefined,
 									name: session.user.name ?? undefined,
 								},
-								knowledgeContext,
-								memoryContext,
 								organizationId,
 							},
 							useVisionModel: chatHasImageAttachment,
@@ -616,6 +636,18 @@ export const createChatsRoutes = (options: CreateApiAppOptions) => {
 						abortSignal: userStopSignal.signal,
 						experimental_transform: smoothStream({ chunking: "word" }),
 					});
+
+					// The last step's input tokens are the real size of the final prompt
+					// (summing across steps would overcount the resent prefix).
+					void Promise.resolve(result.steps)
+						.then((steps) => {
+							const inputTokens = steps.at(-1)?.usage.inputTokens;
+
+							if (typeof inputTokens === "number") {
+								lastPromptTokens = inputTokens;
+							}
+						})
+						.catch(() => undefined);
 
 					writer.merge(toUIMessageStream({ stream: result.stream, sendReasoning: true }));
 				},
@@ -639,25 +671,6 @@ export const createChatsRoutes = (options: CreateApiAppOptions) => {
 
 					options.scheduleAfter(async () => {
 						try {
-							await Promise.all([
-								chatMessage.role === "user"
-									? embedChatMessage({
-											message: {
-												id: chatMessage.id,
-												parts: chatMessage.parts as TextualMessage["parts"],
-											},
-										})
-									: Promise.resolve(),
-								...assistantMessages.map((assistantMessage) =>
-									embedChatMessage({
-										message: {
-											id: assistantMessage.id,
-											parts: assistantMessage.parts as TextualMessage["parts"],
-										},
-									})
-								),
-							]);
-
 							await extractAndUpdateMemories({
 								chatId,
 								messages: [...recentMessages, ...assistantMessages],
@@ -665,6 +678,10 @@ export const createChatsRoutes = (options: CreateApiAppOptions) => {
 							});
 
 							await reflectOnChat({ chatId, organizationId });
+
+							// Compaction runs after the response so it never blocks a turn;
+							// the next turn picks up the new block.
+							await compactChatIfNeeded({ chatId, organizationId, promptTokens: lastPromptTokens });
 						} catch (error) {
 							await logServerEvent({
 								level: "error",

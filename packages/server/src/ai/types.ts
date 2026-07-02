@@ -9,6 +9,7 @@ import type { dashboardChatTools } from "./tools";
 export const appContextSchema = z
 	.object({
 		organizationId: z.string().optional(),
+		chatId: z.string().optional(),
 		userId: z.string().optional(),
 		currentUser: z
 			.object({
@@ -24,8 +25,7 @@ export const appContextSchema = z
 				})
 			)
 			.optional(),
-		memoryContext: z.string().optional(),
-		knowledgeContext: z.string().optional(),
+		blocksContext: z.string().optional(),
 		locale: z.string().optional(),
 		timezone: z.string().optional(),
 	})

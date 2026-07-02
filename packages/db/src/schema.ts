@@ -1,4 +1,5 @@
 // AI schema
+export { aiChatBlocks } from "./schema/ai/block.ts";
 export { aiChats } from "./schema/ai/chat.ts";
 export { chatEpisodes } from "./schema/ai/episode.ts";
 export { memories, memorySource } from "./schema/ai/memory.ts";

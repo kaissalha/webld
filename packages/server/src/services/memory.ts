@@ -1,20 +1,21 @@
 import { convertToModelMessages, generateText, NoObjectGeneratedError, Output } from "ai";
-import { and, cosineDistance, desc, eq, isNotNull, ne, notInArray, sql } from "drizzle-orm";
+import { and, asc, cosineDistance, desc, eq, gte, inArray, lte, ne, sql } from "drizzle-orm";
 
 import { type ModelConfig, models } from "@webld/ai/models";
 import {
+	blockSummarySchema,
+	blockSummarySystemPrompt,
 	chatReflectionSchema,
 	chatReflectionSystemPrompt,
 	type MemoryForPrompt,
 	memoryExtractionSchema,
 	memoryExtractionSystemPrompt,
 } from "@webld/ai/prompts";
-import { aiChatMessages, aiChats, type ChatEpisode, chatEpisodes, db, type Memory, memories } from "@webld/db";
+import { aiChatBlocks, aiChatMessages, type ChatEpisode, chatEpisodes, db, type Memory, memories } from "@webld/db";
 
 import type { BaseChatUIMessage } from "../ai/types";
 import { generateRagEmbedding } from "./rag";
 
-const DEFAULT_OLD_MESSAGE_TOP_K = 10;
 const DEFAULT_RELATED_CHATS_TOP_K = 3;
 
 export type TextualPart = { type: string; [key: string]: unknown };
@@ -192,69 +193,258 @@ export const extractAndUpdateMemories = async ({
 };
 
 // =============================================================================
-// Working memory (per-message embeddings + semantic recall of older messages)
+// Working memory (token-budgeted live window + compaction blocks + recall)
 // =============================================================================
 
-export const embedChatMessage = async ({ message }: { message: { id: string; parts: TextualPart[] } }) => {
-	const text = messagePartsToText(message.parts).trim();
+const COMPACT_TRIGGER_TOKENS = 12_000;
+const COMPACT_SPAN_FRACTION = 0.5;
+const KEEP_RECENT_MESSAGES = 4;
+const DEFAULT_BLOCK_SEARCH_TOP_K = 3;
 
-	if (!text) {
-		return;
+export type CompactableMessage = { id: string; role: string; parts: TextualPart[] };
+
+/**
+ * Splits the live window into the span to compact and the remainder. Folds the
+ * oldest half of the window in one chunk - every compaction rewrites the prompt
+ * prefix and busts provider caching, so it must run rarely and be chunky. The
+ * span ends on a turn boundary (the remainder starts with a user message) and
+ * always leaves the most recent messages verbatim. Whether compaction is needed
+ * at all is decided by the caller from the real prompt token count.
+ */
+export const selectCompactionSpan = <T extends CompactableMessage>({
+	keepRecent = KEEP_RECENT_MESSAGES,
+	messages,
+	spanFraction = COMPACT_SPAN_FRACTION,
+}: {
+	keepRecent?: number;
+	messages: T[];
+	spanFraction?: number;
+}) => {
+	const maxSpanEnd = Math.max(0, messages.length - keepRecent);
+	let spanEnd = Math.min(Math.ceil(messages.length * spanFraction), maxSpanEnd);
+
+	// Never end the span mid-turn: the remainder must start with a user message.
+	while (spanEnd < maxSpanEnd && messages[spanEnd]?.role !== "user") {
+		spanEnd += 1;
 	}
 
-	const embedding = await generateRagEmbedding({ value: text });
+	if (spanEnd === 0 || messages[spanEnd]?.role !== "user") {
+		return null;
+	}
 
-	await db.update(aiChatMessages).set({ embedding }).where(eq(aiChatMessages.id, message.id));
+	return { rest: messages.slice(spanEnd), span: messages.slice(0, spanEnd) };
 };
 
 /**
- * Finds older messages in the same chat that are semantically relevant to the
- * recent window, so long conversations can stay within the context budget.
+ * Messages after the newest block's boundary - the part of the chat the model
+ * sees verbatim. Without blocks, the whole chat is the live window.
  */
-export const searchOlderMessages = async ({
+export const liveWindowMessages = <T extends { id: string }>({
+	blocks,
+	messages,
+}: {
+	blocks: Array<{ lastMessageId: string }>;
+	messages: T[];
+}) => {
+	const lastBlock = blocks.at(-1);
+
+	if (!lastBlock) {
+		return messages;
+	}
+
+	const boundaryIndex = messages.findIndex((message) => message.id === lastBlock.lastMessageId);
+
+	return boundaryIndex === -1 ? messages : messages.slice(boundaryIndex + 1);
+};
+
+export const blockToText = (block: { title: string; summary: string; tags: string[] }) =>
+	[block.title, block.summary, block.tags.length > 0 ? `Tags: ${block.tags.join(", ")}` : undefined]
+		.filter(Boolean)
+		.join("\n");
+
+/**
+ * Runs the block-summary prompt over a span of messages and returns the
+ * structured summary. Pure (no DB I/O) so it can be exercised directly by evals.
+ */
+export const generateBlockSummary = async ({
+	messages,
+	model = models.cheapFast,
+}: {
+	messages: TextualMessage[];
+	model?: ModelConfig;
+}) => {
+	const transcript = messages
+		.map(messageToText)
+		.filter((text) => text.trim().length > 0)
+		.join("\n");
+
+	const { output } = await generateText({
+		...model,
+		output: Output.object({
+			schema: blockSummarySchema,
+		}),
+		instructions: blockSummarySystemPrompt,
+		prompt: transcript,
+	});
+
+	return output;
+};
+
+/**
+ * Compacts the oldest part of a chat's live window into a titled summary block
+ * when the turn's real prompt size (reported by the gateway) exceeds the
+ * trigger. Safe to call after every turn; a no-op while the prompt is within
+ * budget. Concurrent runs are defused by the (chatId, orderIndex) unique index.
+ */
+export const compactChatIfNeeded = async ({
 	chatId,
-	excludeMessageIds = [],
 	organizationId,
-	queryEmbedding: providedEmbedding,
-	recentMessages,
-	topK = DEFAULT_OLD_MESSAGE_TOP_K,
+	promptTokens,
 }: {
 	chatId: string;
-	excludeMessageIds?: string[];
 	organizationId: string;
-	/** Precomputed embedding of the message-history query, to avoid re-embedding when callers fan out. */
-	queryEmbedding?: number[];
-	recentMessages: TextualMessage[];
+	/** Input token count of the turn's final model call, as reported by the gateway. */
+	promptTokens: number | undefined;
+}) => {
+	if (promptTokens === undefined || promptTokens <= COMPACT_TRIGGER_TOKENS) {
+		return null;
+	}
+
+	const chat = await db.query.aiChats.findFirst({
+		where: { id: chatId, organizationId },
+		with: {
+			blocks: { orderBy: { orderIndex: "asc" } },
+			messages: { orderBy: { createdAt: "asc" } },
+		},
+	});
+
+	if (!chat) {
+		return null;
+	}
+
+	const selection = selectCompactionSpan({
+		messages: liveWindowMessages({ blocks: chat.blocks, messages: chat.messages }),
+	});
+
+	if (!selection) {
+		return null;
+	}
+
+	const firstMessage = selection.span.at(0);
+	const lastMessage = selection.span.at(-1);
+
+	if (!firstMessage || !lastMessage) {
+		return null;
+	}
+
+	// The cheap model occasionally echoes the JSON schema instead of matching it.
+	const summary = await generateBlockSummary({ messages: selection.span }).catch((error) => {
+		if (!NoObjectGeneratedError.isInstance(error)) {
+			throw error;
+		}
+
+		return generateBlockSummary({ messages: selection.span, model: models.fast });
+	});
+
+	const embedding = await generateRagEmbedding({ value: blockToText(summary) });
+
+	const [block] = await db
+		.insert(aiChatBlocks)
+		.values({
+			chatId,
+			embedding,
+			firstMessageId: firstMessage.id,
+			lastMessageId: lastMessage.id,
+			orderIndex: chat.blocks.length,
+			organizationId,
+			summary: summary.summary,
+			tags: summary.tags,
+			title: summary.title.slice(0, 200),
+		})
+		.onConflictDoNothing()
+		.returning();
+
+	return block ?? null;
+};
+
+/** The verbatim messages a block compacted, for on-demand recall. */
+export const getBlockMessages = async ({
+	blockId,
+	chatId,
+	organizationId,
+}: {
+	blockId: string;
+	chatId: string;
+	organizationId: string;
+}) => {
+	const block = await db.query.aiChatBlocks.findFirst({
+		where: { id: blockId, chatId, organizationId },
+	});
+
+	if (!block) {
+		return null;
+	}
+
+	const bounds = await db
+		.select({ createdAt: aiChatMessages.createdAt, id: aiChatMessages.id })
+		.from(aiChatMessages)
+		.where(inArray(aiChatMessages.id, [block.firstMessageId, block.lastMessageId]));
+
+	const firstMessage = bounds.find((bound) => bound.id === block.firstMessageId);
+	const lastMessage = bounds.find((bound) => bound.id === block.lastMessageId);
+
+	if (!firstMessage || !lastMessage) {
+		return { block, messages: [] };
+	}
+
+	const rows = await db
+		.select()
+		.from(aiChatMessages)
+		.where(
+			and(
+				eq(aiChatMessages.chatId, chatId),
+				gte(aiChatMessages.createdAt, firstMessage.createdAt),
+				lte(aiChatMessages.createdAt, lastMessage.createdAt)
+			)
+		)
+		.orderBy(asc(aiChatMessages.createdAt));
+
+	return { block, messages: rows };
+};
+
+/** Semantic search over a chat's block summaries, for query-based recall. */
+export const searchChatBlocks = async ({
+	chatId,
+	organizationId,
+	query,
+	topK = DEFAULT_BLOCK_SEARCH_TOP_K,
+}: {
+	chatId: string;
+	organizationId: string;
+	query: string;
 	topK?: number;
 }) => {
-	const query = messageHistoryToQuery(recentMessages);
-
 	if (!query.trim()) {
 		return [];
 	}
 
-	const queryEmbedding = providedEmbedding ?? (await generateRagEmbedding({ value: query }));
-	const similarity = sql<number>`1 - (${cosineDistance(aiChatMessages.embedding, queryEmbedding)})`;
-
-	const conditions = [
-		eq(aiChatMessages.chatId, chatId),
-		eq(aiChats.organizationId, organizationId),
-		isNotNull(aiChatMessages.embedding),
-	];
-
-	if (excludeMessageIds.length > 0) {
-		conditions.push(notInArray(aiChatMessages.id, excludeMessageIds));
-	}
+	const queryEmbedding = await generateRagEmbedding({ value: query });
+	const similarity = sql<number>`1 - (${cosineDistance(aiChatBlocks.embedding, queryEmbedding)})`;
 
 	const rows = await db
-		.select({ id: aiChatMessages.id, similarity })
-		.from(aiChatMessages)
-		.innerJoin(aiChats, eq(aiChatMessages.chatId, aiChats.id))
-		.where(and(...conditions))
+		.select({
+			id: aiChatBlocks.id,
+			similarity,
+			summary: aiChatBlocks.summary,
+			tags: aiChatBlocks.tags,
+			title: aiChatBlocks.title,
+		})
+		.from(aiChatBlocks)
+		.where(and(eq(aiChatBlocks.chatId, chatId), eq(aiChatBlocks.organizationId, organizationId)))
 		.orderBy((row) => desc(row.similarity))
 		.limit(topK);
 
-	return rows.map((row) => ({ id: row.id, similarity: Number(row.similarity) }));
+	return rows.map(({ similarity: score, ...block }) => ({ block, similarity: Number(score) }));
 };
 
 // =============================================================================

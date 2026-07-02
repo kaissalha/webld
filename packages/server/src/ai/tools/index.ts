@@ -3,15 +3,18 @@ import type { Tool } from "ai";
 
 import { composeEmailTool } from "./compose-email";
 import { getKnowledgeContentTool } from "./get-knowledge-content";
+import { recallChatHistoryTool } from "./recall-chat-history";
 import { retrieveKnowledgeTool } from "./retrieve-knowledge";
 
 export { composeEmailTool } from "./compose-email";
 export { getKnowledgeContentTool } from "./get-knowledge-content";
+export { recallChatHistoryTool } from "./recall-chat-history";
 export { retrieveKnowledgeTool } from "./retrieve-knowledge";
 
 export const dashboardChatTools = {
 	composeEmail: composeEmailTool,
 	getKnowledgeContent: getKnowledgeContentTool,
+	recallChatHistory: recallChatHistoryTool,
 	retrieveKnowledge: retrieveKnowledgeTool,
 	// `@exalabs/ai-sdk` resolves its own copy of `ai` (with zod v3), so its
 	// returned `Tool` type is structurally incompatible with our local `ai`'s

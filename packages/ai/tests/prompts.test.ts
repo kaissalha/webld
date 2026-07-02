@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+	chatBlocksContextPrompt,
 	dashboardChatSystemPrompt,
 	dashboardChatTitlePrompt,
 	knowledgeContextPrompt,
@@ -58,6 +59,29 @@ describe("prompts", () => {
 		expect(prompt).toContain("<knowledge>");
 		expect(prompt).toContain("preloaded");
 		expect(prompt).toContain("Only reach for the knowledge tools when the preloaded excerpts are insufficient");
+	});
+
+	it("directs the agent to recall compacted history instead of guessing", () => {
+		const prompt = dashboardChatSystemPrompt();
+
+		expect(prompt).toContain("recallChatHistory");
+		expect(prompt).toContain("<conversation-blocks>");
+	});
+
+	it("renders conversation blocks with ids, titles, and recall guidance", () => {
+		const prompt = chatBlocksContextPrompt({
+			blocks: [
+				{ id: "block-1", summary: "Agreed 12% discount", tags: ["acme"], title: "Acme renewal" },
+				{ id: "block-2", summary: "Drafted follow-up email", tags: [], title: "Follow-up email" },
+			],
+		});
+
+		expect(prompt).toContain('id="block-1"');
+		expect(prompt).toContain('title="Acme renewal"');
+		expect(prompt).toContain('tags="acme"');
+		expect(prompt).toContain('id="block-2"');
+		expect(prompt).toContain("Agreed 12% discount");
+		expect(prompt).toContain("recallChatHistory");
 	});
 
 	it("renders knowledge excerpts with citations, chunk IDs, and sources", () => {
